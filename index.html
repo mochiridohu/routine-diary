@@ -2738,23 +2738,26 @@ ${recentMsgs}
 
     const diaryData = { text, emotion, emotionLabel, mood: moodEmoji, moodLabel, savedAt: new Date().toISOString() };
 
-    // Supabase 저장
+    // UI 즉시 반응
+    const btn = document.getElementById('diary-save-btn');
+    btn.innerHTML = '✅ 저장됐어요!';
+    btn.style.background = '#4CAF50';
+
+    // localStorage 즉시 저장
+    localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(diaryData));
+
+    // 백그라운드에서 Supabase 저장
     if (_currentUser) {
       const d = new Date(); d.setDate(d.getDate() + diaryOffset);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      await sb.from('diaries').upsert({
+      sb.from('diaries').upsert({
         user_id: _currentUser.id,
         date: dateStr,
         emotion: emotion + ' ' + emotionLabel,
         content: text,
       }, { onConflict: 'user_id,date' });
     }
-    // localStorage 백업
-    localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(diaryData));
 
-    const btn = document.getElementById('diary-save-btn');
-    btn.innerHTML = '✅ 저장됐어요!';
-    btn.style.background = '#4CAF50';
     setTimeout(() => showDiaryView(diaryData), 700);
   }
 
@@ -3004,22 +3007,28 @@ ${recentMsgs}
     updateProgress();
   }
 
-  async function toggleTodo(id) {
+  function toggleTodo(id) {
     const todo = todos.find(t => t.id === id);
     if (!todo) return;
     const newDone = !todo.done;
+    // 낙관적 업데이트 - 즉시 반영
     todos = todos.map(t => t.id === id ? {...t, done: newDone} : t);
     renderTodos();
-    if (_currentUser) {
-      await sb.from('todos').update({ done: newDone }).eq('id', id).eq('user_id', _currentUser.id);
+    updateProgress();
+    // 백그라운드 DB 저장
+    if (_currentUser && !String(id).startsWith('tmp_')) {
+      sb.from('todos').update({ done: newDone }).eq('id', id).eq('user_id', _currentUser.id);
     }
   }
 
-  async function deleteTodo(id) {
+  function deleteTodo(id) {
+    // 낙관적 업데이트 - 즉시 반영
     todos = todos.filter(t => t.id !== id);
     renderTodos();
-    if (_currentUser) {
-      await sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
+    updateProgress();
+    // 백그라운드 DB 삭제
+    if (_currentUser && !String(id).startsWith('tmp_')) {
+      sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
     }
   }
 
@@ -3029,15 +3038,22 @@ ${recentMsgs}
     if (!text) return;
     const newTodo = { text, tag: selectedTag, done: false, date: new Date().toISOString().slice(0,10) };
     input.value = '';
-    if (_currentUser) {
-      const { data, error } = await sb.from('todos').insert({ ...newTodo, user_id: _currentUser.id }).select().single();
-      if (!error && data) {
-        todos.push({ id: data.id, ...newTodo });
-      }
-    } else {
-      todos.push({ id: nextId++, ...newTodo });
-    }
+
+    // 낙관적 업데이트 - UI 즉시 반영
+    const tempId = 'tmp_' + Date.now();
+    todos.push({ id: tempId, ...newTodo });
     renderTodos();
+
+    // 백그라운드에서 DB 저장
+    if (_currentUser) {
+      sb.from('todos').insert({ ...newTodo, user_id: _currentUser.id }).select().single()
+        .then(({ data, error }) => {
+          if (!error && data) {
+            // 임시 ID를 실제 DB ID로 교체
+            todos = todos.map(t => t.id === tempId ? { ...t, id: data.id } : t);
+          }
+        });
+    }
   }
 
   function filterTodo(tag, btn) {
@@ -3582,7 +3598,7 @@ ${diaryText}`
     const today = new Date();
     const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
 
-    // AI 자유 태그 생성
+    // AI 태그 생성 (이건 어쩔 수 없이 await - AI 응답 필요)
     let tag = '💡 아이디어';
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -3601,27 +3617,30 @@ ${diaryText}`
     } catch(e) {}
 
     const { bg, tc } = pickTagColor(tag);
+    const tempId = 'tmp_' + Date.now();
 
-    if (_currentUser) {
-      const { data: saved, error } = await sb.from('ideas').insert({
-        user_id: _currentUser.id,
-        title, content, tag,
-        tag_color: bg, tag_text_color: tc
-      }).select().single();
-      if (!error && saved) {
-        ideas.unshift({ id: saved.id, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
-      }
-    } else {
-      ideas.push({ id: nextIdeaId++, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
-    }
-
+    // 낙관적 업데이트 - UI 즉시 반영
+    ideas.unshift({ id: tempId, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
     document.getElementById('idea-title').value = '';
     document.getElementById('idea-content').value = '';
-
     saveIcon.textContent = '✅';
     saveLabel.textContent = `${tag} 태그로 저장됐어요!`;
     saveBtn.style.background = '#4CAF50';
     saveBtn.style.opacity = '1';
+    renderIdeas();
+
+    // 백그라운드 DB 저장
+    if (_currentUser) {
+      sb.from('ideas').insert({
+        user_id: _currentUser.id, title, content, tag,
+        tag_color: bg, tag_text_color: tc
+      }).select().single().then(({ data: saved, error }) => {
+        if (!error && saved) {
+          ideas = ideas.map(i => i.id === tempId ? { ...i, id: saved.id } : i);
+        }
+      });
+    }
+
     setTimeout(() => {
       saveIcon.textContent = '💡';
       saveLabel.textContent = '아이디어 저장하기';
