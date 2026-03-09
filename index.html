@@ -1608,6 +1608,14 @@
       <div style="font-size:12px; color:var(--text-light);">Claude가 만들어준 나만의 앱</div>
     </div>
   </div>
+
+  <div class="section">
+    <div class="section-title">🗑 데이터 관리</div>
+    <div class="card" style="display:flex; flex-direction:column; gap:10px;">
+      <button id="logout-btn" onclick="logout()" style="width:100%; padding:13px; border-radius:12px; border:1.5px solid var(--border); background:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; color:var(--text-light); cursor:pointer;">로그아웃</button>
+      <button onclick="clearLocalCache()" style="width:100%; padding:13px; border-radius:12px; border:1.5px solid #ffb3b3; background:#fff5f5; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; color:#e05; cursor:pointer;">🗑 로컬 캐시 초기화</button>
+    </div>
+  </div>
 </div>
 
 <!-- 🎉 축하 오버레이 -->
@@ -4040,6 +4048,19 @@ ${todoList}
     document.getElementById('login-screen').style.display = 'block';
   }
   window.logout = logout;
+
+  function clearLocalCache() {
+    if (!confirm('로컬 캐시를 초기화할까요?\n(Supabase에 저장된 데이터는 유지돼요)')) return;
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('mochi_')) keysToRemove.push(key);
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    alert(`캐시 ${keysToRemove.length}개 삭제됐어요. 새로고침할게요!`);
+    location.reload();
+  }
+  window.clearLocalCache = clearLocalCache;
 
   // ── 앱 시작: 세션 확인 ──
   (async function initAuth() {
