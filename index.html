@@ -2677,22 +2677,20 @@ ${recentMsgs}
     updateProgress();
   }
 
-  function toggleTodo(id) {
+  async function toggleTodo(id) {
     todos = todos.map(t => t.id === id ? {...t, done: !t.done} : t);
     renderTodos();
-    // Supabase 백그라운드 동기화
     if (_currentUser && !String(id).startsWith('tmp_')) {
       const todo = todos.find(t => t.id === id);
-      if (todo) sb.from('todos').update({ done: todo.done }).eq('id', id).eq('user_id', _currentUser.id);
+      if (todo) await sb.from('todos').update({ done: todo.done }).eq('id', id).eq('user_id', _currentUser.id);
     }
   }
 
-  function deleteTodo(id) {
+  async function deleteTodo(id) {
     todos = todos.filter(t => t.id !== id);
     renderTodos();
-    // Supabase 백그라운드 동기화
     if (_currentUser && !String(id).startsWith('tmp_')) {
-      sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
+      await sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
     }
   }
 
@@ -3870,17 +3868,13 @@ ${todoList}
     renderCalendar();
   }
 
-  function openDaylog(y, m, d) {
+  async function openDaylog(y, m, d) {
     const n = new Date();
     const isToday = y === n.getFullYear() && m === n.getMonth() && d === n.getDate();
 
     document.getElementById('cal-overlay').style.display = 'none';
-
     if (isToday) { returnToToday(); return; }
 
-    viewingDate = { y, m, d };
-
-    // 날짜 뱃지 업데이트
     const dayNames = ['일','월','화','수','목','금','토'];
     const dow = new Date(y, m, d).getDay();
     const isFuture = new Date(y, m, d) > new Date(n.getFullYear(), n.getMonth(), n.getDate());
@@ -3888,24 +3882,30 @@ ${todoList}
     document.getElementById('date-badge').textContent = `${label} ${y}년 ${m+1}월 ${d}일 (${dayNames[dow]})`;
     document.getElementById('return-today-btn').style.display = 'inline-block';
 
-    // 해당 날짜 데이터 불러와서 화면 교체
-    const raw = localStorage.getItem(viewingKey(y, m, d));
-    let data = {};
-    try { if (raw) data = JSON.parse(raw); } catch(e) {}
+    // 1. 해당 날짜 할일 먼저 로드
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let newTodos = [];
+    if (_currentUser && sb) {
+      const { data: dbTodos } = await sb.from('todos').select('*').eq('user_id', _currentUser.id).eq('date', dateStr);
+      newTodos = (dbTodos || []).map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
+    } else {
+      const raw = localStorage.getItem(viewingKey(y, m, d));
+      try { if (raw) newTodos = JSON.parse(raw).todos || []; } catch(e) {}
+    }
 
-    // 할 일 교체
-    todos = data.todos || [];
-    nextId = todos.length ? Math.max(...todos.map(t => t.id || 0)) + 1 : 1;
+    // 2. 데이터 로드 완료 후 viewingDate 세팅 + 화면 업데이트
+    viewingDate = { y, m, d };
+    todos = newTodos;
+    nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0)) + 1 : 1;
     renderTodos();
     renderTagTabs();
+    renderWeeklyProgress();
 
-    // 마음일기 교체 - 자정 기준으로 offset 계산
+    // 일기 offset 계산
     const todayMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
     const targetMidnight = new Date(y, m, d);
     diaryOffset = Math.round((targetMidnight - todayMidnight) / 86400000);
     renderDiary();
-
-    // 할 일 렌더 완료
   }
 
   // saveToday가 viewingDate 기준으로 저장하도록 오버라이드
