@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>윤주의 하루 비서 ✨</title>
+<title>모찌의 하루 비서 ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1191,6 +1191,92 @@
 </head>
 <body>
 
+<!-- ── 로그인 화면 ── -->
+<div id="login-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10000; overflow-y:auto;">
+  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
+
+    <!-- 로고 -->
+    <div style="text-align:center; margin-bottom:40px;">
+      <div style="font-size:56px; margin-bottom:12px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
+      <div style="font-size:22px; font-weight:900; color:var(--purple); letter-spacing:-0.5px;">모찌의 하루 비서</div>
+      <div style="font-size:13px; color:var(--text-light); margin-top:6px;">계정을 선택하거나 새로 만들어요</div>
+    </div>
+
+    <!-- 계정 목록 -->
+    <div id="account-list" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
+
+    <!-- 새 계정 만들기 버튼 -->
+    <button onclick="showCreateAccount()" style="width:100%; padding:14px; border-radius:16px; border:2px dashed var(--purple); background:transparent; color:var(--purple); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; transition:all 0.2s;">
+      + 새 계정 만들기
+    </button>
+
+  </div>
+</div>
+
+<!-- ── 계정 생성 화면 ── -->
+<div id="create-account-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
+  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
+
+    <div style="text-align:center; margin-bottom:36px;">
+      <div style="font-size:48px; margin-bottom:12px;">✨</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text); letter-spacing:-0.4px;">새 계정 만들기</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">닉네임</label>
+        <input id="ca-name" type="text" class="todo-input" style="width:100%; font-size:16px; box-sizing:border-box;" placeholder="예: 윤주, 엄마, 오빠">
+      </div>
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">비밀번호 <span style="font-weight:400;">(영문+숫자+특수문자 포함, 6자 이상)</span></label>
+        <div style="position:relative;">
+          <input id="ca-pw" type="password" class="todo-input" style="width:100%; box-sizing:border-box; padding-right:44px;" placeholder="예: Mochi@12">
+          <button onclick="toggleCaPw()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-light);" id="ca-pw-eye">👁</button>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">비밀번호 확인</label>
+        <input id="ca-pw2" type="password" class="todo-input" style="width:100%; box-sizing:border-box;" placeholder="동일하게 입력해주세요">
+      </div>
+      <div id="ca-error" style="font-size:12px; color:#e05; display:none; text-align:center;"></div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:28px;">
+      <button onclick="hideCreateAccount()" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">취소</button>
+      <button onclick="createAccount()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">계정 만들기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PIN 입력 화면 ── -->
+<div id="pin-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
+  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+
+    <div id="pin-avatar" style="font-size:52px; margin-bottom:10px;"></div>
+    <div id="pin-name" style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:6px;"></div>
+    <div style="font-size:13px; color:var(--text-light); margin-bottom:32px;">비밀번호를 입력해주세요</div>
+
+    <div style="width:100%; max-width:320px; position:relative;">
+      <input id="pin-input" type="password" class="todo-input"
+        style="width:100%; font-size:18px; letter-spacing:3px; text-align:center; box-sizing:border-box; padding-right:44px;"
+        placeholder="비밀번호 입력"
+        onkeydown="if(event.key==='Enter') checkPin()">
+      <button onclick="togglePinVisibility()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-light);" id="pin-eye">👁</button>
+    </div>
+
+    <div id="pin-error" style="font-size:12px; color:#e05; margin-top:12px; display:none;">비밀번호가 틀렸어요 😢</div>
+
+    <button onclick="checkPin()" style="margin-top:20px; width:100%; max-width:320px; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">
+      로그인
+    </button>
+
+    <button onclick="showLoginScreen()" style="margin-top:14px; background:none; border:none; color:var(--text-light); font-size:13px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">← 다른 계정</button>
+  </div>
+</div>
+
+<!-- ── 앱 본체 (로그인 후 표시) ── -->
+<div id="app-wrapper" style="display:none;">
+
 <div class="bg-blob blob1"></div>
 <div class="bg-blob blob2"></div>
 <div class="bg-blob blob3"></div>
@@ -1614,15 +1700,15 @@
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">하는 일 / 직업</label>
-        <input type="text" id="profile-job" class="todo-input" style="width:100%;" placeholder="예: 쇼피 셀러, 급식 납품 사업, 도시락 유튜브 운영" oninput="saveProfile()">
+        <input type="text" id="profile-job" class="todo-input" style="width:100%;" placeholder="예: 프리랜서 디자이너, 회사원, 학생" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">요즘 목표</label>
-        <input type="text" id="profile-goal" class="todo-input" style="width:100%;" placeholder="예: 쇼피 매출 늘리기, 건강 루틴 만들기" oninput="saveProfile()">
+        <input type="text" id="profile-goal" class="todo-input" style="width:100%;" placeholder="예: 건강한 루틴 만들기, 수입 늘리기" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">관심사 / 좋아하는 것</label>
-        <input type="text" id="profile-interest" class="todo-input" style="width:100%;" placeholder="예: 맛집, 운동, 쇼핑, 여행" oninput="saveProfile()">
+        <input type="text" id="profile-interest" class="todo-input" style="width:100%;" placeholder="예: 맛집, 운동, 독서, 여행" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:8px;">💬 모찌한테 더 하고 싶은 말</label>
@@ -1649,6 +1735,8 @@
         <div id="learned-profile-list" style="font-size:12px; color:var(--text); line-height:1.8; background:var(--purple-light); border-radius:10px; padding:10px 12px;"></div>
         <button onclick="clearLearnedProfile()" style="margin-top:8px; font-size:11px; color:var(--text-light); background:none; border:1px solid var(--border); border-radius:8px; padding:4px 10px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">초기화</button>
       </div>
+      <!-- 프로필 전체 초기화 -->
+      <button onclick="resetAllProfile()" style="margin-top:14px; width:100%; padding:10px; border-radius:10px; border:1px solid #fdd; background:white; color:#c03; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">🗑 프로필 전체 초기화</button>
     </div>
   </div>
 
@@ -1692,15 +1780,32 @@
     </div>
   </div>
 
+  <!-- 로그아웃 -->
   <div class="section">
-    <div class="card" style="text-align:center; background:var(--white); border:1px solid var(--border);">
-      <div style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px;">윤주의 하루 비서 🌸</div>
-      <div style="font-size:12px; color:var(--text-light);">Claude가 만들어준 나만의 앱</div>
+    <button id="logout-btn" onclick="logout()" style="width:100%; padding:14px; border-radius:14px; border:1.5px solid #fdd; background:white; color:#c03; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">로그아웃</button>
+  </div>
+
+</div>
+
+<!-- 🎉 축하 오버레이 -->
+<!-- ── 튜토리얼 오버레이 ── -->
+<div id="tutorial-overlay" style="display:none; position:fixed; inset:0; background:rgba(20,15,40,0.75); z-index:9999; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);">
+  <div id="tutorial-box" style="position:absolute; bottom:0; left:0; right:0; background:white; border-radius:28px 28px 0 0; padding:32px 24px 40px; max-height:90vh; overflow-y:auto; box-shadow:0 -8px 40px rgba(0,0,0,0.18);">
+
+    <!-- 진행 도트 -->
+    <div style="display:flex; gap:6px; justify-content:center; margin-bottom:24px;" id="tut-dots"></div>
+
+    <!-- 슬라이드 컨테이너 -->
+    <div id="tut-slides"></div>
+
+    <!-- 버튼 -->
+    <div style="display:flex; gap:10px; margin-top:28px;">
+      <button id="tut-skip-btn" onclick="tutSkip()" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">건너뛰기</button>
+      <button id="tut-next-btn" onclick="tutNext()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.35);">다음 →</button>
     </div>
   </div>
 </div>
 
-<!-- 🎉 축하 오버레이 -->
 <div class="confetti-overlay" id="confetti-overlay"></div>
 <div class="celebrate-banner" id="celebrate-banner">
   <span class="cb-emoji" id="cb-emoji">🎉</span>
@@ -1972,6 +2077,22 @@
   }
 
   window.saveProfile = saveProfile;
+  function resetAllProfile() {
+    if (!confirm('프로필을 모두 초기화할까요?')) return;
+    ['profile-job','profile-goal','profile-interest','profile-memo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    // 칩 선택 해제
+    document.querySelectorAll('#gender-btns .profile-chip, #age-btns .profile-chip').forEach(b => b.classList.remove('selected'));
+    const locEl = document.getElementById('profile-location');
+    if (locEl) locEl.value = '';
+    // localStorage 삭제
+    ['mochi_profile','mochi_learned','profile_gender','profile_age','profile_location'].forEach(k => localStorage.removeItem(k));
+    renderLearnedProfile();
+  }
+  window.resetAllProfile = resetAllProfile;
+
   window.clearLearnedProfile = clearLearnedProfile;
 
   // ── ChatGPT 프롬프트 가이드 ──
@@ -2600,22 +2721,17 @@ ${recentMsgs}
 
 
   // Todos
-  let todos = [
-    { id: 1, text: '쇼피 상품 등록 1개', tag: 'shopee', done: false },
-    { id: 2, text: '급식 거래처 발주 확인', tag: 'gupsal', done: false },
-    { id: 3, text: '도시락 영상 아이디어 메모', tag: 'dosirak', done: false },
-    { id: 4, text: '산책 30분', tag: 'personal', done: false },
-  ];
-  let nextId = 5;
+  let todos = [];
+  let nextId = 1;
   let currentFilter = 'all';
   let selectedTag = 'personal';
 
   // ── 태그 관리 ──
   let customTags = JSON.parse(localStorage.getItem('mochi_tags') || 'null') || [
-    { id: 'personal',  emoji: '',   label: '개인',    color: '#F0EAFF', textColor: '#6040A0' },
-    { id: 'shopee',    emoji: '🛍', label: '쇼피',    color: '#FFF0E0', textColor: '#C05000' },
-    { id: 'gupsal',    emoji: '🥘', label: '급식',    color: '#EAF5EA', textColor: '#2A6E2A' },
-    { id: 'dosirak',   emoji: '🍱', label: '도시락',  color: '#FFEAEE', textColor: '#A02030' },
+    { id: 'personal',  emoji: '🏠', label: '일상',    color: '#F0EAFF', textColor: '#6040A0' },
+    { id: 'work',      emoji: '💼', label: '업무',    color: '#E8F0FF', textColor: '#2040A0' },
+    { id: 'health',    emoji: '🏃', label: '건강',    color: '#E8F5E9', textColor: '#2A6E2A' },
+    { id: 'family',    emoji: '👨‍👩‍👧', label: '가족',   color: '#FFF3E0', textColor: '#C05000' },
     { id: 'mochi_rec', emoji: '💗', label: '모찌추천', color: '#FFE8F8', textColor: '#901060' },
   ];
   // 기존 localStorage에 모찌추천 태그 없으면 자동 추가
@@ -3269,11 +3385,8 @@ ${diaryText}`
   window.cancelOverlayEdit = cancelOverlayEdit;
 
   // Ideas
-  let ideas = [
-    { id: 1, title: '쇼피 첫 상품 아이디어', content: '동남아에서 인기 있는 한국 뷰티 제품 소싱해보기. K-beauty 트렌드 활용!', tag: '🛍 이커머스', tagColor: '#FFF0E0', tagTextColor: '#C05000', date: '2026.03.09' },
-    { id: 2, title: '도시락 채널 콘텐츠 기획', content: '남편 도시락 리뷰에 스토리 추가하기. 준비 과정 비하인드 숏폼 만들면 좋을 것 같아!', tag: '🎬 콘텐츠', tagColor: '#FCE4EC', tagTextColor: '#C62828', date: '2026.03.08' },
-  ];
-  let nextIdeaId = 3;
+  let ideas = [];
+  let nextIdeaId = 1;
 
   // 태그 배경색 팔레트 (AI가 고름)
   const TAG_PALETTE = [
@@ -3596,12 +3709,132 @@ ${profileStr ? '배경: ' + profileStr : ''}
   // 오늘 기록 불러오기
   setTimeout(loadToday, 800);
 
+  // ── 튜토리얼 ──
+  const TUT_SLIDES = [
+    {
+      emoji: '🐰',
+      title: '안녕하세요! 저는 모찌예요',
+      desc: '매일의 할 일, 마음일기, 아이디어까지\n모찌가 옆에서 함께 도와줄게요 💜\n\n총 5개 탭으로 이루어진 앱이에요.\n지금부터 하나씩 소개해드릴게요!',
+    },
+    {
+      emoji: '✏️',
+      title: '먼저 닉네임을 알려주세요!',
+      desc: '모찌가 어떻게 불러드릴까요?',
+      input: { id: 'tut-name-input', placeholder: '예: 윤주, 쥬, 언니 ...', storageKey: 'mochi_user_name' },
+    },
+    {
+      emoji: '📋',
+      title: '오늘 탭 — 하루를 한눈에',
+      desc: '• 수면시간 · 컨디션을 기록해요\n• 오늘 할 일을 태그별로 관리해요\n• 모찌와 채팅으로 뭐든 물어봐요\n• 마음일기를 매일 한 줄씩 써요\n\n💬 "오늘 뭐부터 해야 해?" 라고 물어보면\n모찌가 우선순위를 같이 고민해줘요!',
+    },
+    {
+      emoji: '📔',
+      title: '마음일기 탭 — 감정을 기록해요',
+      desc: '• 날짜별 감정 이모지 + 한 줄 일기\n• 한 달치 기록을 모아서 볼 수 있어요\n• 모찌가 한 달을 돌아보는 편지를 써줘요 🌸\n\n쌓일수록 나만의 감정 히스토리가 돼요.\n오늘 하루 어땠는지 꼭 기록해보세요!',
+    },
+    {
+      emoji: '💡',
+      title: '아이디어 노트 — 모찌 피드백까지',
+      desc: '• 떠오르는 아이디어를 바로 메모해요\n• 저장하면 AI가 자동으로 태그를 붙여줘요\n\n🐰 모찌 피드백 기능:\n저장된 아이디어마다 "모찌 피드백 받기"\n버튼을 누르면 좋은 점, 신경 쓸 점,\n응원 한 마디를 솔직하게 말해줘요!',
+    },
+    {
+      emoji: '⚙️',
+      title: '설정 탭 — 꼭 채워주세요!',
+      desc: '📌 모찌에게 나 소개하기를 작성하면\n대화할 때 나에게 딱 맞는 맞춤 답변을\n받을 수 있어요.\n\n직업, 관심사, 목표를 알수록\n모찌가 훨씬 더 잘 도와줄 수 있어요 🐰\n\n설정 탭에서 바로 입력해보세요!',
+      highlight: true,
+    },
+    {
+      emoji: '🎉',
+      title: '준비 완료!',
+      desc: '이제 모찌와 함께 하루를 시작해봐요.\n\n먼저 설정 탭에서 나를 소개하고\n오늘 탭에서 할 일을 추가해보세요 💜',
+      last: true,
+    },
+  ];
+
+  let tutStep = 0;
+
+  function renderTutSlides() {
+    const slidesEl = document.getElementById('tut-slides');
+    const dotsEl = document.getElementById('tut-dots');
+    const s = TUT_SLIDES[tutStep];
+
+    // 도트
+    dotsEl.innerHTML = TUT_SLIDES.map((_, i) =>
+      `<div style="width:${i===tutStep?'20':'8'}px;height:8px;border-radius:4px;background:${i===tutStep?'var(--purple)':'#ddd'};transition:all 0.3s;"></div>`
+    ).join('');
+
+    // 하이라이트 박스 (설정 슬라이드)
+    const highlightBox = s.highlight ? `
+      <div style="background:linear-gradient(135deg,#f0ebff,#ffe8f5);border-radius:14px;padding:14px 16px;margin-top:16px;border:1.5px solid #d8c8ff;text-align:left;">
+        <div style="font-size:12px;font-weight:800;color:var(--purple);margin-bottom:6px;">⚙️ 설정 → 모찌에게 나 소개하기</div>
+        <div style="font-size:12px;color:#7060a0;line-height:1.7;">직업 · 목표 · 관심사를 입력할수록<br>모찌의 답변이 나에게 딱 맞아져요!</div>
+      </div>` : '';
+
+    slidesEl.innerHTML = `
+      <div style="text-align:center; padding:0 4px;">
+        <div style="font-size:48px; margin-bottom:14px; animation:floatY 2s ease-in-out infinite;">${s.emoji}</div>
+        <div style="font-size:19px; font-weight:800; color:var(--text); margin-bottom:12px; letter-spacing:-0.4px;">${s.title}</div>
+        <div style="font-size:13.5px; color:#555; line-height:1.9; white-space:pre-line; text-align:left; background:#f8f7fc; border-radius:14px; padding:16px 18px;">${s.desc}</div>
+        ${highlightBox}
+        ${s.input ? `
+          <input id="${s.input.id}" type="text" class="todo-input"
+            placeholder="${s.input.placeholder}"
+            style="width:100%; margin-top:20px; font-size:16px; text-align:center; font-weight:700; box-sizing:border-box;"
+            value="${localStorage.getItem(s.input.storageKey)||''}"
+            oninput="localStorage.setItem('${s.input.storageKey}', this.value); const ni=document.getElementById('setting-name'); if(ni) ni.value=this.value; if(typeof updateUserName==='function') updateUserName(this.value);">
+        ` : ''}
+      </div>
+    `;
+
+    const nextBtn = document.getElementById('tut-next-btn');
+    const skipBtn = document.getElementById('tut-skip-btn');
+    if (s.last) {
+      nextBtn.textContent = '시작하기 🐰';
+      nextBtn.style.background = 'linear-gradient(135deg, var(--purple), #c060d0)';
+      skipBtn.style.display = 'none';
+    } else {
+      nextBtn.textContent = '다음 →';
+      nextBtn.style.background = 'var(--purple)';
+      skipBtn.style.display = '';
+    }
+
+    if (s.input) setTimeout(() => document.getElementById(s.input.id)?.focus(), 200);
+  }
+
+  function tutNext() {
+    if (tutStep < TUT_SLIDES.length - 1) {
+      tutStep++;
+      renderTutSlides();
+    } else {
+      tutFinish();
+    }
+  }
+
+  function tutSkip() { tutFinish(); }
+
+  function tutFinish() {
+    localStorage.setItem('mochi_tutorial_done', '1');
+    document.getElementById('tutorial-overlay').style.display = 'none';
+    const saved = localStorage.getItem('mochi_user_name') || '';
+    const ni = document.getElementById('setting-name');
+    if (ni) ni.value = saved;
+    if (saved && typeof updateUserName === 'function') updateUserName(saved);
+    const settingsBtn = document.querySelector('.nav-btn[onclick*="settings"]');
+    if (settingsBtn && typeof showPage === 'function') showPage('settings', settingsBtn);
+  }
+
+  // 첫 실행 튜토리얼은 loginUser()에서 새 계정일 때 자동 실행
+
+  window.tutNext = tutNext;
+  window.tutSkip = tutSkip;
+
   // ===== 토끼 AI 채팅 =====
 
   function getAppState() {
     const done = todos.filter(t => t.done).length;
     const total = todos.length;
-    const pending = todos.filter(t => !t.done).map(t => `${t.text}(${catLabels[t.tag]||t.tag})`).join(', ');
+    const tagLabels = getTagLabels();
+    const pending = todos.filter(t => !t.done).map(t => `${t.text}(${tagLabels[t.tag]||t.tag})`).join(', ');
     const sleepTime = document.getElementById('sleep-time')?.value || '미입력';
     const wakeTime = document.getElementById('wake-time')?.value || '미입력';
     const moodEl = document.querySelector('.emoji-btn.selected');
@@ -4134,6 +4367,283 @@ ${todoList}
     localStorage.setItem(viewingKey(y,m,d), JSON.stringify(existing));
     renderCalendar();
   };
+
+  // ══════════════════════════════════════
+  // 계정 관리 시스템
+  // ══════════════════════════════════════
+
+  let _currentUserId = null;
+
+  // localStorage 키에 유저 prefix 자동 적용
+  const _origGet = localStorage.getItem.bind(localStorage);
+  const _origSet = localStorage.setItem.bind(localStorage);
+  const _origRem = localStorage.removeItem.bind(localStorage);
+
+  // 계정 메타데이터는 prefix 없이 저장 (공용)
+  const ACCOUNT_META_KEY = '__mochi_accounts__';
+  const SESSION_KEY = '__mochi_session__';
+
+  function getAccounts() {
+    try { return JSON.parse(_origGet(ACCOUNT_META_KEY) || '[]'); } catch(e) { return []; }
+  }
+  function saveAccounts(arr) { _origSet(ACCOUNT_META_KEY, JSON.stringify(arr)); }
+
+  function userPrefix(uid) { return `u_${uid}_`; }
+
+  // 유저 데이터 접근 (현재 로그인된 유저 기준)
+  function uGet(key) { return _currentUserId ? _origGet(userPrefix(_currentUserId) + key) : _origGet(key); }
+  function uSet(key, val) { return _currentUserId ? _origSet(userPrefix(_currentUserId) + key, val) : _origSet(key, val); }
+  function uRemove(key) { return _currentUserId ? _origRem(userPrefix(_currentUserId) + key) : _origRem(key); }
+
+  // localStorage 전역 오버라이드 (로그인 후 앱 코드가 자동으로 유저별 저장)
+  function activateUserStorage(uid) {
+    _currentUserId = uid;
+    localStorage.getItem = (key) => {
+      // 공용 키는 그대로
+      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origGet(key);
+      return _origGet(userPrefix(uid) + key);
+    };
+    localStorage.setItem = (key, val) => {
+      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origSet(key, val);
+      return _origSet(userPrefix(uid) + key, val);
+    };
+    localStorage.removeItem = (key) => {
+      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origRem(key);
+      return _origRem(userPrefix(uid) + key);
+    };
+  }
+
+  // 계정 생성
+  function createAccount() {
+    const name = document.getElementById('ca-name').value.trim();
+    const pw = document.getElementById('ca-pw').value;
+    const pw2 = document.getElementById('ca-pw2').value;
+    const errEl = document.getElementById('ca-error');
+    errEl.style.display = 'none';
+
+    if (!name) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
+    if (pw.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 해요'; errEl.style.display = 'block'; return; }
+    if (!/[a-zA-Z]/.test(pw)) { errEl.textContent = '영문자를 포함해주세요'; errEl.style.display = 'block'; return; }
+    if (!/[0-9]/.test(pw)) { errEl.textContent = '숫자를 포함해주세요'; errEl.style.display = 'block'; return; }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) { errEl.textContent = '특수문자를 포함해주세요 (예: !@#$)'; errEl.style.display = 'block'; return; }
+    if (pw !== pw2) { errEl.textContent = '비밀번호가 일치하지 않아요'; errEl.style.display = 'block'; return; }
+
+    const accounts = getAccounts();
+    if (accounts.find(a => a.name === name)) { errEl.textContent = '이미 있는 닉네임이에요'; errEl.style.display = 'block'; return; }
+
+    const uid = Date.now().toString(36);
+    const avatars = ['🐰','🐱','🐻','🦊','🐼','🐸','🐨','🦁'];
+    const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+    accounts.push({ uid, name, pw, avatar, createdAt: new Date().toISOString() });
+    saveAccounts(accounts);
+    loginUser(uid, name, avatar, true);
+  }
+
+  // 비밀번호 표시 토글
+  function toggleCaPw() {
+    const inp = document.getElementById('ca-pw');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+  function togglePinVisibility() {
+    const inp = document.getElementById('pin-input');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+  window.toggleCaPw = toggleCaPw;
+  window.togglePinVisibility = togglePinVisibility;
+
+  // 로그인
+  function loginUser(uid, name, avatar, isNew = false) {
+    activateUserStorage(uid);
+    _origSet(SESSION_KEY, uid);
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('create-account-screen').style.display = 'none';
+    document.getElementById('app-wrapper').style.display = 'block';
+
+    // 로그아웃 버튼 업데이트
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.innerHTML = `${avatar} ${name} · <span style="color:#e05">로그아웃</span>`;
+
+    // 닉네임 동기화
+    if (!localStorage.getItem('mochi_user_name')) {
+      localStorage.setItem('mochi_user_name', name);
+    }
+    if (typeof updateUserName === 'function') {
+      updateUserName(localStorage.getItem('mochi_user_name') || name);
+    }
+
+    // 새 계정이면 prefix 없는 레거시 데이터 정리 + 튜토리얼
+    if (isNew) {
+      // 공용 키 제외하고 prefix 없는 기존 데이터 삭제
+      const legacyKeys = Object.keys(localStorage).filter(k =>
+        !k.startsWith('__mochi_') && !k.startsWith('u_')
+      );
+      legacyKeys.forEach(k => _origRem(k));
+      todos = []; nextId = 1;
+      ideas = []; nextIdeaId = 1;
+      localStorage.setItem('mochi_user_name', name);
+      if (typeof renderTutSlides === 'function') {
+        tutStep = 0;
+        document.getElementById('tutorial-overlay').style.display = 'block';
+        setTimeout(renderTutSlides, 100);
+      }
+    }
+
+    // 앱 데이터 초기화
+    if (typeof loadBasicProfile === 'function') setTimeout(loadBasicProfile, 100);
+    if (typeof loadProfile === 'function') setTimeout(loadProfile, 120);
+    if (typeof renderTags === 'function') setTimeout(renderTags, 150);
+    if (typeof loadToday === 'function') setTimeout(loadToday, 200);
+    const settingsNameEl = document.getElementById('setting-name');
+    if (settingsNameEl) settingsNameEl.value = localStorage.getItem('mochi_user_name') || name;
+  }
+
+  // 로그아웃
+  function logout() {
+    if (!confirm('로그아웃 할까요?')) return;
+    _origRem(SESSION_KEY);
+    _currentUserId = null;
+    // storage 원복
+    localStorage.getItem = _origGet;
+    localStorage.setItem = _origSet;
+    localStorage.removeItem = _origRem;
+    document.getElementById('app-wrapper').style.display = 'none';
+    showLoginScreen();
+  }
+  function resetAllData() {
+    if (!confirm('정말로 모든 데이터를 삭제할까요?\n할 일, 일기, 아이디어, 프로필이 전부 지워져요.')) return;
+    if (!_currentUserId) return;
+    const prefix = userPrefix(_currentUserId);
+    const keysToDelete = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = _origGet === localStorage.getItem ? localStorage.key(i) : (() => {
+        // 원본 접근
+        for (let j = 0; j < localStorage.length; j++) {
+          const raw = Object.keys(localStorage)[j];
+          return raw;
+        }
+      })();
+    }
+    // 원본 localStorage에서 현재 유저 prefix 키 전부 삭제
+    const allKeys = Object.keys(localStorage);
+    allKeys.forEach(k => { if (k.startsWith(prefix)) _origRem(k); });
+    // 메모리 상 todos/ideas 초기화
+    todos = []; nextId = 1;
+    ideas = []; nextIdeaId = 1;
+    // UI 갱신
+    if (typeof renderTodoList === 'function') renderTodoList();
+    if (typeof renderIdeas === 'function') renderIdeas();
+    if (typeof renderWeeklyProgress === 'function') renderWeeklyProgress();
+    if (typeof loadProfile === 'function') loadProfile();
+    if (typeof loadBasicProfile === 'function') loadBasicProfile();
+    ['profile-job','profile-goal','profile-interest','profile-memo'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.querySelectorAll('#gender-btns .profile-chip, #age-btns .profile-chip').forEach(b => b.classList.remove('selected'));
+    const locEl = document.getElementById('profile-location'); if (locEl) locEl.value = '';
+    if (typeof renderLearnedProfile === 'function') renderLearnedProfile();
+    alert('✅ 초기화 완료! 깨끗하게 시작해요 🐰');
+  }
+  window.resetAllData = resetAllData;
+
+  window.logout = logout;
+
+  // 계정 선택 화면
+  function showLoginScreen() {
+    const accounts = getAccounts();
+    const listEl = document.getElementById('account-list');
+    listEl.innerHTML = '';
+
+    if (accounts.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">아직 계정이 없어요<br>아래 버튼으로 만들어보세요 🐰</div>`;
+    } else {
+      accounts.forEach(acc => {
+        const btn = document.createElement('div');
+        btn.style.cssText = 'display:flex;align-items:center;gap:14px;padding:16px 18px;background:white;border-radius:16px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.05);';
+        btn.innerHTML = `
+          <div style="font-size:32px;">${acc.avatar}</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;color:var(--text);">${acc.name}</div>
+            <div style="font-size:11px;color:var(--text-light);margin-top:2px;">가입일 ${acc.createdAt?.slice(0,10)||''}</div>
+          </div>
+          <div style="font-size:20px;color:var(--text-light);">›</div>
+        `;
+        btn.onmouseenter = () => btn.style.borderColor = 'var(--purple)';
+        btn.onmouseleave = () => btn.style.borderColor = 'var(--border)';
+        btn.onclick = () => showPinScreen(acc);
+        listEl.appendChild(btn);
+      });
+    }
+
+    document.getElementById('login-screen').style.display = 'block';
+    document.getElementById('create-account-screen').style.display = 'none';
+    document.getElementById('pin-screen').style.display = 'none';
+  }
+
+  // 비밀번호 확인
+  let _pinTarget = null;
+
+  function showPinScreen(acc) {
+    _pinTarget = acc;
+    document.getElementById('pin-avatar').textContent = acc.avatar;
+    document.getElementById('pin-name').textContent = acc.name;
+    document.getElementById('pin-error').style.display = 'none';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-input').type = 'password';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('pin-screen').style.display = 'block';
+    setTimeout(() => document.getElementById('pin-input').focus(), 200);
+  }
+
+  function checkPin() {
+    const entered = document.getElementById('pin-input').value;
+    if (entered === _pinTarget.pw) {
+      loginUser(_pinTarget.uid, _pinTarget.name, _pinTarget.avatar);
+    } else {
+      const errEl = document.getElementById('pin-error');
+      errEl.style.display = 'block';
+      const inp = document.getElementById('pin-input');
+      inp.style.borderColor = '#e05';
+      setTimeout(() => { inp.style.borderColor = ''; inp.value = ''; inp.focus(); }, 800);
+    }
+  }
+  window.checkPin = checkPin;
+
+  function showCreateAccount() {
+    document.getElementById('ca-name').value = '';
+    document.getElementById('ca-pw').value = '';
+    document.getElementById('ca-pw2').value = '';
+    document.getElementById('ca-error').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('create-account-screen').style.display = 'block';
+    setTimeout(() => document.getElementById('ca-name').focus(), 200);
+  }
+
+  function hideCreateAccount() {
+    document.getElementById('create-account-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'block';
+  }
+
+  window.showCreateAccount = showCreateAccount;
+  window.hideCreateAccount = hideCreateAccount;
+  window.createAccount = createAccount;
+
+  // ── 앱 시작: 세션 복원 or 로그인 화면 ──
+  (function initAuth() {
+    const savedUid = _origGet(SESSION_KEY);
+    if (savedUid) {
+      const accounts = getAccounts();
+      const acc = accounts.find(a => a.uid === savedUid);
+      if (acc) {
+        loginUser(acc.uid, acc.name, acc.avatar);
+        return;
+      }
+    }
+    showLoginScreen();
+  })();
+
 </script>
+</div><!-- /app-wrapper -->
 </body>
 </html>
