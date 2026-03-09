@@ -2814,23 +2814,35 @@ ${recentMsgs}
     renderDiaryMeta(data);
   }
 
-  function diaryStartEdit() {
+  async function diaryStartEdit() {
     document.getElementById('diary-view-mode').style.display = 'none';
     document.getElementById('diary-write-mode').style.display = 'block';
     document.getElementById('diary-edit-btn').style.display = 'none';
-    // 저장된 감정 복원
-    const raw = localStorage.getItem(diaryKey(diaryOffset));
-    if (raw) {
-      try {
-        const data = JSON.parse(raw);
-        document.getElementById('diary-input').value = data.text || '';
-        if (data.emotion) {
-          document.querySelectorAll('.diary-emotion-btn').forEach(b => {
-            b.classList.toggle('selected', b.dataset.emotion === data.emotion);
-          });
-        }
-      } catch(e) {}
+
+    // Supabase에서 현재 일기 불러오기
+    let text = '', emotion = '';
+    if (_currentUser) {
+      const d = new Date(); d.setDate(d.getDate() + diaryOffset);
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const { data: dbDiary } = await sb.from('diaries').select('*').eq('user_id', _currentUser.id).eq('date', dateStr).maybeSingle();
+      if (dbDiary) {
+        text = dbDiary.content || '';
+        emotion = (dbDiary.emotion || '').split(' ')[0] || '';
+      }
+    } else {
+      const raw = localStorage.getItem(diaryKey(diaryOffset));
+      if (raw) {
+        try { const data = JSON.parse(raw); text = data.text || ''; emotion = data.emotion || ''; } catch(e) {}
+      }
     }
+
+    document.getElementById('diary-input').value = text;
+    if (emotion) {
+      document.querySelectorAll('.diary-emotion-btn').forEach(b => {
+        b.classList.toggle('selected', b.dataset.emotion === emotion);
+      });
+    }
+
     const btn = document.getElementById('diary-save-btn');
     btn.innerHTML = '📔 오늘 마음일기 저장하기';
     btn.style.background = 'var(--purple)';
@@ -3522,12 +3534,23 @@ ${diaryText}`
     document.getElementById('ds-cancel-btn').style.display = 'inline-block';
   }
 
-  function saveOverlayEdit() {
+  async function saveOverlayEdit() {
     const e = _overlayEntry;
     const newText = document.getElementById('ds-edit-textarea').value.trim();
     if (!newText) return;
 
-    // localStorage 저장
+    // Supabase 저장
+    if (_currentUser) {
+      const dateStr = `${e.year}-${String(e.month).padStart(2,'0')}-${String(e.day).padStart(2,'0')}`;
+      sb.from('diaries').upsert({
+        user_id: _currentUser.id,
+        date: dateStr,
+        emotion: (e.emotion || '') + ' ' + (e.emotionLabel || ''),
+        content: newText,
+      }, { onConflict: 'user_id,date' });
+    }
+
+    // localStorage 백업
     const key = `diary_${e.year}_${e.month}_${e.day}`;
     const existing = JSON.parse(localStorage.getItem(key) || '{}');
     existing.text = newText;
