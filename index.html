@@ -2766,16 +2766,20 @@ ${recentMsgs}
     // localStorage 즉시 저장
     localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(diaryData));
 
-    // 백그라운드에서 Supabase 저장
+    // Supabase 저장 후 목록 갱신
     if (_currentUser) {
       const d = new Date(); d.setDate(d.getDate() + diaryOffset);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      sb.from('diaries').upsert({
+      await sb.from('diaries').upsert({
         user_id: _currentUser.id,
         date: dateStr,
         emotion: emotion + ' ' + emotionLabel,
         content: text,
       }, { onConflict: 'user_id,date' });
+      // 저장 완료 후 캐시 무효화 & 목록 갱신
+      _recordCache = {};
+      _emotionCache = {};
+      renderDiaryList();
     }
 
     setTimeout(() => showDiaryView(diaryData), 700);
@@ -3232,7 +3236,14 @@ ${recentMsgs}
     if (btn) btn.classList.add('active');
     window.scrollTo(0, 0);
     if (page === 'idea') renderIdeas();
-    if (page === 'diarylist') renderDiaryList();
+    if (page === 'diarylist') {
+      // 즉시 비우고 로딩 표시
+      const container = document.getElementById('diarylist-container');
+      const monthTabsWrap = document.getElementById('diary-month-tabs');
+      if (container) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);font-size:14px;">🐰 불러오는 중...</div>';
+      if (monthTabsWrap) monthTabsWrap.innerHTML = '';
+      renderDiaryList();
+    }
   }
 
   // ── 일기 목록 렌더 ──
@@ -3264,7 +3275,9 @@ ${recentMsgs}
 
     if (_currentUser) {
       const { data: dbDiaries } = await sb.from('diaries')
-        .select('*').eq('user_id', _currentUser.id).order('date', { ascending: false });
+        .select('*').eq('user_id', _currentUser.id).order('date', { ascending: false })
+        .limit(1000); // 캐시 방지용
+      console.log('📔 diarylist fetch:', dbDiaries?.length, dbDiaries?.[0]?.content);
       if (dbDiaries) {
         allEntries = dbDiaries.map(d => {
           const parts = d.date.split('-');
