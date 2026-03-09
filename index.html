@@ -3113,7 +3113,7 @@ ${recentMsgs}
   renderTodos();
   renderTagTabs();
   renderTagSelector();
-  renderWeeklyProgress();
+  // renderWeeklyProgress는 loadToday 완료 후 호출됨
 
   // 주간 할 일 캐시
   let _weeklyTodoCache = {}; // 'YYYY-MM-DD' -> {total, done}
@@ -3132,7 +3132,11 @@ ${recentMsgs}
     });
   }
 
+  let _weeklyRendering = false;
   async function renderWeeklyProgress() {
+    if (_weeklyRendering) return;
+    _weeklyRendering = true;
+    try {
     const n = new Date();
     const base = viewingDate
       ? new Date(viewingDate.y, viewingDate.m, viewingDate.d)
@@ -3153,11 +3157,13 @@ ${recentMsgs}
 
     const dayLabels = ['월','화','수','목','금','토','일'];
     const bars = document.getElementById('weekly-bars');
-    if (!bars) return;
-    bars.innerHTML = '';
+    if (!bars) { _weeklyRendering = false; return; }
 
     // Supabase에서 주간 데이터 로드
     await loadWeekCache(week);
+
+    // 로드 후 다시 초기화 (await 중 중복 방지)
+    bars.innerHTML = '';
 
     let totalAll = 0, doneAll = 0;
 
@@ -3212,6 +3218,9 @@ ${recentMsgs}
     const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
     const el = document.getElementById('weekly-overall-pct');
     if (el) el.textContent = totalAll > 0 ? `${doneAll}/${totalAll} 완료 · ${overallPct}%` : '기록 없음';
+    } finally {
+      _weeklyRendering = false;
+    }
   }
 
   // Page navigation
@@ -3954,21 +3963,22 @@ ${profileStr ? '배경: ' + profileStr : ''}
     // ① progress bar 업데이트
     _origUpdateProgress();
 
-    // ② 저장 먼저 (localStorage에 최신 상태 기록)
+    // ② 저장
     saveToday();
 
-    // ③ 저장 후 주간 달성률 렌더
-    renderWeeklyProgress();
-
-    // ④ 축하 애니메이션
+    // ③ 축하 애니메이션
     const isDone = todos.length > 0 && todos.every(t => t.done);
     if (isDone && !wasDone) {
       launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
+      // 완료됐을 때만 주간 달성률 갱신
+      renderWeeklyProgress();
     }
   };
 
+  window.diaryStartEdit = diaryStartEdit;
+
   // 오늘 기록 불러오기
-  setTimeout(loadToday, 800);
+  setTimeout(() => loadToday().then(() => renderWeeklyProgress()), 800);
 
   // ── 튜토리얼 ──
   const TUT_SLIDES = [
