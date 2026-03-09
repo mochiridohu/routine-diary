@@ -2770,13 +2770,13 @@ ${recentMsgs}
     if (_currentUser) {
       const d = new Date(); d.setDate(d.getDate() + diaryOffset);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      await sb.from('diaries').upsert({
+      const { data: upsertData, error: upsertError } = await sb.from('diaries').upsert({
         user_id: _currentUser.id,
         date: dateStr,
         emotion: emotion + ' ' + emotionLabel,
         content: text,
       }, { onConflict: 'user_id,date' });
-      // 저장 완료 후 캐시 무효화 & 목록 갱신
+      console.log('💾 upsert:', upsertError, 'content saved:', text);
       _recordCache = {};
       _emotionCache = {};
       renderDiaryList();
@@ -3276,8 +3276,7 @@ ${recentMsgs}
     if (_currentUser) {
       const { data: dbDiaries } = await sb.from('diaries')
         .select('*').eq('user_id', _currentUser.id).order('date', { ascending: false })
-        .limit(1000); // 캐시 방지용
-      console.log('📔 diarylist fetch:', dbDiaries?.length, dbDiaries?.[0]?.content);
+        .limit(1000);
       if (dbDiaries) {
         allEntries = dbDiaries.map(d => {
           const parts = d.date.split('-');
