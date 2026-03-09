@@ -644,6 +644,21 @@
   .profile-chip:hover { background: var(--lavender); border-color: var(--purple); color: var(--purple); }
   .profile-chip.selected { background: var(--purple); border-color: var(--purple); color: white; }
 
+  .ob-chip {
+    padding: 10px 18px;
+    border-radius: 22px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .ob-chip:hover { background: var(--lavender); border-color: var(--purple); color: var(--purple); }
+  .ob-chip.selected { background: var(--purple); border-color: var(--purple); color: white; }
+
   .idea-feedback-btn {
     width: 100%;
     margin-top: 0;
@@ -1211,15 +1226,95 @@
 
 <!-- ── 닉네임 설정 화면 (첫 로그인) ── -->
 <div id="nickname-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
-  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
-    <div style="text-align:center; margin-bottom:36px;">
-      <div style="font-size:48px; margin-bottom:12px;">✨</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:8px;">반가워요! 닉네임을 정해줘요</div>
-      <div style="font-size:13px; color:var(--text-light);">모찌가 이렇게 불러드릴게요 🐰</div>
+  <div style="max-width:480px; margin:0 auto; padding:0 24px 60px; min-height:100vh; display:flex; flex-direction:column;">
+
+    <!-- 진행 바 -->
+    <div style="padding:28px 0 20px; position:sticky; top:0; background:var(--theme-bg); z-index:1;">
+      <div style="display:flex; gap:6px; margin-bottom:20px;">
+        <div id="ob-dot-0" style="flex:1; height:4px; border-radius:4px; background:var(--purple); transition:all 0.3s;"></div>
+        <div id="ob-dot-1" style="flex:1; height:4px; border-radius:4px; background:var(--border); transition:all 0.3s;"></div>
+        <div id="ob-dot-2" style="flex:1; height:4px; border-radius:4px; background:var(--border); transition:all 0.3s;"></div>
+        <div id="ob-dot-3" style="flex:1; height:4px; border-radius:4px; background:var(--border); transition:all 0.3s;"></div>
+      </div>
     </div>
-    <input id="nickname-input" type="text" class="todo-input" style="width:100%; font-size:18px; text-align:center; font-weight:700; box-sizing:border-box;" placeholder="예: 윤주, 쥬, 언니">
-    <div id="nickname-error" style="font-size:12px; color:#e05; margin-top:8px; text-align:center; display:none;"></div>
-    <button onclick="saveNickname()" style="margin-top:20px; width:100%; padding:15px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">시작하기 🐰</button>
+
+    <!-- 스텝 0: 닉네임 -->
+    <div id="ob-step-0" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div style="font-size:52px; text-align:center; margin-bottom:16px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
+      <div style="font-size:22px; font-weight:900; color:var(--text); text-align:center; margin-bottom:8px;">안녕하세요!</div>
+      <div style="font-size:14px; color:var(--text-light); text-align:center; margin-bottom:36px;">모찌가 어떻게 불러드릴까요?</div>
+      <input id="nickname-input" type="text" class="todo-input" style="width:100%; font-size:18px; text-align:center; font-weight:700; box-sizing:border-box;" placeholder="예: 윤주, 쥬, 언니" maxlength="12">
+      <div id="nickname-error" style="font-size:12px; color:#e05; margin-top:8px; text-align:center; display:none;"></div>
+      <button onclick="obNext(0)" style="margin-top:20px; width:100%; padding:15px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">다음 →</button>
+    </div>
+
+    <!-- 스텝 1: 성별 + 연령대 -->
+    <div id="ob-step-1" style="flex:1; display:none; flex-direction:column; justify-content:center;">
+      <div style="font-size:40px; text-align:center; margin-bottom:16px;">🙋</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:6px;">나에 대해 알려줘요</div>
+      <div style="font-size:13px; color:var(--text-light); text-align:center; margin-bottom:32px;">모찌가 더 잘 이해할 수 있어요</div>
+
+      <div style="margin-bottom:24px;">
+        <div style="font-size:13px; font-weight:700; color:var(--text-light); margin-bottom:10px;">성별</div>
+        <div style="display:flex; gap:8px;">
+          <button class="ob-chip" data-group="gender" data-val="female" onclick="selectObChip(this)">여성</button>
+          <button class="ob-chip" data-group="gender" data-val="male" onclick="selectObChip(this)">남성</button>
+          <button class="ob-chip" data-group="gender" data-val="private" onclick="selectObChip(this)">비공개</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:32px;">
+        <div style="font-size:13px; font-weight:700; color:var(--text-light); margin-bottom:10px;">연령대</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button class="ob-chip" data-group="age" data-val="10대" onclick="selectObChip(this)">10대</button>
+          <button class="ob-chip" data-group="age" data-val="20대" onclick="selectObChip(this)">20대</button>
+          <button class="ob-chip" data-group="age" data-val="30대" onclick="selectObChip(this)">30대</button>
+          <button class="ob-chip" data-group="age" data-val="40대" onclick="selectObChip(this)">40대</button>
+          <button class="ob-chip" data-group="age" data-val="50대+" onclick="selectObChip(this)">50대+</button>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button onclick="obBack(1)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
+        <button onclick="obNext(1)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 스텝 2: 거주 지역 -->
+    <div id="ob-step-2" style="flex:1; display:none; flex-direction:column; justify-content:center;">
+      <div style="font-size:40px; text-align:center; margin-bottom:16px;">📍</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:6px;">어디 사세요?</div>
+      <div style="font-size:13px; color:var(--text-light); text-align:center; margin-bottom:32px;">모찌가 지역에 맞는 얘기를 해줄 수 있어요</div>
+      <input id="ob-location" type="text" class="todo-input" style="width:100%; box-sizing:border-box;" placeholder="예: 서울 마포구, 경기 고양시">
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button onclick="obBack(2)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
+        <button onclick="obNext(2)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">다음 →</button>
+      </div>
+    </div>
+
+    <!-- 스텝 3: 수면 목표 -->
+    <div id="ob-step-3" style="flex:1; display:none; flex-direction:column; justify-content:center;">
+      <div style="font-size:40px; text-align:center; margin-bottom:16px;">😴</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:6px;">수면 목표를 설정해요</div>
+      <div style="font-size:13px; color:var(--text-light); text-align:center; margin-bottom:32px;">건강한 하루를 위해!</div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:32px;">
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">취침 시간</div>
+          <input id="ob-sleep" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="23:00">
+        </div>
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">기상 시간</div>
+          <input id="ob-wake" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="07:00">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button onclick="obBack(3)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
+        <button onclick="saveNickname()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">시작하기 🐰</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1939,13 +2034,27 @@
     localStorage.setItem(storageKey, btn.dataset.val);
   }
 
-  function saveBasicProfile() {
+  async function saveBasicProfile() {
+    const gender = document.querySelector('#gender-btns .profile-chip.selected')?.dataset.val || '';
+    const age_group = document.querySelector('#age-btns .profile-chip.selected')?.dataset.val || '';
     const location = document.getElementById('profile-location')?.value || '';
-    const sleepTime = document.getElementById('goal-sleep-time')?.value || '23:30';
-    const wakeTime = document.getElementById('goal-wake-time')?.value || '07:00';
+    const sleep_time = document.getElementById('goal-sleep-time')?.value || '23:30';
+    const wake_time = document.getElementById('goal-wake-time')?.value || '07:00';
+
+    localStorage.setItem('profile_gender', gender);
+    localStorage.setItem('profile_age', age_group);
     localStorage.setItem('profile_location', location);
-    localStorage.setItem('goal_sleep_time', sleepTime);
-    localStorage.setItem('goal_wake_time', wakeTime);
+    localStorage.setItem('goal_sleep_time', sleep_time);
+    localStorage.setItem('goal_wake_time', wake_time);
+
+    if (_currentUser) {
+      await sb.from('profiles').update({ gender, age_group, location, sleep_time, wake_time })
+        .eq('id', _currentUser.id);
+    }
+
+    // 저장 피드백
+    const btn = document.querySelector('[onclick="saveBasicProfile()"]');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✅ 저장됐어요!'; setTimeout(() => btn.textContent = orig, 1500); }
   }
 
   function loadBasicProfile() {
@@ -2452,7 +2561,7 @@ ${recentMsgs}
 
   setTimeout(loadProfile, 100);
 
-  // ── 날씨 (Open-Meteo, 고양시 기준) ──
+  // ── 날씨 (Open-Meteo, 현재 위치 기반) ──
   const WMO = {
     0:'☀️ 맑음', 1:'🌤 대체로 맑음', 2:'⛅ 부분 흐림', 3:'☁️ 흐림',
     45:'🌫 안개', 48:'🌫 안개',
@@ -2463,17 +2572,47 @@ ${recentMsgs}
     85:'🌨 눈 소나기', 86:'🌨 눈 소나기',
     95:'⛈ 뇌우', 96:'⛈ 뇌우', 99:'⛈ 뇌우',
   };
-  async function fetchWeather() {
+
+  async function fetchWeatherAt(lat, lon, locationName) {
     try {
-      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.658&longitude=126.832&current=temperature_2m,weathercode&timezone=Asia%2FSeoul');
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&timezone=Asia%2FSeoul`);
       const data = await res.json();
       const temp = Math.round(data.current.temperature_2m);
       const code = data.current.weathercode;
       const desc = WMO[code] || '🌤 날씨';
-      document.getElementById('weather-text').textContent = `${desc} · 고양시 ${temp}°C`;
+      document.getElementById('weather-text').textContent = `${desc} · ${locationName} ${temp}°C`;
     } catch(e) {
       document.getElementById('weather-text').textContent = '🌤 날씨를 불러올 수 없어요';
     }
+  }
+
+  async function fetchWeather() {
+    if (!navigator.geolocation) {
+      fetchWeatherAt(37.658, 126.832, '내 위치');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        // 역지오코딩으로 지역명 가져오기
+        let locationName = '내 위치';
+        try {
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ko`);
+          const geoData = await geoRes.json();
+          const addr = geoData.address;
+          locationName = addr.city || addr.town || addr.county || addr.state || '내 위치';
+          // 한국 행정구역 정리 (시/구/군만)
+          if (addr.city_district) locationName = addr.city_district;
+          else if (addr.suburb) locationName = addr.suburb;
+        } catch(e) {}
+        fetchWeatherAt(lat, lon, locationName);
+      },
+      () => {
+        // 위치 거부 시 기본값
+        fetchWeatherAt(37.658, 126.832, '내 위치');
+      },
+      { timeout: 5000 }
+    );
   }
   fetchWeather();
 
@@ -3037,30 +3176,47 @@ ${recentMsgs}
 
   let diarySelectedMonth = null; // 'YYYY-M' 형식
 
-  function renderDiaryList() {
+  async function renderDiaryList() {
     const container = document.getElementById('diarylist-container');
     const empty = document.getElementById('diarylist-empty');
     const monthTabsWrap = document.getElementById('diary-month-tabs');
     container.innerHTML = '';
 
     const dayNames = ['일','월','화','수','목','금','토'];
-    const allEntries = [];
+    let allEntries = [];
 
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!key.startsWith('diary_')) continue;
-      try {
-        const parts = key.split('_');
-        const year = parseInt(parts[1]), month = parseInt(parts[2]), day = parseInt(parts[3]);
-        const raw = localStorage.getItem(key);
-        let data;
-        try { data = JSON.parse(raw); } catch(e) { data = { text: raw, mood: '' }; }
-        if (!data.text) continue;
-        allEntries.push({ year, month, day, text: data.text, emotion: data.emotion || '', emotionLabel: data.emotionLabel || '', mood: data.mood || '', moodLabel: data.moodLabel || '' });
-      } catch(e) {}
+    if (_currentUser) {
+      const { data: dbDiaries } = await sb.from('diaries')
+        .select('*').eq('user_id', _currentUser.id).order('date', { ascending: false });
+      if (dbDiaries) {
+        allEntries = dbDiaries.map(d => {
+          const parts = d.date.split('-');
+          const emoParts = (d.emotion || '').split(' ');
+          return {
+            year: parseInt(parts[0]), month: parseInt(parts[1]), day: parseInt(parts[2]),
+            text: d.content || '',
+            emotion: emoParts[0] || '',
+            emotionLabel: emoParts[1] || '',
+            mood: '', moodLabel: ''
+          };
+        }).filter(e => e.text);
+      }
+    } else {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key.startsWith('diary_')) continue;
+        try {
+          const parts = key.split('_');
+          const year = parseInt(parts[1]), month = parseInt(parts[2]), day = parseInt(parts[3]);
+          const raw = localStorage.getItem(key);
+          let data;
+          try { data = JSON.parse(raw); } catch(e) { data = { text: raw, mood: '' }; }
+          if (!data.text) continue;
+          allEntries.push({ year, month, day, text: data.text, emotion: data.emotion || '', emotionLabel: data.emotionLabel || '', mood: data.mood || '', moodLabel: data.moodLabel || '' });
+        } catch(e) {}
+      }
+      allEntries.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day));
     }
-
-    allEntries.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day));
 
     if (allEntries.length === 0) {
       empty.style.display = 'block';
@@ -3649,20 +3805,20 @@ ${profileStr ? '배경: ' + profileStr : ''}
   };
 
   async function saveToday() {
-    const data = {
-      todos,
-      sleepTime: document.getElementById('sleep-time')?.value,
-      wakeTime: document.getElementById('wake-time')?.value,
-      ideas,
-      savedAt: new Date().toISOString(),
-    };
-    try { localStorage.setItem(TODAY_KEY(), JSON.stringify(data)); } catch(e) {}
+    const sleepTime = document.getElementById('sleep-time')?.value;
+    const wakeTime = document.getElementById('wake-time')?.value;
+    // 수면 데이터는 localStorage에 유지 (별도 테이블 없음)
+    const today = new Date().toISOString().slice(0,10);
+    try {
+      localStorage.setItem('mochi_sleep_' + today, JSON.stringify({ sleepTime, wakeTime }));
+    } catch(e) {}
   }
 
   async function loadToday() {
+    const today = new Date().toISOString().slice(0,10);
+
     if (_currentUser) {
-      // Supabase에서 오늘 할 일 불러오기
-      const today = new Date().toISOString().slice(0,10);
+      // 할 일 불러오기
       const { data: dbTodos } = await sb.from('todos')
         .select('*').eq('user_id', _currentUser.id).eq('date', today);
       if (dbTodos && dbTodos.length > 0) {
@@ -3682,18 +3838,26 @@ ${profileStr ? '배경: ' + profileStr : ''}
         nextIdeaId = ideas.length + 1;
         renderIdeas();
       }
-    } else {
-      // localStorage 폴백
-      try {
-        const raw = localStorage.getItem(TODAY_KEY());
-        if (!raw) return;
-        const data = JSON.parse(raw);
-        if (data.todos) { todos = data.todos; nextId = Math.max(...todos.map(t=>t.id), nextId) + 1; renderTodos(); }
-        if (data.sleepTime) { document.getElementById('sleep-time').value = data.sleepTime; }
-        if (data.wakeTime) { document.getElementById('wake-time').value = data.wakeTime; calcSleep(); }
-        if (data.ideas) { ideas = data.ideas; nextIdeaId = Math.max(...ideas.map(i=>i.id), nextIdeaId) + 1; }
-      } catch(e) {}
+      // 오늘 일기 불러오기
+      const { data: dbDiary } = await sb.from('diaries')
+        .select('*').eq('user_id', _currentUser.id).eq('date', today).maybeSingle();
+      if (dbDiary) {
+        document.getElementById('diary-input').value = dbDiary.content || '';
+        const parts = (dbDiary.emotion || '').split(' ');
+        const emo = parts[0];
+        const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emo}"]`);
+        if (btn) { document.querySelectorAll('.diary-emotion-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
+      }
     }
+    // 수면 데이터는 localStorage에서
+    try {
+      const sleepRaw = localStorage.getItem('mochi_sleep_' + today);
+      if (sleepRaw) {
+        const s = JSON.parse(sleepRaw);
+        if (s.sleepTime) { document.getElementById('sleep-time').value = s.sleepTime; }
+        if (s.wakeTime) { document.getElementById('wake-time').value = s.wakeTime; calcSleep(); }
+      }
+    } catch(e) {}
   }
 
   function showSaveBadge() {
@@ -4407,19 +4571,73 @@ ${todoList}
   window.loginWithGoogle = loginWithGoogle;
 
   // 닉네임 저장 (첫 로그인)
+  // 온보딩 칩 선택
+  function selectObChip(el) {
+    const group = el.dataset.group;
+    document.querySelectorAll(`.ob-chip[data-group="${group}"]`).forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  window.selectObChip = selectObChip;
+
+  // 온보딩 스텝 이동
+  function obNext(step) {
+    if (step === 0) {
+      const nick = document.getElementById('nickname-input').value.trim();
+      const errEl = document.getElementById('nickname-error');
+      errEl.style.display = 'none';
+      if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
+      if (nick.length > 12) { errEl.textContent = '12자 이내로 입력해주세요'; errEl.style.display = 'block'; return; }
+    }
+    document.getElementById(`ob-step-${step}`).style.display = 'none';
+    document.getElementById(`ob-step-${step+1}`).style.display = 'flex';
+    document.getElementById(`ob-dot-${step}`).style.background = 'var(--purple)';
+    document.getElementById(`ob-dot-${step+1}`).style.background = 'var(--purple)';
+  }
+  window.obNext = obNext;
+
+  function obBack(step) {
+    document.getElementById(`ob-step-${step}`).style.display = 'none';
+    document.getElementById(`ob-step-${step-1}`).style.display = 'flex';
+    document.getElementById(`ob-dot-${step}`).style.background = 'var(--border)';
+  }
+  window.obBack = obBack;
+
   async function saveNickname() {
     const nick = document.getElementById('nickname-input').value.trim();
     const errEl = document.getElementById('nickname-error');
     errEl.style.display = 'none';
-    if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
-    if (nick.length > 12) { errEl.textContent = '12자 이내로 입력해주세요'; errEl.style.display = 'block'; return; }
+    if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block';
+      document.getElementById('ob-step-3').style.display = 'none';
+      document.getElementById('ob-step-0').style.display = 'flex'; return; }
 
     // 중복 체크
     const { data: existing } = await sb.from('profiles').select('id').eq('nickname', nick).maybeSingle();
-    if (existing) { errEl.textContent = '이미 사용 중인 닉네임이에요'; errEl.style.display = 'block'; return; }
+    if (existing) {
+      errEl.textContent = '이미 사용 중인 닉네임이에요';
+      errEl.style.display = 'block';
+      document.getElementById('ob-step-3').style.display = 'none';
+      document.getElementById('ob-step-0').style.display = 'flex';
+      return;
+    }
 
-    const { error } = await sb.from('profiles').insert({ id: _currentUser.id, nickname: nick, avatar: randomAvatar() });
+    const gender = document.querySelector('.ob-chip[data-group="gender"].selected')?.dataset.val || '';
+    const age_group = document.querySelector('.ob-chip[data-group="age"].selected')?.dataset.val || '';
+    const location = document.getElementById('ob-location')?.value.trim() || '';
+    const sleep_time = document.getElementById('ob-sleep')?.value || '23:00';
+    const wake_time = document.getElementById('ob-wake')?.value || '07:00';
+
+    const { error } = await sb.from('profiles').insert({
+      id: _currentUser.id, nickname: nick, avatar: randomAvatar(),
+      gender, age_group, location, sleep_time, wake_time
+    });
     if (error) { errEl.textContent = '저장 실패: ' + error.message; errEl.style.display = 'block'; return; }
+
+    // localStorage에도 동기화
+    localStorage.setItem('profile_gender', gender);
+    localStorage.setItem('profile_age', age_group);
+    localStorage.setItem('profile_location', location);
+    localStorage.setItem('goal_sleep_time', sleep_time);
+    localStorage.setItem('goal_wake_time', wake_time);
 
     document.getElementById('nickname-screen').style.display = 'none';
     enterApp(nick, true);
@@ -4432,7 +4650,7 @@ ${todoList}
   }
 
   // 앱 진입
-  function enterApp(nickname, isNew = false) {
+  async function enterApp(nickname, isNew = false) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('nickname-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
@@ -4446,6 +4664,18 @@ ${todoList}
     // 로그아웃 버튼
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.textContent = `${nickname} · 로그아웃`;
+
+    // 기존 사용자면 Supabase에서 프로필 불러와 localStorage 동기화
+    if (!isNew && _currentUser) {
+      const { data: prof } = await sb.from('profiles').select('*').eq('id', _currentUser.id).maybeSingle();
+      if (prof) {
+        if (prof.gender) localStorage.setItem('profile_gender', prof.gender);
+        if (prof.age_group) localStorage.setItem('profile_age', prof.age_group);
+        if (prof.location) localStorage.setItem('profile_location', prof.location);
+        if (prof.sleep_time) localStorage.setItem('goal_sleep_time', prof.sleep_time);
+        if (prof.wake_time) localStorage.setItem('goal_wake_time', prof.wake_time);
+      }
+    }
 
     // 새 계정이면 튜토리얼
     if (isNew) {
