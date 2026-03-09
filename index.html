@@ -4670,6 +4670,10 @@ ${todoList}
 
   // 앱 진입
   async function enterApp(nickname, isNew = false) {
+    // 스플래시 제거
+    const splash = document.getElementById('splash');
+    if (splash) splash.remove();
+
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('nickname-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
