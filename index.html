@@ -2665,6 +2665,16 @@ ${recentMsgs}
   }
 
   // ── 일기 기능 ──
+  function parseEmotion(raw) {
+    if (!raw) return { emoji: '', label: '' };
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed.emoji !== undefined) return parsed;
+    } catch(e) {}
+    // 구형 포맷 (이모지 공백 라벨) 호환
+    const parts = raw.trim().split(' ');
+    return { emoji: parts[0] || '', label: parts.slice(1).join(' ') || '' };
+  }
   let diaryOffset = 0; // 0 = 오늘, -1 = 어제, ...
 
   function diaryKey(offset) {
@@ -2700,8 +2710,8 @@ ${recentMsgs}
       const { data: dbDiary } = await sb.from('diaries')
         .select('*').eq('user_id', _currentUser.id).eq('date', dateStr).maybeSingle();
       if (dbDiary) {
-        const emoParts = (dbDiary.emotion || '').split(' ');
-        data = { text: dbDiary.content, emotion: emoParts[0] || '', emotionLabel: emoParts[1] || '', mood: '', moodLabel: '' };
+        const emo = parseEmotion(dbDiary.emotion);
+        data = { text: dbDiary.content, emotion: emo.emoji, emotionLabel: emo.label, mood: '', moodLabel: '' };
         // localStorage도 동기화
         localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(data));
       }
@@ -2770,13 +2780,12 @@ ${recentMsgs}
     if (_currentUser) {
       const d = new Date(); d.setDate(d.getDate() + diaryOffset);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      const { data: upsertData, error: upsertError } = await sb.from('diaries').upsert({
+      await sb.from('diaries').upsert({
         user_id: _currentUser.id,
         date: dateStr,
-        emotion: emotion + ' ' + emotionLabel,
+        emotion: JSON.stringify({ emoji: emotion, label: emotionLabel }),
         content: text,
       }, { onConflict: 'user_id,date' });
-      console.log('💾 upsert:', upsertError, 'content saved:', text);
       _recordCache = {};
       _emotionCache = {};
       renderDiaryList();
@@ -2830,8 +2839,9 @@ ${recentMsgs}
       const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const { data: dbDiary } = await sb.from('diaries').select('*').eq('user_id', _currentUser.id).eq('date', dateStr).maybeSingle();
       if (dbDiary) {
+        const emo = parseEmotion(dbDiary.emotion);
         text = dbDiary.content || '';
-        emotion = (dbDiary.emotion || '').split(' ')[0] || '';
+        emotion = emo.emoji;
       }
     } else {
       const raw = localStorage.getItem(diaryKey(diaryOffset));
@@ -3047,22 +3057,20 @@ ${recentMsgs}
     const todo = todos.find(t => t.id === id);
     if (!todo) return;
     const newDone = !todo.done;
-    // 낙관적 업데이트 - 즉시 반영
     todos = todos.map(t => t.id === id ? {...t, done: newDone} : t);
     renderTodos();
     updateProgress();
-    // 백그라운드 DB 저장
+    renderWeeklyProgress();
     if (_currentUser && !String(id).startsWith('tmp_')) {
       sb.from('todos').update({ done: newDone }).eq('id', id).eq('user_id', _currentUser.id);
     }
   }
 
   function deleteTodo(id) {
-    // 낙관적 업데이트 - 즉시 반영
     todos = todos.filter(t => t.id !== id);
     renderTodos();
     updateProgress();
-    // 백그라운드 DB 삭제
+    renderWeeklyProgress();
     if (_currentUser && !String(id).startsWith('tmp_')) {
       sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
     }
@@ -3072,7 +3080,12 @@ ${recentMsgs}
     const input = document.getElementById('todo-input');
     const text = input.value.trim();
     if (!text) return;
-    const newTodo = { text, tag: selectedTag, done: false, date: new Date().toISOString().slice(0,10) };
+    
+    // viewingDate가 있으면 그 날짜로, 없으면 오늘
+    const dateStr = viewingDate
+      ? `${viewingDate.y}-${String(viewingDate.m+1).padStart(2,'0')}-${String(viewingDate.d).padStart(2,'0')}`
+      : new Date().toISOString().slice(0,10);
+    const newTodo = { text, tag: selectedTag, done: false, date: dateStr };
     input.value = '';
 
     // 낙관적 업데이트 - UI 즉시 반영
@@ -3124,12 +3137,14 @@ ${recentMsgs}
 
   async function loadWeekCache(week) {
     if (!_currentUser) return;
+    const today = new Date().toISOString().slice(0, 10);
     const dates = week.map(d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
     const from = dates[0], to = dates[6];
     const { data: dbTodos } = await sb.from('todos').select('date,done')
       .eq('user_id', _currentUser.id).gte('date', from).lte('date', to);
     dates.forEach(date => { _weeklyTodoCache[date] = { total: 0, done: 0 }; });
     (dbTodos || []).forEach(t => {
+      if (t.date === today) return; // 오늘은 메모리 todos 사용
       if (!_weeklyTodoCache[t.date]) _weeklyTodoCache[t.date] = { total: 0, done: 0 };
       _weeklyTodoCache[t.date].total++;
       if (t.done) _weeklyTodoCache[t.date].done++;
@@ -3163,8 +3178,10 @@ ${recentMsgs}
     const bars = document.getElementById('weekly-bars');
     if (!bars) { _weeklyRendering = false; return; }
 
-    // Supabase에서 주간 데이터 로드
-    await loadWeekCache(week);
+    // 캐시가 없을 때만 DB에서 로드 (오늘은 항상 메모리 todos 사용)
+    const weekKeys = week.map(d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+    const hasCacheForWeek = weekKeys.some(k => _weeklyTodoCache[k] !== undefined);
+    if (!hasCacheForWeek) await loadWeekCache(week);
 
     // 로드 후 다시 초기화 (await 중 중복 방지)
     bars.innerHTML = '';
@@ -3280,12 +3297,12 @@ ${recentMsgs}
       if (dbDiaries) {
         allEntries = dbDiaries.map(d => {
           const parts = d.date.split('-');
-          const emoParts = (d.emotion || '').split(' ');
+          const emo = parseEmotion(d.emotion);
           return {
             year: parseInt(parts[0]), month: parseInt(parts[1]), day: parseInt(parts[2]),
             text: d.content || '',
-            emotion: emoParts[0] || '',
-            emotionLabel: emoParts[1] || '',
+            emotion: emo.emoji,
+            emotionLabel: emo.label,
             mood: '', moodLabel: ''
           };
         }).filter(e => e.text);
@@ -3566,7 +3583,7 @@ ${diaryText}`
       sb.from('diaries').upsert({
         user_id: _currentUser.id,
         date: dateStr,
-        emotion: (e.emotion || '') + ' ' + (e.emotionLabel || ''),
+        emotion: JSON.stringify({ emoji: e.emotion || '', label: e.emotionLabel || '' }),
         content: newText,
       }, { onConflict: 'user_id,date' });
     }
@@ -3946,9 +3963,8 @@ ${profileStr ? '배경: ' + profileStr : ''}
         .select('*').eq('user_id', _currentUser.id).eq('date', today).maybeSingle();
       if (dbDiary) {
         document.getElementById('diary-input').value = dbDiary.content || '';
-        const parts = (dbDiary.emotion || '').split(' ');
-        const emo = parts[0];
-        const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emo}"]`);
+        const emo = parseEmotion(dbDiary.emotion);
+        const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emo.emoji}"]`);
         if (btn) { document.querySelectorAll('.diary-emotion-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
       }
     }
@@ -4544,8 +4560,8 @@ ${todoList}
 
     (diaries || []).forEach(d => {
       _recordCache[d.date] = true;
-      const emoParts = (d.emotion || '').split(' ');
-      _emotionCache[d.date] = emoParts[0] || '';
+      const emoParts = parseEmotion(d.emotion);
+      _emotionCache[d.date] = emoParts.emoji || '';
     });
     (todoData || []).forEach(t => { _recordCache[t.date] = true; });
   }
