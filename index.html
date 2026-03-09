@@ -1957,6 +1957,14 @@
 </div>
 
 <script>
+  // ── API 키 ──
+  const CLAUDE_API_KEY = 'REPLACE_WITH_YOUR_API_KEY';
+
+  // ── Supabase 초기화 (전역) ──
+  const SUPABASE_URL = 'https://subjdjbrdjdikjaqjafi.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YmpkamJyZGpkaWtqYXFqYWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjM5MTAsImV4cCI6MjA4ODYzOTkxMH0.x6ZwV3w7qdqnd_Tf2Blh9o6ppoH5zbDyd9tAY1tVeRI';
+  let sb; // supabase 로드 후 초기화
+
   // ── 일기 감정 선택 ──
   let viewingDate = null; // null = 오늘
   function selectDiaryEmotion(btn) {
@@ -2331,7 +2339,7 @@ ${recentMsgs}
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 300,
@@ -2428,7 +2436,7 @@ ${recentMsgs}
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 400,
@@ -3151,11 +3159,13 @@ ${recentMsgs}
     });
   }
 
-  let _weeklyRendering = false;
-  async function renderWeeklyProgress() {
-    if (_weeklyRendering) return;
-    _weeklyRendering = true;
-    try {
+  let _weeklyRenderTimer = null;
+  let _lastWeekKey = null; // 마지막으로 로드한 주의 키
+  function renderWeeklyProgress() {
+    clearTimeout(_weeklyRenderTimer);
+    _weeklyRenderTimer = setTimeout(_doRenderWeeklyProgress, 50);
+  }
+  async function _doRenderWeeklyProgress() {
     const n = new Date();
     const base = viewingDate
       ? new Date(viewingDate.y, viewingDate.m, viewingDate.d)
@@ -3176,12 +3186,14 @@ ${recentMsgs}
 
     const dayLabels = ['월','화','수','목','금','토','일'];
     const bars = document.getElementById('weekly-bars');
-    if (!bars) { _weeklyRendering = false; return; }
+    if (!bars) { return; }
 
-    // 캐시가 없을 때만 DB에서 로드 (오늘은 항상 메모리 todos 사용)
-    const weekKeys = week.map(d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
-    const hasCacheForWeek = weekKeys.some(k => _weeklyTodoCache[k] !== undefined);
-    if (!hasCacheForWeek) await loadWeekCache(week);
+    // 주가 바뀌었을 때만 DB에서 재로드
+    const weekKey = week[0].toISOString().slice(0,10);
+    if (_lastWeekKey !== weekKey) {
+      await loadWeekCache(week);
+      _lastWeekKey = weekKey;
+    }
 
     // 로드 후 다시 초기화 (await 중 중복 방지)
     bars.innerHTML = '';
@@ -3239,9 +3251,6 @@ ${recentMsgs}
     const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
     const el = document.getElementById('weekly-overall-pct');
     if (el) el.textContent = totalAll > 0 ? `${doneAll}/${totalAll} 완료 · ${overallPct}%` : '기록 없음';
-    } finally {
-      _weeklyRendering = false;
-    }
   }
 
   // Page navigation
@@ -3442,7 +3451,7 @@ ${recentMsgs}
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 700,
@@ -3704,7 +3713,7 @@ ${diaryText}`
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 15,
@@ -3779,7 +3788,7 @@ ${diaryText}`
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 400,
@@ -3994,16 +4003,15 @@ ${profileStr ? '배경: ' + profileStr : ''}
     // ② 저장
     saveToday();
 
-    // ③ 축하 애니메이션
+    // ③ 주간 달성률 항상 갱신 (debounce로 처리됨)
+    renderWeeklyProgress();
+
+    // ④ 축하 애니메이션
     const isDone = todos.length > 0 && todos.every(t => t.done);
     if (isDone && !wasDone) {
       launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
-      // 완료됐을 때만 주간 달성률 갱신
-      renderWeeklyProgress();
     }
   };
-
-  window.diaryStartEdit = diaryStartEdit;
 
   // 오늘 기록 불러오기
   setTimeout(() => loadToday().then(() => renderWeeklyProgress()), 800);
@@ -4328,7 +4336,7 @@ ${todoList}
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -4622,7 +4630,8 @@ ${todoList}
     const dayNames = ['일','월','화','수','목','금','토'];
     document.getElementById('date-badge').textContent = `📅 ${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일 (${dayNames[n.getDay()]})`;
     document.getElementById('return-today-btn').style.display = 'none';
-    loadToday();
+    _lastWeekKey = null;
+    loadToday().then(() => renderWeeklyProgress());
     renderDiary();
     renderCalendar();
   }
@@ -4666,6 +4675,10 @@ ${todoList}
     const targetMidnight = new Date(y, m, d);
     diaryOffset = Math.round((targetMidnight - todayMidnight) / 86400000);
     renderDiary();
+
+    // 해당 날짜의 주 달성률 새로 로드
+    _lastWeekKey = null;
+    renderWeeklyProgress();
   }
 
   // saveToday 오버라이드 - 과거 날짜 할 일 Supabase에 저장
@@ -4679,9 +4692,7 @@ ${todoList}
   // Supabase 인증 시스템
   // ══════════════════════════════════════
 
-  const SUPABASE_URL = 'https://subjdjbrdjdikjaqjafi.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YmpkamJyZGpkaWtqYXFqYWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjM5MTAsImV4cCI6MjA4ODYzOTkxMH0.x6ZwV3w7qdqnd_Tf2Blh9o6ppoH5zbDyd9tAY1tVeRI';
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let _currentUser = null;
 
@@ -4880,6 +4891,30 @@ ${todoList}
       }
     });
   })();
+
+  // ── 모든 window 등록 (모든 함수 정의 후) ──
+  window.addTodo = addTodo;
+  window.addIdea = addIdea;
+  window.saveDiaryManual = saveDiaryManual;
+  window.toggleTodo = toggleTodo;
+  window.deleteTodo = deleteTodo;
+  window.filterTodo = filterTodo;
+  window.selectTag = selectTag;
+  window.diaryNav = diaryNav;
+  window.calNav = calNav;
+  window.openCalendar = openCalendar;
+  window.closeCalOverlay = closeCalOverlay;
+  window.setTheme = setTheme;
+  window.showPage = showPage;
+  window.returnToToday = returnToToday;
+  window.selectDiaryEmotion = selectDiaryEmotion;
+  window.addCustomTag = addCustomTag;
+  window.deleteTag = deleteTag;
+  window.closeTagModal = closeTagModal;
+  window.openDaylog = openDaylog;
+  window.closeDiaryOverlay = closeDiaryOverlay;
+  window.saveDiary = saveDiary;
+  window.diaryStartEdit = diaryStartEdit;
 
 </script>
 </div><!-- /app-wrapper -->
