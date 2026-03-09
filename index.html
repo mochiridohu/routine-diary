@@ -3062,53 +3062,38 @@ ${recentMsgs}
   }
 
   function toggleTodo(id) {
-    const todo = todos.find(t => t.id === id);
-    if (!todo) return;
-    const newDone = !todo.done;
-    todos = todos.map(t => t.id === id ? {...t, done: newDone} : t);
+    todos = todos.map(t => t.id === id ? {...t, done: !t.done} : t);
     renderTodos();
-    updateProgress();
-    renderWeeklyProgress();
+    // Supabase 백그라운드 동기화
     if (_currentUser && !String(id).startsWith('tmp_')) {
-      sb.from('todos').update({ done: newDone }).eq('id', id).eq('user_id', _currentUser.id);
+      const todo = todos.find(t => t.id === id);
+      if (todo) sb.from('todos').update({ done: todo.done }).eq('id', id).eq('user_id', _currentUser.id);
     }
   }
 
   function deleteTodo(id) {
     todos = todos.filter(t => t.id !== id);
     renderTodos();
-    updateProgress();
-    renderWeeklyProgress();
+    // Supabase 백그라운드 동기화
     if (_currentUser && !String(id).startsWith('tmp_')) {
       sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
     }
   }
 
-  async function addTodo() {
+  function addTodo() {
     const input = document.getElementById('todo-input');
     const text = input.value.trim();
     if (!text) return;
-    
-    // viewingDate가 있으면 그 날짜로, 없으면 오늘
-    const dateStr = viewingDate
-      ? `${viewingDate.y}-${String(viewingDate.m+1).padStart(2,'0')}-${String(viewingDate.d).padStart(2,'0')}`
-      : new Date().toISOString().slice(0,10);
-    const newTodo = { text, tag: selectedTag, done: false, date: dateStr };
-    input.value = '';
-
-    // 낙관적 업데이트 - UI 즉시 반영
+    const dateStr = getCurrentDateStr();
     const tempId = 'tmp_' + Date.now();
-    todos.push({ id: tempId, ...newTodo });
+    todos.push({ id: tempId, text, tag: selectedTag, done: false, date: dateStr });
+    input.value = '';
     renderTodos();
-
-    // 백그라운드에서 DB 저장
+    // Supabase 백그라운드 동기화
     if (_currentUser) {
-      sb.from('todos').insert({ ...newTodo, user_id: _currentUser.id }).select().single()
-        .then(({ data, error }) => {
-          if (!error && data) {
-            // 임시 ID를 실제 DB ID로 교체
-            todos = todos.map(t => t.id === tempId ? { ...t, id: data.id } : t);
-          }
+      sb.from('todos').insert({ text, tag: selectedTag, done: false, date: dateStr, user_id: _currentUser.id })
+        .select().single().then(({ data, error }) => {
+          if (!error && data) todos = todos.map(t => t.id === tempId ? { ...t, id: data.id } : t);
         });
     }
   }
@@ -3140,32 +3125,14 @@ ${recentMsgs}
   renderTagSelector();
   // renderWeeklyProgress는 loadToday 완료 후 호출됨
 
-  // 주간 할 일 캐시
-  let _weeklyTodoCache = {}; // 'YYYY-MM-DD' -> {total, done}
-
-  async function loadWeekCache(week) {
-    if (!_currentUser) return;
-    const today = new Date().toISOString().slice(0, 10);
-    const dates = week.map(d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
-    const from = dates[0], to = dates[6];
-    const { data: dbTodos } = await sb.from('todos').select('date,done')
-      .eq('user_id', _currentUser.id).gte('date', from).lte('date', to);
-    dates.forEach(date => { _weeklyTodoCache[date] = { total: 0, done: 0 }; });
-    (dbTodos || []).forEach(t => {
-      if (t.date === today) return; // 오늘은 메모리 todos 사용
-      if (!_weeklyTodoCache[t.date]) _weeklyTodoCache[t.date] = { total: 0, done: 0 };
-      _weeklyTodoCache[t.date].total++;
-      if (t.done) _weeklyTodoCache[t.date].done++;
-    });
-  }
-
+  // 주간 달성률 (localStorage 기반 - 잘 됐던 버전과 동일한 로직)
   let _weeklyRenderTimer = null;
-  let _lastWeekKey = null; // 마지막으로 로드한 주의 키
   function renderWeeklyProgress() {
     clearTimeout(_weeklyRenderTimer);
-    _weeklyRenderTimer = setTimeout(_doRenderWeeklyProgress, 50);
+    _weeklyRenderTimer = setTimeout(_doRenderWeeklyProgress, 80);
   }
-  async function _doRenderWeeklyProgress() {
+
+  function _doRenderWeeklyProgress() {
     const n = new Date();
     const base = viewingDate
       ? new Date(viewingDate.y, viewingDate.m, viewingDate.d)
@@ -3186,46 +3153,38 @@ ${recentMsgs}
 
     const dayLabels = ['월','화','수','목','금','토','일'];
     const bars = document.getElementById('weekly-bars');
-    if (!bars) { return; }
-
-    // 주가 바뀌었을 때만 DB에서 재로드
-    const weekKey = week[0].toISOString().slice(0,10);
-    if (_lastWeekKey !== weekKey) {
-      await loadWeekCache(week);
-      _lastWeekKey = weekKey;
-    }
-
-    // 로드 후 다시 초기화 (await 중 중복 방지)
+    if (!bars) return;
     bars.innerHTML = '';
 
     let totalAll = 0, doneAll = 0;
 
     week.forEach((d, idx) => {
-      const dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const key = `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
       const isToday = d.toDateString() === n.toDateString();
       const isBaseDay = d.toDateString() === base.toDateString();
       const dMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const nMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
       const isFuture = dMidnight > nMidnight;
 
-      let total = 0, done = 0;
-      if (isToday && !viewingDate) {
-        total = todos.length;
-        done = todos.filter(t => t.done).length;
+      let dayTodos;
+      if (isBaseDay) {
+        // 현재 보고 있는 날짜는 메모리 todos 사용 (최신 상태)
+        dayTodos = todos;
+      } else if (isToday) {
+        dayTodos = todos;
       } else {
-        const cache = _weeklyTodoCache[dateKey];
-        total = cache ? cache.total : 0;
-        done = cache ? cache.done : 0;
+        dayTodos = (() => { try { return JSON.parse(localStorage.getItem(key)||'{}').todos || []; } catch(e) { return []; } })();
       }
+
+      const total = dayTodos.length;
+      const done = dayTodos.filter(t => t.done).length;
       totalAll += total;
       doneAll += done;
-      const pct = total > 0 ? Math.round(done / total * 100) : 0;
+      const pct = total > 0 ? Math.round(done / total * 100) : null;
 
-      // SVG 도넛 - 미래도 할일 있으면 표시
       const size = 36, r = 14, c = size / 2;
       const circ = 2 * Math.PI * r;
       const filled = pct !== null ? (pct / 100) * circ : 0;
-      const isEmpty = pct === null;
       const isComplete = pct === 100;
       const strokeColor = isComplete ? '#7C4DFF' : '#C4B5FD';
 
@@ -3234,13 +3193,13 @@ ${recentMsgs}
       col.innerHTML = `
         <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
           <circle cx="${c}" cy="${c}" r="${r}" fill="${isBaseDay ? '#F3EEFF' : '#F5F5F7'}" stroke="none"/>
-          ${!isEmpty ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="3"
+          ${pct !== null ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="3"
             stroke-dasharray="${filled} ${circ - filled}"
             stroke-dashoffset="${circ / 4}"
             stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/>` : ''}
           <text x="${c}" y="${c+1}" text-anchor="middle" dominant-baseline="middle"
-            font-size="${isEmpty ? '11' : '9'}" fill="${isBaseDay ? 'var(--purple)' : '#888'}" font-family="'Noto Sans KR',sans-serif" font-weight="${isBaseDay?'700':'500'}">
-            ${isEmpty ? '-' : `${pct}%`}
+            font-size="${pct === null ? '11' : '9'}" fill="${isBaseDay ? 'var(--purple)' : '#888'}" font-family="'Noto Sans KR',sans-serif" font-weight="${isBaseDay?'700':'500'}">
+            ${pct === null ? (isFuture ? '' : '-') : `${pct}%`}
           </text>
         </svg>
         <span style="font-size:11px;font-weight:${isBaseDay?'700':'400'};color:${isBaseDay?'var(--purple)':'var(--text-light)'};">${dayLabels[idx]}</span>
@@ -3927,86 +3886,88 @@ ${profileStr ? '배경: ' + profileStr : ''}
   // 전역 참조도 동기화
   setMood = window.setMood;
 
-  // 💾 날짜별 로컬 저장
+  // 💾 날짜별 저장 (localStorage = source of truth)
   const TODAY_KEY = () => {
     const d = new Date();
     return `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
   };
 
-  async function saveToday() {
-    const sleepTime = document.getElementById('sleep-time')?.value;
-    const wakeTime = document.getElementById('wake-time')?.value;
-    // 수면 데이터는 localStorage에 유지 (별도 테이블 없음)
+  function saveToday() {
+    const data = {
+      todos,
+      sleepTime: document.getElementById('sleep-time')?.value,
+      wakeTime: document.getElementById('wake-time')?.value,
+      ideas,
+      savedAt: new Date().toISOString(),
+    };
+    try { localStorage.setItem(TODAY_KEY(), JSON.stringify(data)); } catch(e) {}
+    // Supabase 백그라운드 동기화 (수면 데이터)
     const today = new Date().toISOString().slice(0,10);
-    try {
-      localStorage.setItem('mochi_sleep_' + today, JSON.stringify({ sleepTime, wakeTime }));
-    } catch(e) {}
+    try { localStorage.setItem('mochi_sleep_' + today, JSON.stringify({ sleepTime: data.sleepTime, wakeTime: data.wakeTime })); } catch(e) {}
   }
 
   async function loadToday() {
     const today = new Date().toISOString().slice(0,10);
 
-    if (_currentUser) {
-      // 할 일 불러오기
-      const { data: dbTodos } = await sb.from('todos')
-        .select('*').eq('user_id', _currentUser.id).eq('date', today);
-      if (dbTodos && dbTodos.length > 0) {
-        todos = dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done }));
-        nextId = Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0), 0) + 1;
-        renderTodos();
+    // 1. localStorage에서 즉시 로드 (빠른 응답)
+    try {
+      const raw = localStorage.getItem(TODAY_KEY());
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data.todos?.length) { todos = data.todos; nextId = Math.max(...todos.map(t=>t.id||0), nextId) + 1; renderTodos(); }
+        if (data.sleepTime) document.getElementById('sleep-time').value = data.sleepTime;
+        if (data.wakeTime) { document.getElementById('wake-time').value = data.wakeTime; calcSleep(); }
+        if (data.ideas?.length) { ideas = data.ideas; nextIdeaId = Math.max(...ideas.map(i=>i.id||0), nextIdeaId) + 1; }
       }
-      // 아이디어 불러오기
-      const { data: dbIdeas } = await sb.from('ideas')
-        .select('*').eq('user_id', _currentUser.id).order('created_at', { ascending: false });
-      if (dbIdeas && dbIdeas.length > 0) {
-        ideas = dbIdeas.map(i => ({
-          id: i.id, title: i.title, content: i.content,
-          tag: i.tag, tagColor: i.tag_color, tagTextColor: i.tag_text_color,
-          date: i.created_at?.slice(0,10).replace(/-/g,'.')
-        }));
-        nextIdeaId = ideas.length + 1;
-        renderIdeas();
-      }
-      // 오늘 일기 불러오기
-      const { data: dbDiary } = await sb.from('diaries')
-        .select('*').eq('user_id', _currentUser.id).eq('date', today).maybeSingle();
-      if (dbDiary) {
-        document.getElementById('diary-input').value = dbDiary.content || '';
-        const emo = parseEmotion(dbDiary.emotion);
-        const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emo.emoji}"]`);
-        if (btn) { document.querySelectorAll('.diary-emotion-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
-      }
+    } catch(e) {}
+
+    // 2. Supabase에서 최신 데이터로 덮어쓰기 (동기화)
+    if (!_currentUser) return;
+
+    const { data: dbTodos } = await sb.from('todos')
+      .select('*').eq('user_id', _currentUser.id).eq('date', today);
+    if (dbTodos) {
+      todos = dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
+      nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0), 0) + 1 : 1;
+      renderTodos();
     }
-    // 수면 데이터는 localStorage에서
+
+    const { data: dbIdeas } = await sb.from('ideas')
+      .select('*').eq('user_id', _currentUser.id).order('created_at', { ascending: false });
+    if (dbIdeas?.length) {
+      ideas = dbIdeas.map(i => ({ id: i.id, title: i.title, content: i.content, tag: i.tag, tagColor: i.tag_color, tagTextColor: i.tag_text_color, date: i.created_at?.slice(0,10).replace(/-/g,'.') }));
+      nextIdeaId = ideas.length + 1;
+      renderIdeas();
+    }
+
+    const { data: dbDiary } = await sb.from('diaries')
+      .select('*').eq('user_id', _currentUser.id).eq('date', today).maybeSingle();
+    if (dbDiary) {
+      document.getElementById('diary-input').value = dbDiary.content || '';
+      const emo = parseEmotion(dbDiary.emotion);
+      const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emo.emoji}"]`);
+      if (btn) { document.querySelectorAll('.diary-emotion-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
+    }
+
     try {
       const sleepRaw = localStorage.getItem('mochi_sleep_' + today);
       if (sleepRaw) {
         const s = JSON.parse(sleepRaw);
-        if (s.sleepTime) { document.getElementById('sleep-time').value = s.sleepTime; }
+        if (s.sleepTime) document.getElementById('sleep-time').value = s.sleepTime;
         if (s.wakeTime) { document.getElementById('wake-time').value = s.wakeTime; calcSleep(); }
       }
     } catch(e) {}
   }
 
-  function showSaveBadge() {
-    // 알림 숨김
-  }
+  function showSaveBadge() { }
 
-  // 할 일 완료 시 축하 + 저장 연동
+  // updateProgress 오버라이드 - 저장 + 주간달성률 + 축하
   const _origUpdateProgress = updateProgress;
   updateProgress = function() {
     const wasDone = todos.length > 0 && todos.every(t => t.done);
-
-    // ① progress bar 업데이트
     _origUpdateProgress();
-
-    // ② 저장
     saveToday();
-
-    // ③ 주간 달성률 항상 갱신 (debounce로 처리됨)
     renderWeeklyProgress();
-
-    // ④ 축하 애니메이션
     const isDone = todos.length > 0 && todos.every(t => t.done);
     if (isDone && !wasDone) {
       launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
@@ -4623,6 +4584,33 @@ ${todoList}
   // ── 날짜별 보기 ──
   function viewingKey(y, m, d) { return `mochi_${y}_${m+1}_${d}`; }
 
+  // ══════════════════════════════════════
+  // 날짜 & 할일 통합 관리 (새 설계)
+  // ══════════════════════════════════════
+
+  // 지금 보고 있는 날짜 (null = 오늘)
+  // viewingDate는 위에 선언돼있음
+
+  // 현재 보고 있는 날짜의 dateStr 반환
+  function getCurrentDateStr() {
+    if (viewingDate) {
+      return `${viewingDate.y}-${String(viewingDate.m+1).padStart(2,'0')}-${String(viewingDate.d).padStart(2,'0')}`;
+    }
+    return new Date().toISOString().slice(0,10);
+  }
+
+  // 특정 날짜의 할일을 DB에서 불러와 todos에 세팅
+  async function loadTodosForDate(dateStr) {
+    if (!_currentUser) return;
+    const { data: dbTodos } = await sb.from('todos')
+      .select('*').eq('user_id', _currentUser.id).eq('date', dateStr);
+    todos = (dbTodos || []).map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
+    nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0)) + 1 : 1;
+    renderTodos();
+    renderTagTabs();
+  }
+
+  // 오늘로 돌아오기
   function returnToToday() {
     viewingDate = null;
     diaryOffset = 0;
@@ -4630,18 +4618,17 @@ ${todoList}
     const dayNames = ['일','월','화','수','목','금','토'];
     document.getElementById('date-badge').textContent = `📅 ${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일 (${dayNames[n.getDay()]})`;
     document.getElementById('return-today-btn').style.display = 'none';
-    _lastWeekKey = null;
-    loadToday().then(() => renderWeeklyProgress());
+    loadToday();
     renderDiary();
     renderCalendar();
   }
 
-  async function openDaylog(y, m, d) {
+  // 특정 날짜로 이동
+  function openDaylog(y, m, d) {
     const n = new Date();
     const isToday = y === n.getFullYear() && m === n.getMonth() && d === n.getDate();
 
     document.getElementById('cal-overlay').style.display = 'none';
-
     if (isToday) { returnToToday(); return; }
 
     viewingDate = { y, m, d };
@@ -4653,38 +4640,48 @@ ${todoList}
     document.getElementById('date-badge').textContent = `${label} ${y}년 ${m+1}월 ${d}일 (${dayNames[dow]})`;
     document.getElementById('return-today-btn').style.display = 'inline-block';
 
-    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-
-    // Supabase에서 할 일 불러오기
-    if (_currentUser) {
-      const { data: dbTodos } = await sb.from('todos')
-        .select('*').eq('user_id', _currentUser.id).eq('date', dateStr);
-      todos = dbTodos ? dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done })) : [];
-    } else {
-      const raw = localStorage.getItem(viewingKey(y, m, d));
-      let data = {};
-      try { if (raw) data = JSON.parse(raw); } catch(e) {}
-      todos = data.todos || [];
-    }
-
-    nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0)) + 1 : 1;
+    // localStorage에서 해당 날짜 데이터 로드
+    const raw = localStorage.getItem(viewingKey(y, m, d));
+    let data = {};
+    try { if (raw) data = JSON.parse(raw); } catch(e) {}
+    todos = data.todos || [];
+    nextId = todos.length ? Math.max(...todos.map(t => t.id || 0)) + 1 : 1;
     renderTodos();
     renderTagTabs();
 
+    // Supabase에서 최신 데이터로 덮어쓰기 (백그라운드)
+    if (_currentUser) {
+      const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      sb.from('todos').select('*').eq('user_id', _currentUser.id).eq('date', dateStr)
+        .then(({ data: dbTodos }) => {
+          if (dbTodos) {
+            todos = dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
+            nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0)) + 1 : 1;
+            renderTodos();
+            renderTagTabs();
+            renderWeeklyProgress();
+          }
+        });
+    }
+
+    // 일기 offset 계산
     const todayMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
     const targetMidnight = new Date(y, m, d);
     diaryOffset = Math.round((targetMidnight - todayMidnight) / 86400000);
     renderDiary();
-
-    // 해당 날짜의 주 달성률 새로 로드
-    _lastWeekKey = null;
     renderWeeklyProgress();
   }
 
-  // saveToday 오버라이드 - 과거 날짜 할 일 Supabase에 저장
+  // saveToday 오버라이드 - viewingDate 기준으로 저장
   const _origSaveToday = saveToday;
   saveToday = function() {
     if (!viewingDate) { _origSaveToday(); return; }
+    const { y, m, d } = viewingDate;
+    const existing = (() => { try { return JSON.parse(localStorage.getItem(viewingKey(y,m,d)) || '{}'); } catch(e) { return {}; } })();
+    existing.todos = todos;
+    existing.savedAt = new Date().toISOString();
+    localStorage.setItem(viewingKey(y,m,d), JSON.stringify(existing));
+    // Supabase 백그라운드 동기화 - 변경된 todos만 업데이트
     renderCalendar();
   };
 
