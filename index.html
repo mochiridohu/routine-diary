@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>모찌의 하루 비서 ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --cream: #F4F4F6;
@@ -1193,84 +1194,32 @@
 
 <!-- ── 로그인 화면 ── -->
 <div id="login-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10000; overflow-y:auto;">
-  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
-
-    <!-- 로고 -->
-    <div style="text-align:center; margin-bottom:40px;">
-      <div style="font-size:56px; margin-bottom:12px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
-      <div style="font-size:22px; font-weight:900; color:var(--purple); letter-spacing:-0.5px;">모찌의 하루 비서</div>
-      <div style="font-size:13px; color:var(--text-light); margin-top:6px;">계정을 선택하거나 새로 만들어요</div>
-    </div>
-
-    <!-- 계정 목록 -->
-    <div id="account-list" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
-
-    <!-- 새 계정 만들기 버튼 -->
-    <button onclick="showCreateAccount()" style="width:100%; padding:14px; border-radius:16px; border:2px dashed var(--purple); background:transparent; color:var(--purple); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; transition:all 0.2s;">
-      + 새 계정 만들기
-    </button>
-
-  </div>
-</div>
-
-<!-- ── 계정 생성 화면 ── -->
-<div id="create-account-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
-  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
-
-    <div style="text-align:center; margin-bottom:36px;">
-      <div style="font-size:48px; margin-bottom:12px;">✨</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); letter-spacing:-0.4px;">새 계정 만들기</div>
-    </div>
-
-    <div style="display:flex; flex-direction:column; gap:16px;">
-      <div>
-        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">닉네임</label>
-        <input id="ca-name" type="text" class="todo-input" style="width:100%; font-size:16px; box-sizing:border-box;" placeholder="예: 윤주, 엄마, 오빠">
-      </div>
-      <div>
-        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">비밀번호 <span style="font-weight:400;">(영문+숫자+특수문자 포함, 6자 이상)</span></label>
-        <div style="position:relative;">
-          <input id="ca-pw" type="password" class="todo-input" style="width:100%; box-sizing:border-box; padding-right:44px;" placeholder="예: Mochi@12">
-          <button onclick="toggleCaPw()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-light);" id="ca-pw-eye">👁</button>
-        </div>
-      </div>
-      <div>
-        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">비밀번호 확인</label>
-        <input id="ca-pw2" type="password" class="todo-input" style="width:100%; box-sizing:border-box;" placeholder="동일하게 입력해주세요">
-      </div>
-      <div id="ca-error" style="font-size:12px; color:#e05; display:none; text-align:center;"></div>
-    </div>
-
-    <div style="display:flex; gap:10px; margin-top:28px;">
-      <button onclick="hideCreateAccount()" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">취소</button>
-      <button onclick="createAccount()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">계정 만들기</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── PIN 입력 화면 ── -->
-<div id="pin-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
   <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;">
 
-    <div id="pin-avatar" style="font-size:52px; margin-bottom:10px;"></div>
-    <div id="pin-name" style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:6px;"></div>
-    <div style="font-size:13px; color:var(--text-light); margin-bottom:32px;">비밀번호를 입력해주세요</div>
+    <div style="font-size:64px; margin-bottom:16px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
+    <div style="font-size:24px; font-weight:900; color:var(--purple); letter-spacing:-0.5px; margin-bottom:8px;">모찌의 하루 비서</div>
+    <div style="font-size:14px; color:var(--text-light); margin-bottom:48px;">매일을 더 잘 살아가도록 도와줄게요</div>
 
-    <div style="width:100%; max-width:320px; position:relative;">
-      <input id="pin-input" type="password" class="todo-input"
-        style="width:100%; font-size:18px; letter-spacing:3px; text-align:center; box-sizing:border-box; padding-right:44px;"
-        placeholder="비밀번호 입력"
-        onkeydown="if(event.key==='Enter') checkPin()">
-      <button onclick="togglePinVisibility()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-light);" id="pin-eye">👁</button>
-    </div>
-
-    <div id="pin-error" style="font-size:12px; color:#e05; margin-top:12px; display:none;">비밀번호가 틀렸어요 😢</div>
-
-    <button onclick="checkPin()" style="margin-top:20px; width:100%; max-width:320px; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">
-      로그인
+    <button onclick="loginWithGoogle()" style="display:flex; align-items:center; gap:12px; width:100%; max-width:320px; padding:16px 20px; border-radius:16px; border:1.5px solid var(--border); background:white; cursor:pointer; font-family:'Noto Sans KR',sans-serif; font-size:15px; font-weight:700; color:var(--text); box-shadow:0 2px 12px rgba(0,0,0,0.08); transition:all 0.2s;">
+      <img src="https://www.google.com/favicon.ico" width="20" height="20">
+      Google로 시작하기
     </button>
 
-    <button onclick="showLoginScreen()" style="margin-top:14px; background:none; border:none; color:var(--text-light); font-size:13px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">← 다른 계정</button>
+    <div id="login-error" style="margin-top:16px; font-size:12px; color:#e05; display:none;"></div>
+  </div>
+</div>
+
+<!-- ── 닉네임 설정 화면 (첫 로그인) ── -->
+<div id="nickname-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
+  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
+    <div style="text-align:center; margin-bottom:36px;">
+      <div style="font-size:48px; margin-bottom:12px;">✨</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:8px;">반가워요! 닉네임을 정해줘요</div>
+      <div style="font-size:13px; color:var(--text-light);">모찌가 이렇게 불러드릴게요 🐰</div>
+    </div>
+    <input id="nickname-input" type="text" class="todo-input" style="width:100%; font-size:18px; text-align:center; font-weight:700; box-sizing:border-box;" placeholder="예: 윤주, 쥬, 언니">
+    <div id="nickname-error" style="font-size:12px; color:#e05; margin-top:8px; text-align:center; display:none;"></div>
+    <button onclick="saveNickname()" style="margin-top:20px; width:100%; padding:15px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">시작하기 🐰</button>
   </div>
 </div>
 
@@ -4369,278 +4318,124 @@ ${todoList}
   };
 
   // ══════════════════════════════════════
-  // 계정 관리 시스템
+  // Supabase 인증 시스템
   // ══════════════════════════════════════
 
-  let _currentUserId = null;
+  const SUPABASE_URL = 'https://subjdjbrdjdikjaqjafi.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YmpkamJyZGpkaWtqYXFqYWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjM5MTAsImV4cCI6MjA4ODYzOTkxMH0.x6ZwV3w7qdqnd_Tf2Blh9o6ppoH5zbDyd9tAO1tVeRI';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // localStorage 키에 유저 prefix 자동 적용
-  const _origGet = localStorage.getItem.bind(localStorage);
-  const _origSet = localStorage.setItem.bind(localStorage);
-  const _origRem = localStorage.removeItem.bind(localStorage);
+  let _currentUser = null;
 
-  // 계정 메타데이터는 prefix 없이 저장 (공용)
-  const ACCOUNT_META_KEY = '__mochi_accounts__';
-  const SESSION_KEY = '__mochi_session__';
-
-  function getAccounts() {
-    try { return JSON.parse(_origGet(ACCOUNT_META_KEY) || '[]'); } catch(e) { return []; }
+  // 구글 로그인
+  async function loginWithGoogle() {
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + window.location.pathname }
+    });
+    if (error) {
+      document.getElementById('login-error').textContent = '로그인 실패: ' + error.message;
+      document.getElementById('login-error').style.display = 'block';
+    }
   }
-  function saveAccounts(arr) { _origSet(ACCOUNT_META_KEY, JSON.stringify(arr)); }
+  window.loginWithGoogle = loginWithGoogle;
 
-  function userPrefix(uid) { return `u_${uid}_`; }
-
-  // 유저 데이터 접근 (현재 로그인된 유저 기준)
-  function uGet(key) { return _currentUserId ? _origGet(userPrefix(_currentUserId) + key) : _origGet(key); }
-  function uSet(key, val) { return _currentUserId ? _origSet(userPrefix(_currentUserId) + key, val) : _origSet(key, val); }
-  function uRemove(key) { return _currentUserId ? _origRem(userPrefix(_currentUserId) + key) : _origRem(key); }
-
-  // localStorage 전역 오버라이드 (로그인 후 앱 코드가 자동으로 유저별 저장)
-  function activateUserStorage(uid) {
-    _currentUserId = uid;
-    localStorage.getItem = (key) => {
-      // 공용 키는 그대로
-      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origGet(key);
-      return _origGet(userPrefix(uid) + key);
-    };
-    localStorage.setItem = (key, val) => {
-      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origSet(key, val);
-      return _origSet(userPrefix(uid) + key, val);
-    };
-    localStorage.removeItem = (key) => {
-      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origRem(key);
-      return _origRem(userPrefix(uid) + key);
-    };
-  }
-
-  // 계정 생성
-  function createAccount() {
-    const name = document.getElementById('ca-name').value.trim();
-    const pw = document.getElementById('ca-pw').value;
-    const pw2 = document.getElementById('ca-pw2').value;
-    const errEl = document.getElementById('ca-error');
+  // 닉네임 저장 (첫 로그인)
+  async function saveNickname() {
+    const nick = document.getElementById('nickname-input').value.trim();
+    const errEl = document.getElementById('nickname-error');
     errEl.style.display = 'none';
+    if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
+    if (nick.length > 12) { errEl.textContent = '12자 이내로 입력해주세요'; errEl.style.display = 'block'; return; }
 
-    if (!name) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
-    if (pw.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 해요'; errEl.style.display = 'block'; return; }
-    if (!/[a-zA-Z]/.test(pw)) { errEl.textContent = '영문자를 포함해주세요'; errEl.style.display = 'block'; return; }
-    if (!/[0-9]/.test(pw)) { errEl.textContent = '숫자를 포함해주세요'; errEl.style.display = 'block'; return; }
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) { errEl.textContent = '특수문자를 포함해주세요 (예: !@#$)'; errEl.style.display = 'block'; return; }
-    if (pw !== pw2) { errEl.textContent = '비밀번호가 일치하지 않아요'; errEl.style.display = 'block'; return; }
+    // 중복 체크
+    const { data: existing } = await sb.from('profiles').select('id').eq('nickname', nick).maybeSingle();
+    if (existing) { errEl.textContent = '이미 사용 중인 닉네임이에요'; errEl.style.display = 'block'; return; }
 
-    const accounts = getAccounts();
-    if (accounts.find(a => a.name === name)) { errEl.textContent = '이미 있는 닉네임이에요'; errEl.style.display = 'block'; return; }
+    const { error } = await sb.from('profiles').insert({ id: _currentUser.id, nickname: nick, avatar: randomAvatar() });
+    if (error) { errEl.textContent = '저장 실패: ' + error.message; errEl.style.display = 'block'; return; }
 
-    const uid = Date.now().toString(36);
-    const avatars = ['🐰','🐱','🐻','🦊','🐼','🐸','🐨','🦁'];
-    const avatar = avatars[Math.floor(Math.random() * avatars.length)];
-    accounts.push({ uid, name, pw, avatar, createdAt: new Date().toISOString() });
-    saveAccounts(accounts);
-    loginUser(uid, name, avatar, true);
+    document.getElementById('nickname-screen').style.display = 'none';
+    enterApp(nick, true);
+  }
+  window.saveNickname = saveNickname;
+
+  function randomAvatar() {
+    const list = ['🐰','🐱','🐻','🦊','🐼','🐸','🐨','🦁'];
+    return list[Math.floor(Math.random() * list.length)];
   }
 
-  // 비밀번호 표시 토글
-  function toggleCaPw() {
-    const inp = document.getElementById('ca-pw');
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-  }
-  function togglePinVisibility() {
-    const inp = document.getElementById('pin-input');
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-  }
-  window.toggleCaPw = toggleCaPw;
-  window.togglePinVisibility = togglePinVisibility;
-
-  // 로그인
-  function loginUser(uid, name, avatar, isNew = false) {
-    activateUserStorage(uid);
-    _origSet(SESSION_KEY, uid);
-
+  // 앱 진입
+  function enterApp(nickname, isNew = false) {
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('pin-screen').style.display = 'none';
-    document.getElementById('create-account-screen').style.display = 'none';
+    document.getElementById('nickname-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
 
-    // 로그아웃 버튼 업데이트
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) logoutBtn.innerHTML = `${avatar} ${name} · <span style="color:#e05">로그아웃</span>`;
-
     // 닉네임 동기화
-    if (!localStorage.getItem('mochi_user_name')) {
-      localStorage.setItem('mochi_user_name', name);
-    }
-    if (typeof updateUserName === 'function') {
-      updateUserName(localStorage.getItem('mochi_user_name') || name);
-    }
+    localStorage.setItem('mochi_user_name', nickname);
+    if (typeof updateUserName === 'function') updateUserName(nickname);
+    const ni = document.getElementById('setting-name');
+    if (ni) ni.value = nickname;
 
-    // 새 계정이면 prefix 없는 레거시 데이터 정리 + 튜토리얼
+    // 로그아웃 버튼
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) logoutBtn.textContent = `${nickname} · 로그아웃`;
+
+    // 새 계정이면 튜토리얼
     if (isNew) {
-      // 공용 키 제외하고 prefix 없는 기존 데이터 삭제
-      const legacyKeys = Object.keys(localStorage).filter(k =>
-        !k.startsWith('__mochi_') && !k.startsWith('u_')
-      );
-      legacyKeys.forEach(k => _origRem(k));
-      todos = []; nextId = 1;
-      ideas = []; nextIdeaId = 1;
-      localStorage.setItem('mochi_user_name', name);
-      if (typeof renderTutSlides === 'function') {
-        tutStep = 0;
-        document.getElementById('tutorial-overlay').style.display = 'block';
-        setTimeout(renderTutSlides, 100);
-      }
+      tutStep = 0;
+      document.getElementById('tutorial-overlay').style.display = 'block';
+      setTimeout(renderTutSlides, 100);
     }
 
-    // 앱 데이터 초기화
     if (typeof loadBasicProfile === 'function') setTimeout(loadBasicProfile, 100);
     if (typeof loadProfile === 'function') setTimeout(loadProfile, 120);
-    if (typeof renderTags === 'function') setTimeout(renderTags, 150);
     if (typeof loadToday === 'function') setTimeout(loadToday, 200);
-    const settingsNameEl = document.getElementById('setting-name');
-    if (settingsNameEl) settingsNameEl.value = localStorage.getItem('mochi_user_name') || name;
   }
 
   // 로그아웃
-  function logout() {
+  async function logout() {
     if (!confirm('로그아웃 할까요?')) return;
-    _origRem(SESSION_KEY);
-    _currentUserId = null;
-    // storage 원복
-    localStorage.getItem = _origGet;
-    localStorage.setItem = _origSet;
-    localStorage.removeItem = _origRem;
+    await sb.auth.signOut();
+    _currentUser = null;
     document.getElementById('app-wrapper').style.display = 'none';
-    showLoginScreen();
+    document.getElementById('login-screen').style.display = 'block';
   }
-  function resetAllData() {
-    if (!confirm('정말로 모든 데이터를 삭제할까요?\n할 일, 일기, 아이디어, 프로필이 전부 지워져요.')) return;
-    if (!_currentUserId) return;
-    const prefix = userPrefix(_currentUserId);
-    const keysToDelete = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = _origGet === localStorage.getItem ? localStorage.key(i) : (() => {
-        // 원본 접근
-        for (let j = 0; j < localStorage.length; j++) {
-          const raw = Object.keys(localStorage)[j];
-          return raw;
-        }
-      })();
-    }
-    // 원본 localStorage에서 현재 유저 prefix 키 전부 삭제
-    const allKeys = Object.keys(localStorage);
-    allKeys.forEach(k => { if (k.startsWith(prefix)) _origRem(k); });
-    // 메모리 상 todos/ideas 초기화
-    todos = []; nextId = 1;
-    ideas = []; nextIdeaId = 1;
-    // UI 갱신
-    if (typeof renderTodoList === 'function') renderTodoList();
-    if (typeof renderIdeas === 'function') renderIdeas();
-    if (typeof renderWeeklyProgress === 'function') renderWeeklyProgress();
-    if (typeof loadProfile === 'function') loadProfile();
-    if (typeof loadBasicProfile === 'function') loadBasicProfile();
-    ['profile-job','profile-goal','profile-interest','profile-memo'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
-    });
-    document.querySelectorAll('#gender-btns .profile-chip, #age-btns .profile-chip').forEach(b => b.classList.remove('selected'));
-    const locEl = document.getElementById('profile-location'); if (locEl) locEl.value = '';
-    if (typeof renderLearnedProfile === 'function') renderLearnedProfile();
-    alert('✅ 초기화 완료! 깨끗하게 시작해요 🐰');
-  }
-  window.resetAllData = resetAllData;
-
   window.logout = logout;
 
-  // 계정 선택 화면
   function showLoginScreen() {
-    const accounts = getAccounts();
-    const listEl = document.getElementById('account-list');
-    listEl.innerHTML = '';
-
-    if (accounts.length === 0) {
-      listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">아직 계정이 없어요<br>아래 버튼으로 만들어보세요 🐰</div>`;
-    } else {
-      accounts.forEach(acc => {
-        const btn = document.createElement('div');
-        btn.style.cssText = 'display:flex;align-items:center;gap:14px;padding:16px 18px;background:white;border-radius:16px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.05);';
-        btn.innerHTML = `
-          <div style="font-size:32px;">${acc.avatar}</div>
-          <div style="flex:1;">
-            <div style="font-size:15px;font-weight:800;color:var(--text);">${acc.name}</div>
-            <div style="font-size:11px;color:var(--text-light);margin-top:2px;">가입일 ${acc.createdAt?.slice(0,10)||''}</div>
-          </div>
-          <div style="font-size:20px;color:var(--text-light);">›</div>
-        `;
-        btn.onmouseenter = () => btn.style.borderColor = 'var(--purple)';
-        btn.onmouseleave = () => btn.style.borderColor = 'var(--border)';
-        btn.onclick = () => showPinScreen(acc);
-        listEl.appendChild(btn);
-      });
-    }
-
-    document.getElementById('login-screen').style.display = 'block';
-    document.getElementById('create-account-screen').style.display = 'none';
-    document.getElementById('pin-screen').style.display = 'none';
-  }
-
-  // 비밀번호 확인
-  let _pinTarget = null;
-
-  function showPinScreen(acc) {
-    _pinTarget = acc;
-    document.getElementById('pin-avatar').textContent = acc.avatar;
-    document.getElementById('pin-name').textContent = acc.name;
-    document.getElementById('pin-error').style.display = 'none';
-    document.getElementById('pin-input').value = '';
-    document.getElementById('pin-input').type = 'password';
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('pin-screen').style.display = 'block';
-    setTimeout(() => document.getElementById('pin-input').focus(), 200);
-  }
-
-  function checkPin() {
-    const entered = document.getElementById('pin-input').value;
-    if (entered === _pinTarget.pw) {
-      loginUser(_pinTarget.uid, _pinTarget.name, _pinTarget.avatar);
-    } else {
-      const errEl = document.getElementById('pin-error');
-      errEl.style.display = 'block';
-      const inp = document.getElementById('pin-input');
-      inp.style.borderColor = '#e05';
-      setTimeout(() => { inp.style.borderColor = ''; inp.value = ''; inp.focus(); }, 800);
-    }
-  }
-  window.checkPin = checkPin;
-
-  function showCreateAccount() {
-    document.getElementById('ca-name').value = '';
-    document.getElementById('ca-pw').value = '';
-    document.getElementById('ca-pw2').value = '';
-    document.getElementById('ca-error').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('create-account-screen').style.display = 'block';
-    setTimeout(() => document.getElementById('ca-name').focus(), 200);
-  }
-
-  function hideCreateAccount() {
-    document.getElementById('create-account-screen').style.display = 'none';
     document.getElementById('login-screen').style.display = 'block';
   }
 
-  window.showCreateAccount = showCreateAccount;
-  window.hideCreateAccount = hideCreateAccount;
-  window.createAccount = createAccount;
-
-  // ── 앱 시작: 세션 복원 or 로그인 화면 ──
-  (function initAuth() {
-    const savedUid = _origGet(SESSION_KEY);
-    if (savedUid) {
-      const accounts = getAccounts();
-      const acc = accounts.find(a => a.uid === savedUid);
-      if (acc) {
-        loginUser(acc.uid, acc.name, acc.avatar);
-        return;
+  // ── 앱 시작: 세션 확인 ──
+  (async function initAuth() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      _currentUser = session.user;
+      const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
+      if (profile) {
+        enterApp(profile.nickname, false);
+      } else {
+        // 첫 로그인 - 닉네임 설정
+        document.getElementById('nickname-screen').style.display = 'block';
       }
+    } else {
+      document.getElementById('login-screen').style.display = 'block';
     }
-    showLoginScreen();
+
+    // OAuth 리디렉트 후 처리
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        _currentUser = session.user;
+        const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
+        if (profile) {
+          enterApp(profile.nickname, false);
+        } else {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('nickname-screen').style.display = 'block';
+        }
+      }
+    });
   })();
 
 </script>
