@@ -4724,25 +4724,40 @@ ${todoList}
 
   // ── 앱 시작: 세션 확인 ──
   (async function initAuth() {
+    // 로딩 중 스플래시
+    document.body.insertAdjacentHTML('beforeend', `
+      <div id="splash" style="position:fixed;inset:0;background:var(--theme-bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div style="font-size:52px;animation:floatY 1.5s ease-in-out infinite;">🐰</div>
+        <div style="font-size:14px;color:var(--text-light);margin-top:12px;">모찌 불러오는 중...</div>
+      </div>
+    `);
+
+    const hideSplash = () => {
+      const s = document.getElementById('splash');
+      if (s) s.remove();
+    };
+
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       _currentUser = session.user;
       const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
+      hideSplash();
       if (profile) {
         enterApp(profile.nickname, false);
       } else {
-        // 첫 로그인 - 닉네임 설정
         document.getElementById('nickname-screen').style.display = 'block';
       }
     } else {
+      hideSplash();
       document.getElementById('login-screen').style.display = 'block';
     }
 
-    // OAuth 리디렉트 후 처리
+    // OAuth 리디렉트 후 처리 (새 로그인만)
     sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if (event === 'SIGNED_IN' && session && !_currentUser) {
         _currentUser = session.user;
         const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
+        hideSplash();
         if (profile) {
           enterApp(profile.nickname, false);
         } else {
