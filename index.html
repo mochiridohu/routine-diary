@@ -2579,7 +2579,7 @@ ${recentMsgs}
 
   function saveDiary() {}
 
-  function saveDiaryManual() {
+  async function saveDiaryManual() {
     const text = document.getElementById('diary-input').value.trim();
     if (!text) {
       const btn = document.getElementById('diary-save-btn');
@@ -2592,13 +2592,25 @@ ${recentMsgs}
     const emotionBtn = document.querySelector('.diary-emotion-btn.selected');
     const emotion = emotionBtn ? emotionBtn.dataset.emotion : '';
     const emotionLabel = emotionBtn ? emotionBtn.dataset.label : '';
-
     const moodBtn = document.querySelector('.mood-mini.selected');
     const moodEmoji = moodBtn ? moodBtn.textContent.trim() : '';
     const moodLabels = { '5': '최고', '4': '좋음', '3': '보통', '2': '별로', '1': '힘듦' };
     const moodLabel = moodBtn ? (moodLabels[moodBtn.dataset.mood] || '') : '';
 
     const diaryData = { text, emotion, emotionLabel, mood: moodEmoji, moodLabel, savedAt: new Date().toISOString() };
+
+    // Supabase 저장
+    if (_currentUser) {
+      const d = new Date(); d.setDate(d.getDate() + diaryOffset);
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      await sb.from('diaries').upsert({
+        user_id: _currentUser.id,
+        date: dateStr,
+        emotion: emotion + ' ' + emotionLabel,
+        content: text,
+      }, { onConflict: 'user_id,date' });
+    }
+    // localStorage 백업
     localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(diaryData));
 
     const btn = document.getElementById('diary-save-btn');
@@ -2853,22 +2865,39 @@ ${recentMsgs}
     updateProgress();
   }
 
-  function toggleTodo(id) {
-    todos = todos.map(t => t.id === id ? {...t, done: !t.done} : t);
+  async function toggleTodo(id) {
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+    const newDone = !todo.done;
+    todos = todos.map(t => t.id === id ? {...t, done: newDone} : t);
     renderTodos();
+    if (_currentUser) {
+      await sb.from('todos').update({ done: newDone }).eq('id', id).eq('user_id', _currentUser.id);
+    }
   }
 
-  function deleteTodo(id) {
+  async function deleteTodo(id) {
     todos = todos.filter(t => t.id !== id);
     renderTodos();
+    if (_currentUser) {
+      await sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
+    }
   }
 
-  function addTodo() {
+  async function addTodo() {
     const input = document.getElementById('todo-input');
     const text = input.value.trim();
     if (!text) return;
-    todos.push({ id: nextId++, text, tag: selectedTag, done: false });
+    const newTodo = { text, tag: selectedTag, done: false, date: new Date().toISOString().slice(0,10) };
     input.value = '';
+    if (_currentUser) {
+      const { data, error } = await sb.from('todos').insert({ ...newTodo, user_id: _currentUser.id }).select().single();
+      if (!error && data) {
+        todos.push({ id: data.id, ...newTodo });
+      }
+    } else {
+      todos.push({ id: nextId++, ...newTodo });
+    }
     renderTodos();
   }
 
@@ -3416,7 +3445,20 @@ ${diaryText}`
     } catch(e) {}
 
     const { bg, tc } = pickTagColor(tag);
-    ideas.push({ id: nextIdeaId++, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
+
+    if (_currentUser) {
+      const { data: saved, error } = await sb.from('ideas').insert({
+        user_id: _currentUser.id,
+        title, content, tag,
+        tag_color: bg, tag_text_color: tc
+      }).select().single();
+      if (!error && saved) {
+        ideas.unshift({ id: saved.id, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
+      }
+    } else {
+      ideas.push({ id: nextIdeaId++, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
+    }
+
     document.getElementById('idea-title').value = '';
     document.getElementById('idea-content').value = '';
 
@@ -3606,7 +3648,7 @@ ${profileStr ? '배경: ' + profileStr : ''}
     return `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
   };
 
-  function saveToday() {
+  async function saveToday() {
     const data = {
       todos,
       sleepTime: document.getElementById('sleep-time')?.value,
@@ -3617,17 +3659,41 @@ ${profileStr ? '배경: ' + profileStr : ''}
     try { localStorage.setItem(TODAY_KEY(), JSON.stringify(data)); } catch(e) {}
   }
 
-  function loadToday() {
-    try {
-      const raw = localStorage.getItem(TODAY_KEY());
-      if (!raw) return;
-      const data = JSON.parse(raw);
-      if (data.todos) { todos = data.todos; nextId = Math.max(...todos.map(t=>t.id), nextId) + 1; renderTodos(); }
-      if (data.sleepTime) { document.getElementById('sleep-time').value = data.sleepTime; }
-      if (data.wakeTime) { document.getElementById('wake-time').value = data.wakeTime; calcSleep(); }
-      if (data.ideas) { ideas = data.ideas; nextIdeaId = Math.max(...ideas.map(i=>i.id), nextIdeaId) + 1; }
-      showSaveBadge();
-    } catch(e) {}
+  async function loadToday() {
+    if (_currentUser) {
+      // Supabase에서 오늘 할 일 불러오기
+      const today = new Date().toISOString().slice(0,10);
+      const { data: dbTodos } = await sb.from('todos')
+        .select('*').eq('user_id', _currentUser.id).eq('date', today);
+      if (dbTodos && dbTodos.length > 0) {
+        todos = dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done }));
+        nextId = Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0), 0) + 1;
+        renderTodos();
+      }
+      // 아이디어 불러오기
+      const { data: dbIdeas } = await sb.from('ideas')
+        .select('*').eq('user_id', _currentUser.id).order('created_at', { ascending: false });
+      if (dbIdeas && dbIdeas.length > 0) {
+        ideas = dbIdeas.map(i => ({
+          id: i.id, title: i.title, content: i.content,
+          tag: i.tag, tagColor: i.tag_color, tagTextColor: i.tag_text_color,
+          date: i.created_at?.slice(0,10).replace(/-/g,'.')
+        }));
+        nextIdeaId = ideas.length + 1;
+        renderIdeas();
+      }
+    } else {
+      // localStorage 폴백
+      try {
+        const raw = localStorage.getItem(TODAY_KEY());
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.todos) { todos = data.todos; nextId = Math.max(...todos.map(t=>t.id), nextId) + 1; renderTodos(); }
+        if (data.sleepTime) { document.getElementById('sleep-time').value = data.sleepTime; }
+        if (data.wakeTime) { document.getElementById('wake-time').value = data.wakeTime; calcSleep(); }
+        if (data.ideas) { ideas = data.ideas; nextIdeaId = Math.max(...ideas.map(i=>i.id), nextIdeaId) + 1; }
+      } catch(e) {}
+    }
   }
 
   function showSaveBadge() {
