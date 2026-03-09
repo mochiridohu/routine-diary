@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>모찌의 하루 비서 ✨</title>
+<title>윤주의 하루 비서 ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --cream: #F4F4F6;
+    --cream: #F7F7F8;
     --peach: #FFD6C0;
     --pink: #FFB5C8;
     --lavender: #EAE4FF;
@@ -22,24 +21,13 @@
     --white: #FFFFFF;
     --border: #EBEBEF;
     --shadow: rgba(0, 0, 0, 0.06);
-
-    /* 테마 전용 변수 */
-    --theme-accent: #7C5CBF;
-    --theme-accent-light: #EAE4FF;
-    --theme-accent-mid: #9B7FD4;
-    --theme-bg: #F4F4F6;
-    --theme-header-from: rgba(124,92,191,0.92);
-    --theme-header-mid: rgba(180,120,210,0.88);
-    --theme-header-to: rgba(255,160,180,0.82);
-    --theme-card-border: #EBEBEF;
-    --theme-nav-bg: rgba(255,255,255,0.95);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'Noto Sans KR', sans-serif;
-    background: var(--theme-bg);
+    background: var(--cream);
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -62,7 +50,7 @@
   }
 
   .header-glass {
-    background: linear-gradient(135deg, var(--theme-header-from) 0%, var(--theme-header-mid) 60%, var(--theme-header-to) 100%);
+    background: linear-gradient(135deg, rgba(124,92,191,0.92) 0%, rgba(180,120,210,0.88) 60%, rgba(255,160,180,0.82) 100%);
     border-radius: 22px;
     padding: 20px 20px 18px;
     margin-bottom: 16px;
@@ -611,88 +599,6 @@
   .idea-card-footer { display: flex; justify-content: space-between; align-items: center; }
   .idea-date { font-size: 11px; color: var(--text-light); }
 
-  /* 모찌 피드백 */
-  /* 테마 버튼 */
-  .theme-btn {
-    border-radius: 16px;
-    padding: 14px 16px;
-    cursor: pointer;
-    border: 3px solid transparent;
-    transition: all 0.2s;
-    display: flex; flex-direction: column; gap: 3px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  .theme-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
-  .theme-btn.selected { box-shadow: 0 4px 16px rgba(0,0,0,0.2); transform: translateY(-1px); }
-  .theme-btn-name { font-size: 13px; font-weight: 800; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-  .theme-btn-desc { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 500; }
-
-  /* 프로필 선택 칩 */
-  .profile-chip {
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1.5px solid var(--border);
-    background: white;
-    font-size: 12px;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 600;
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .profile-chip:hover { background: var(--lavender); border-color: var(--purple); color: var(--purple); }
-  .profile-chip.selected { background: var(--purple); border-color: var(--purple); color: white; }
-
-  .ob-chip {
-    padding: 10px 18px;
-    border-radius: 22px;
-    border: 1.5px solid var(--border);
-    background: white;
-    font-size: 14px;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 600;
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .ob-chip:hover { background: var(--lavender); border-color: var(--purple); color: var(--purple); }
-  .ob-chip.selected { background: var(--purple); border-color: var(--purple); color: white; }
-
-  .idea-feedback-btn {
-    width: 100%;
-    margin-top: 0;
-    padding: 9px 14px;
-    background: #f7f4ff;
-    color: #6c47b8;
-    border: 1.5px dashed #c5aff5;
-    border-radius: 10px;
-    font-size: 12px;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.18s;
-    text-align: left;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .idea-feedback-btn:hover { background: #efe8ff; border-color: #9b7fd4; }
-  .idea-feedback-btn.loading { opacity: 0.6; cursor: not-allowed; }
-
-  .idea-feedback-body {
-    margin-top: 10px;
-    background: #fdfbff;
-    border: 1.5px solid #e8dfff;
-    border-radius: 10px;
-    padding: 12px 14px;
-    animation: fadeUp 0.25s ease;
-  }
-  .idea-feedback-text {
-    font-size: 13px;
-    color: #3d2a6e;
-    line-height: 1.8;
-    font-weight: 400;
-  }
-
   /* 🎉 축하 오버레이 */
   .confetti-overlay {
     position: fixed; inset: 0; pointer-events: none; z-index: 999;
@@ -1040,67 +946,58 @@
   /* ── 일기 목록 카드 ── */
   .diary-list-card {
     background: white;
-    border-radius: 18px;
-    padding: 16px 18px;
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(140,100,220,0.08);
     cursor: pointer;
     transition: all 0.2s;
     animation: fadeUp 0.3s ease;
     overflow: hidden;
+    border: none;
     position: relative;
-    border: 1.5px solid #ede6ff;
-    box-shadow: 0 2px 10px rgba(140,100,220,0.06);
   }
-  .diary-list-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(140,100,220,0.12);
-    border-color: #d4c5f9;
-  }
-  /* 왼쪽 날짜 사이드바 — 숨김 */
-  .diary-list-card .dlc-side { display: none; }
+  .diary-list-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(140,100,220,0.15); }
 
-  /* 본문 전체 사용 */
+  /* 왼쪽 날짜 사이드바 */
+  .diary-list-card .dlc-side {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 60px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    border-radius: 16px 0 0 16px;
+  }
+  .diary-list-card .dlc-day-num {
+    font-size: 22px; font-weight: 800; color: white; line-height: 1;
+  }
+  .diary-list-card .dlc-day-name {
+    font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85);
+  }
+
+  /* 오른쪽 본문 */
   .diary-list-card .dlc-body {
-    margin-left: 0;
-    padding: 0;
-    background: transparent;
-    min-height: unset;
-    display: flex; flex-direction: column; gap: 8px;
-    background-image: none;
+    margin-left: 60px;
+    padding: 14px 16px 14px 14px;
+    background: white;
+    border-radius: 0 16px 16px 0;
+    min-height: 80px;
+    display: flex; flex-direction: column; justify-content: center; gap: 6px;
+    /* 편지지 줄 */
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, #f0eaff 27px, #f0eaff 28px);
+    background-position: 0 34px;
   }
   .diary-list-card .dlc-header {
-    display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
-  }
-  /* 날짜 뱃지 — 통일된 보라 계열 */
-  .diary-list-card .dlc-date-badge {
-    display: flex; align-items: center; gap: 5px;
-  }
-  .diary-list-card .dlc-date-num {
-    font-size: 22px; font-weight: 900; color: #6c47b8; line-height: 1; letter-spacing: -1px;
-  }
-  .diary-list-card .dlc-date-sub {
-    display: flex; flex-direction: column; gap: 1px;
-  }
-  .diary-list-card .dlc-date-month {
-    font-size: 11px; font-weight: 700; color: #9b84c8;
-  }
-  .diary-list-card .dlc-date-dow {
-    font-size: 11px; font-weight: 500; color: #b8a8d8;
+    display: flex; align-items: center; gap: 6px;
   }
   .diary-list-card .dlc-date {
-    font-size: 13px; font-weight: 800; color: var(--text);
-    letter-spacing: -0.2px;
+    font-size: 13px; font-weight: 700; color: var(--text);
   }
-  .diary-list-card .dlc-mood { font-size: 18px; line-height: 1; }
+  .diary-list-card .dlc-mood { font-size: 18px; }
   .diary-list-card .dlc-day {
-    font-size: 10px; color: #9b84c8;
-    background: #f3eeff; padding: 3px 9px; border-radius: 20px;
-    margin-left: auto; font-weight: 700;
-  }
-  .diary-list-card .dlc-divider {
-    height: 1px; background: #f0eaff; margin: 2px 0;
+    font-size: 10px; color: var(--text-light);
+    background: var(--cream); padding: 2px 7px; border-radius: 20px;
+    margin-left: auto; font-weight: 600;
   }
   .diary-list-card .dlc-preview {
-    font-size: 13px; color: #888; line-height: 1.7;
+    font-size: 13px; color: var(--text-light); line-height: 1.6;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
 
@@ -1119,11 +1016,6 @@
   @keyframes slideUp {
     from { transform: translateY(60px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
-  }
-
-  @keyframes floatY {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
   }
   .diary-sheet-handle {
     width: 40px; height: 4px; background: var(--border);
@@ -1203,57 +1095,49 @@
   .memo-chip:hover { background: var(--lavender); border-color: var(--purple); color: var(--purple); }
   .memo-chip.selected { background: var(--purple); border-color: var(--purple); color: white; }
 
+  .ob-chip { padding:8px 16px; border-radius:20px; border:1.5px solid var(--border); background:white; font-family:'Noto Sans KR',sans-serif; font-size:13px; font-weight:600; color:var(--text-light); cursor:pointer; transition:all 0.15s; }
+  .ob-chip.selected { background:var(--purple); border-color:var(--purple); color:white; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
 <!-- ── 로그인 화면 ── -->
 <div id="login-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10000; overflow-y:auto;">
   <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-
     <div style="font-size:64px; margin-bottom:16px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
     <div style="font-size:24px; font-weight:900; color:var(--purple); letter-spacing:-0.5px; margin-bottom:8px;">모찌의 하루 비서</div>
     <div style="font-size:14px; color:var(--text-light); margin-bottom:48px;">매일을 더 잘 살아가도록 도와줄게요</div>
-
-    <button onclick="loginWithGoogle()" style="display:flex; align-items:center; gap:12px; width:100%; max-width:320px; padding:16px 20px; border-radius:16px; border:1.5px solid var(--border); background:white; cursor:pointer; font-family:'Noto Sans KR',sans-serif; font-size:15px; font-weight:700; color:var(--text); box-shadow:0 2px 12px rgba(0,0,0,0.08); transition:all 0.2s;">
+    <button onclick="loginWithGoogle()" style="display:flex; align-items:center; gap:12px; width:100%; max-width:320px; padding:16px 20px; border-radius:16px; border:1.5px solid var(--border); background:white; cursor:pointer; font-family:'Noto Sans KR',sans-serif; font-size:15px; font-weight:700; color:var(--text); box-shadow:0 2px 12px rgba(0,0,0,0.08);">
       <img src="https://www.google.com/favicon.ico" width="20" height="20">
       Google로 시작하기
     </button>
-
     <div id="login-error" style="margin-top:16px; font-size:12px; color:#e05; display:none;"></div>
   </div>
 </div>
 
-<!-- ── 닉네임 설정 화면 (첫 로그인) ── -->
+<!-- ── 온보딩 화면 (첫 로그인) ── -->
 <div id="nickname-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
   <div style="max-width:480px; margin:0 auto; padding:0 24px 60px; min-height:100vh; display:flex; flex-direction:column;">
-
-    <!-- 진행 바 -->
     <div style="padding:28px 0 20px; position:sticky; top:0; background:var(--theme-bg); z-index:1;">
       <div style="display:flex; gap:6px; margin-bottom:20px;">
-        <div id="ob-dot-0" style="flex:1; height:4px; border-radius:4px; background:var(--purple); transition:all 0.3s;"></div>
-        <div id="ob-dot-1" style="flex:1; height:4px; border-radius:4px; background:var(--border); transition:all 0.3s;"></div>
-        <div id="ob-dot-2" style="flex:1; height:4px; border-radius:4px; background:var(--border); transition:all 0.3s;"></div>
-        <div id="ob-dot-3" style="flex:1; height:4px; border-radius:4px; background:var(--border); transition:all 0.3s;"></div>
+        <div id="ob-dot-0" style="flex:1; height:4px; border-radius:4px; background:var(--purple);"></div>
+        <div id="ob-dot-1" style="flex:1; height:4px; border-radius:4px; background:var(--border);"></div>
+        <div id="ob-dot-2" style="flex:1; height:4px; border-radius:4px; background:var(--border);"></div>
+        <div id="ob-dot-3" style="flex:1; height:4px; border-radius:4px; background:var(--border);"></div>
       </div>
     </div>
-
-    <!-- 스텝 0: 닉네임 -->
     <div id="ob-step-0" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
-      <div style="font-size:52px; text-align:center; margin-bottom:16px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
+      <div style="font-size:52px; text-align:center; margin-bottom:16px;">🐰</div>
       <div style="font-size:22px; font-weight:900; color:var(--text); text-align:center; margin-bottom:8px;">안녕하세요!</div>
       <div style="font-size:14px; color:var(--text-light); text-align:center; margin-bottom:36px;">모찌가 어떻게 불러드릴까요?</div>
       <input id="nickname-input" type="text" class="todo-input" style="width:100%; font-size:18px; text-align:center; font-weight:700; box-sizing:border-box;" placeholder="예: 윤주, 쥬, 언니" maxlength="12">
       <div id="nickname-error" style="font-size:12px; color:#e05; margin-top:8px; text-align:center; display:none;"></div>
-      <button onclick="obNext(0)" style="margin-top:20px; width:100%; padding:15px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">다음 →</button>
+      <button onclick="obNext(0)" style="margin-top:20px; width:100%; padding:15px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">다음 →</button>
     </div>
-
-    <!-- 스텝 1: 성별 + 연령대 -->
     <div id="ob-step-1" style="flex:1; display:none; flex-direction:column; justify-content:center;">
       <div style="font-size:40px; text-align:center; margin-bottom:16px;">🙋</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:6px;">나에 대해 알려줘요</div>
-      <div style="font-size:13px; color:var(--text-light); text-align:center; margin-bottom:32px;">모찌가 더 잘 이해할 수 있어요</div>
-
+      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:32px;">나에 대해 알려줘요</div>
       <div style="margin-bottom:24px;">
         <div style="font-size:13px; font-weight:700; color:var(--text-light); margin-bottom:10px;">성별</div>
         <div style="display:flex; gap:8px;">
@@ -1262,7 +1146,6 @@
           <button class="ob-chip" data-group="gender" data-val="private" onclick="selectObChip(this)">비공개</button>
         </div>
       </div>
-
       <div style="margin-bottom:32px;">
         <div style="font-size:13px; font-weight:700; color:var(--text-light); margin-bottom:10px;">연령대</div>
         <div style="display:flex; flex-wrap:wrap; gap:8px;">
@@ -1273,48 +1156,34 @@
           <button class="ob-chip" data-group="age" data-val="50대+" onclick="selectObChip(this)">50대+</button>
         </div>
       </div>
-
       <div style="display:flex; gap:10px;">
         <button onclick="obBack(1)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
-        <button onclick="obNext(1)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">다음 →</button>
+        <button onclick="obNext(1)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">다음 →</button>
       </div>
     </div>
-
-    <!-- 스텝 2: 거주 지역 -->
     <div id="ob-step-2" style="flex:1; display:none; flex-direction:column; justify-content:center;">
       <div style="font-size:40px; text-align:center; margin-bottom:16px;">📍</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:6px;">어디 사세요?</div>
-      <div style="font-size:13px; color:var(--text-light); text-align:center; margin-bottom:32px;">모찌가 지역에 맞는 얘기를 해줄 수 있어요</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:32px;">어디 사세요?</div>
       <input id="ob-location" type="text" class="todo-input" style="width:100%; box-sizing:border-box;" placeholder="예: 서울 마포구, 경기 고양시">
       <div style="display:flex; gap:10px; margin-top:20px;">
         <button onclick="obBack(2)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
-        <button onclick="obNext(2)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">다음 →</button>
+        <button onclick="obNext(2)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">다음 →</button>
       </div>
     </div>
-
-    <!-- 스텝 3: 수면 목표 -->
     <div id="ob-step-3" style="flex:1; display:none; flex-direction:column; justify-content:center;">
       <div style="font-size:40px; text-align:center; margin-bottom:16px;">😴</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:6px;">수면 목표를 설정해요</div>
-      <div style="font-size:13px; color:var(--text-light); text-align:center; margin-bottom:32px;">건강한 하루를 위해!</div>
-
+      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:32px;">수면 목표를 설정해요</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:32px;">
-        <div>
-          <div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">취침 시간</div>
-          <input id="ob-sleep" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="23:00">
-        </div>
-        <div>
-          <div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">기상 시간</div>
-          <input id="ob-wake" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="07:00">
-        </div>
+        <div><div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">취침 시간</div>
+          <input id="ob-sleep" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="23:00"></div>
+        <div><div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">기상 시간</div>
+          <input id="ob-wake" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="07:00"></div>
       </div>
-
       <div style="display:flex; gap:10px;">
         <button onclick="obBack(3)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
-        <button onclick="saveNickname()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">시작하기 🐰</button>
+        <button onclick="saveNickname()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">시작하기 🐰</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -1452,30 +1321,21 @@
   </div>
 
   <!-- 3. 마음일기 -->
-  <div style="background: white; border-radius: 20px; margin-bottom:14px; border: 1.5px solid #ecdeff; box-shadow: 0 2px 12px rgba(140,100,220,0.07); overflow: hidden;">
-    <!-- 일기장 상단 테이프 장식 -->
-    <div style="height: 6px; background: linear-gradient(90deg, #c5a8ff, #ffb5d8, #ffd6a0, #a8f0d0, #a8d4ff); opacity: 0.7;"></div>
-
-    <div style="padding: 16px 16px 0;">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:18px;">📖</span>
-          <span style="font-size:14px; font-weight:800; color:#3d2a6e; letter-spacing:-0.3px;">마음일기</span>
-          <span id="diary-date-label" style="font-size:12px; font-weight:700; color:var(--purple); background:#f0eaff; padding:3px 9px; border-radius:20px;"></span>
-          <button onclick="diaryNav(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-light);padding:0 2px;line-height:1;">‹</button>
-          <button onclick="diaryNav(1)" id="diary-next-btn" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-light);padding:0 2px;line-height:1;">›</button>
-        </div>
-        <button id="diary-edit-btn" onclick="diaryStartEdit()" style="display:none; background:none; border:1.5px solid #ecdeff; border-radius:20px; padding:4px 12px; font-size:11px; color:var(--purple); cursor:pointer; font-family:'Noto Sans KR',sans-serif; font-weight:600;">✏️ 수정</button>
+  <div class="card memo-card" style="margin-bottom:14px; padding:16px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+      <div style="display:flex; align-items:center; gap:6px;">
+        <span style="font-size:13px; font-weight:700; color:var(--text);">📔 마음일기</span>
+        <span id="diary-date-label" style="font-size:13px; font-weight:700; color:var(--purple);"></span>
+        <button onclick="diaryNav(-1)" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light);padding:0 2px;">‹</button>
+        <button onclick="diaryNav(1)" id="diary-next-btn" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light);padding:0 2px;">›</button>
       </div>
+      <button id="diary-edit-btn" onclick="diaryStartEdit()" style="display:none; background:none; border:1px solid var(--border); border-radius:8px; padding:4px 10px; font-size:12px; color:var(--text-light); cursor:pointer; font-family:'Noto Sans KR',sans-serif;">✏️ 수정</button>
     </div>
 
     <!-- 작성 모드 -->
-    <div id="diary-write-mode" style="padding: 0 16px 16px;">
-      <!-- 감정 선택 -->
-      <div style="margin-bottom:12px;">
-        <div style="font-size:11px; font-weight:700; color:#9b84c8; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; display:flex; align-items:center; gap:5px;">
-          <span>✨</span> 오늘의 감정
-        </div>
+    <div id="diary-write-mode">
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px;">오늘의 감정</div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="diary-emotion-btn" data-emotion="😊" data-label="기쁨" onclick="selectDiaryEmotion(this)">😊 기쁨</button>
           <button class="diary-emotion-btn" data-emotion="😌" data-label="평온" onclick="selectDiaryEmotion(this)">😌 평온</button>
@@ -1487,29 +1347,18 @@
           <button class="diary-emotion-btn" data-emotion="🔥" data-label="의욕" onclick="selectDiaryEmotion(this)">🔥 의욕</button>
         </div>
       </div>
-      <!-- 일기 입력 영역 (편지지 스타일) -->
-      <div style="position: relative; background: #fdfaff; border: 1.5px solid #ecdeff; border-radius: 14px; overflow: hidden;">
-        <!-- 줄노트 배경 -->
-        <div style="position:absolute; inset:0; background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, #f0eaff 27px, #f0eaff 28px); background-position: 0 10px; pointer-events:none; z-index:0;"></div>
-        <div style="position:absolute; left:46px; top:0; bottom:0; width:1.5px; background:#ffd6e8; pointer-events:none; z-index:0;"></div>
-        <textarea class="memo-textarea" id="diary-input" placeholder="오늘 하루 어땠어요? 자유롭게 적어봐요 ✏️" style="min-height:110px; position:relative; z-index:1; padding: 12px 14px 12px 58px; background:transparent; border:none; width:100%; box-sizing:border-box; border-radius:14px; line-height: 27px;"></textarea>
-      </div>
-      <button id="diary-save-btn" onclick="saveDiaryManual()" style="width:100%; margin-top:12px; padding:13px; background:linear-gradient(135deg, #7c5cbf, #b478d2); color:white; border:none; border-radius:14px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; letter-spacing:-0.2px; box-shadow: 0 3px 12px rgba(124,92,191,0.3);">📔 마음일기 저장하기</button>
+      <textarea class="memo-textarea" id="diary-input" placeholder="오늘 하루 어땠어요? 자유롭게 적어봐요 ✏️" style="min-height:100px; border:1px solid var(--border); border-radius:10px; padding:12px; background:var(--cream);"></textarea>
+      <button id="diary-save-btn" onclick="saveDiaryManual()" style="width:100%; margin-top:12px; padding:12px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">📔 마음일기 저장하기</button>
     </div>
 
     <!-- 저장 완료 모드 -->
-    <div id="diary-view-mode" style="display:none; padding: 0 16px 16px;">
+    <div id="diary-view-mode" style="display:none;">
       <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px;">
         <span id="diary-view-date" style="font-size:12px; color:var(--text-light); font-weight:500;"></span>
-        <span style="margin-left:auto; font-size:11px; color:#2E7D32; background:#e8f5e9; padding:3px 10px; border-radius:20px; font-weight:700; border:1px solid #c8e6c9;">✓ 저장됨</span>
+        <span style="margin-left:auto; font-size:11px; color:#2E7D32; background:var(--mint); padding:2px 8px; border-radius:20px; font-weight:600;">✓ 저장됨</span>
       </div>
       <div id="diary-view-meta" style="display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;"></div>
-      <!-- 편지지 스타일 뷰 -->
-      <div style="position: relative; background: #fdfaff; border: 1.5px solid #ecdeff; border-radius: 14px; overflow: hidden;">
-        <div style="position:absolute; inset:0; background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, #f0eaff 27px, #f0eaff 28px); background-position: 0 10px; pointer-events:none;"></div>
-        <div style="position:absolute; left:46px; top:0; bottom:0; width:1.5px; background:#ffd6e8; pointer-events:none;"></div>
-        <div id="diary-view-text" style="font-size:14px; color:var(--text); line-height:27px; white-space:pre-wrap; padding:12px 14px 12px 58px; position:relative; z-index:1; min-height:80px;"></div>
-      </div>
+      <div id="diary-view-text" style="font-size:14px; color:var(--text); line-height:1.8; white-space:pre-wrap; background:var(--cream); border-radius:10px; padding:14px; min-height:80px;"></div>
     </div>
   </div>
 
@@ -1518,34 +1367,26 @@
 
 <!-- 아이디어 페이지 -->
 <div class="page" id="page-idea" style="display:none;">
-
-  <!-- 마음일기 헤더와 동일한 스타일 -->
-  <div style="margin-bottom: 18px; position: relative;">
-    <div style="background: linear-gradient(135deg, #fff8ea 0%, #ffefd6 50%, #fff3fa 100%); border-radius: 20px; padding: 20px 20px 16px; border: 1.5px solid #ffe0a0; position: relative; overflow: hidden;">
-      <div style="position:absolute; top:-20px; right:-20px; width:90px; height:90px; background:rgba(255,200,80,0.1); border-radius:50%;"></div>
-      <div style="position:absolute; bottom:-10px; left:20px; width:60px; height:60px; background:rgba(255,180,100,0.1); border-radius:50%;"></div>
-      <div style="display:flex; align-items:center; gap:14px; position:relative; z-index:1;">
-        <div style="width:52px; height:52px; background:white; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow: 0 3px 12px rgba(255,160,60,0.18); flex-shrink:0; border: 1.5px solid #ffe0a0;">💡</div>
-        <div>
-          <div style="font-size:17px; font-weight:800; color:#6e3d0a; letter-spacing:-0.4px; margin-bottom:3px;">아이디어 노트</div>
-          <div style="font-size:12px; color:#c89040; font-weight:500;">떠오르는 건 다 적어둬요 ✨</div>
-        </div>
-        <div style="margin-left:auto; display:flex; gap:6px; font-size:18px; opacity:0.7;">
-          <span style="animation: floatY 3s ease-in-out infinite;">🌟</span>
-          <span style="animation: floatY 3s ease-in-out 1s infinite;">💭</span>
-        </div>
-      </div>
-    </div>
+  <div class="header">
+    <span class="mascot">💡</span>
+    <h1>아이디어 노트</h1>
+    <p class="greeting">떠오르는 건 다 적어둬요!</p>
   </div>
 
   <div class="section">
     <div class="card" style="background: var(--white); border: 1px solid var(--border);">
-      <input type="text" id="idea-title" class="todo-input" placeholder="아이디어 제목..." style="font-weight:600; width:100%; margin-bottom:10px;">
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input type="text" id="idea-title" class="todo-input" placeholder="아이디어 제목..." style="font-weight:600;">
+        <select id="idea-category" style="padding:8px 10px; border:2px solid rgba(155,127,212,0.2); border-radius:12px; font-family:'Nunito','Noto Sans KR',sans-serif; font-size:13px; background:white; color:var(--text); outline:none;">
+          <option value="shopee">🛍 쇼피</option>
+          <option value="gupsal">🥘 급식</option>
+          <option value="dosirak">🍱 도시락</option>
+          <option value="biz">💼 비즈니스</option>
+          <option value="life">✨ 라이프</option>
+        </select>
+      </div>
       <textarea id="idea-content" class="memo-textarea" placeholder="아이디어 내용을 자유롭게 적어요... ✏️" style="min-height:80px;"></textarea>
-      <button onclick="addIdea()" id="idea-save-btn" style="width:100%; margin-top:10px; padding:12px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px;">
-        <span id="idea-save-icon">💡</span>
-        <span id="idea-save-label">아이디어 저장하기</span>
-      </button>
+      <button onclick="addIdea()" style="width:100%; margin-top:10px; padding:12px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s;">💡 아이디어 저장하기</button>
     </div>
   </div>
 
@@ -1557,27 +1398,11 @@
 
 <!-- 일기 목록 페이지 -->
 <div class="page" id="page-diarylist" style="display:none;">
-
-  <!-- 아기자기한 일기장 헤더 -->
-  <div style="margin-bottom: 18px; position: relative;">
-    <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fce8f3 50%, #fff5ea 100%); border-radius: 20px; padding: 20px 20px 16px; border: 1.5px solid #ecdeff; position: relative; overflow: hidden;">
-      <!-- 배경 장식 원 -->
-      <div style="position:absolute; top:-20px; right:-20px; width:90px; height:90px; background:rgba(180,140,255,0.1); border-radius:50%;"></div>
-      <div style="position:absolute; bottom:-10px; left:20px; width:60px; height:60px; background:rgba(255,180,200,0.12); border-radius:50%;"></div>
-
-      <div style="display:flex; align-items:center; gap:14px; position:relative; z-index:1;">
-        <!-- 일기장 아이콘 -->
-        <div style="width:52px; height:52px; background:white; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow: 0 3px 12px rgba(140,100,220,0.18); flex-shrink:0; border: 1.5px solid #ecdeff;">📔</div>
-        <div>
-          <div style="font-size:17px; font-weight:800; color:#3d2a6e; letter-spacing:-0.4px; margin-bottom:3px;">마음일기</div>
-          <div style="font-size:12px; color:#9b84c8; font-weight:500;">매일의 감정을 기록해요 🌱</div>
-        </div>
-        <!-- 오른쪽 장식 이모지들 -->
-        <div style="margin-left:auto; display:flex; gap:6px; font-size:18px; opacity:0.7;">
-          <span style="animation: floatY 3s ease-in-out infinite;">🌸</span>
-          <span style="animation: floatY 3s ease-in-out 1s infinite;">✨</span>
-        </div>
-      </div>
+  <div class="header" style="padding:20px 0 14px; text-align:left; display:flex; align-items:center; gap:12px;">
+    <span style="font-size:32px;">📔</span>
+    <div>
+      <h1 style="font-size:18px; margin-bottom:2px;">마음일기 모아보기</h1>
+      <p class="greeting" style="font-size:12px;">매일의 기록이 쌓여가요 🌱</p>
     </div>
   </div>
 
@@ -1586,127 +1411,81 @@
 
   <!-- 모찌 편지 카드 -->
   <div id="diary-analysis-wrap" style="margin-bottom:16px; display:none;">
-    <!-- 심플 편지 카드 (닫힌 상태) -->
-    <div id="diary-letter-closed" onclick="analyzeDiaryMonth()" style="cursor:pointer; background:linear-gradient(135deg,#f5f0ff,#fce8f8); border:1.5px solid #ddd0f8; border-radius:18px; padding:16px 18px; transition:all 0.2s; box-shadow:0 2px 10px rgba(140,100,220,0.08);">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div style="width:42px; height:42px; background:white; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 2px 8px rgba(140,100,220,0.12); flex-shrink:0;">💌</div>
-        <div style="flex:1;">
-          <div style="font-size:11px; color:#9b84c8; font-weight:600; margin-bottom:3px;">모찌가 보내는 편지</div>
-          <div id="diary-analysis-title" style="font-size:14px; font-weight:800; color:#4a2d9e;"></div>
+    <!-- 편지 봉투 버튼 (닫힌 상태) -->
+    <div id="diary-letter-closed" onclick="analyzeDiaryMonth()" style="cursor:pointer; background:white; border:2px solid var(--purple); border-radius:16px; overflow:hidden; transition:all 0.2s; box-shadow:0 2px 12px rgba(140,100,220,0.12);">
+      <!-- 봉투 상단 삼각형 -->
+      <div style="width:100%; height:44px; background:var(--purple); clip-path:polygon(0 0, 100% 0, 50% 100%); margin-bottom:-1px;"></div>
+      <div style="padding:14px 18px 16px; display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-size:12px; color:var(--text-light); font-weight:600; margin-bottom:3px;">모찌가 보내는 편지 💌</div>
+          <div id="diary-analysis-title" style="font-size:14px; font-weight:700; color:var(--purple);"></div>
         </div>
-        <button id="diary-analysis-btn" style="padding:9px 16px; background:var(--purple); color:white; border:none; border-radius:20px; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0; box-shadow:0 2px 8px rgba(124,92,191,0.3);">열기 →</button>
+        <div id="diary-letter-btn-wrap">
+          <button id="diary-analysis-btn" style="padding:8px 14px; background:var(--purple); color:white; border:none; border-radius:10px; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; white-space:nowrap;">💌 편지 열기</button>
+        </div>
       </div>
     </div>
 
     <!-- 편지 열린 상태 -->
-    <div id="diary-letter-open" style="display:none; background:white; border:1.5px solid #ddd0f8; border-radius:18px; overflow:hidden; box-shadow:0 4px 20px rgba(140,100,220,0.1);">
+    <div id="diary-letter-open" style="display:none; background:white; border:2px solid var(--purple); border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(140,100,220,0.15);">
       <!-- 편지지 헤더 -->
-      <div style="background:linear-gradient(135deg,#7c5cbf,#b478d2); padding:14px 18px; display:flex; align-items:center; justify-content:space-between;">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:36px; height:36px; background:rgba(255,255,255,0.2); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🐰</div>
+      <div style="background:var(--purple); padding:14px 18px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🐰</span>
           <div>
-            <div style="font-size:11px; color:rgba(255,255,255,0.75); font-weight:500; margin-bottom:1px;">모찌가 보내는 편지</div>
-            <div id="diary-letter-month" style="font-size:14px; color:white; font-weight:800;"></div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.8); font-weight:500;">모찌가 보내는 편지</div>
+            <div id="diary-letter-month" style="font-size:14px; color:white; font-weight:700;"></div>
           </div>
         </div>
-        <button onclick="closeDiaryLetter()" style="background:rgba(255,255,255,0.18); border:none; border-radius:20px; padding:6px 14px; color:white; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">접기 ∧</button>
+        <button onclick="closeDiaryLetter()" style="background:rgba(255,255,255,0.2); border:none; border-radius:8px; padding:5px 10px; color:white; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">접기 ∧</button>
       </div>
       <!-- 편지지 내용 -->
-      <div style="padding:20px 20px 24px; background:linear-gradient(to bottom,#fdf9ff,white);">
-        <div id="diary-analysis-body" style="font-size:14px; color:var(--text); line-height:2; white-space:pre-line;"></div>
-        <div style="margin-top:20px; text-align:right; padding-top:14px; border-top:1px dashed #ede6ff;">
+      <div style="padding:20px 20px 24px; background:linear-gradient(to bottom, #faf8ff, white);">
+        <!-- 줄 간격 효과 -->
+        <div style="position:relative;">
+          <div id="diary-analysis-body" style="font-size:14px; color:var(--text); line-height:2; position:relative; z-index:1; white-space:pre-line;"></div>
+        </div>
+        <!-- 서명 -->
+        <div style="margin-top:20px; text-align:right; padding-top:14px; border-top:1px dashed var(--border);">
           <div style="font-size:12px; color:var(--text-light);">언제나 네 편,</div>
-          <div style="font-size:15px; font-weight:800; color:var(--purple); margin-top:2px;">모찌 🐰</div>
+          <div style="font-size:15px; font-weight:700; color:var(--purple); margin-top:2px;">모찌 🐰</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="diarylist-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+  <div id="diarylist-container" style="display:flex; flex-direction:column; gap:12px;"></div>
   <div id="diarylist-empty" style="display:none; text-align:center; padding:60px 0; color:var(--text-light);">
-    <div style="font-size:52px; margin-bottom:14px;">🌙</div>
-    <div style="font-size:15px; font-weight:700; color:#9b84c8; margin-bottom:6px;">아직 마음일기가 없어요</div>
-    <div style="font-size:13px; color:var(--text-light);">오늘 첫 마음일기를 써봐요!</div>
+    <div style="font-size:48px; margin-bottom:12px;">🌙</div>
+    <div style="font-size:15px; font-weight:600; margin-bottom:6px;">아직 마음일기가 없어요</div>
+    <div style="font-size:13px;">오늘 첫 마음일기를 써봐요!</div>
   </div>
 </div>
 
 <!-- 설정 페이지 -->
 <div class="page" id="page-settings" style="display:none;">
-
-  <!-- 통일된 헤더 스타일 -->
-  <div style="margin-bottom: 18px; position: relative;">
-    <div style="background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 50%, #f5f0ff 100%); border-radius: 20px; padding: 20px 20px 16px; border: 1.5px solid #d0d8ff; position: relative; overflow: hidden;">
-      <div style="position:absolute; top:-20px; right:-20px; width:90px; height:90px; background:rgba(120,140,255,0.08); border-radius:50%;"></div>
-      <div style="position:absolute; bottom:-10px; left:20px; width:60px; height:60px; background:rgba(160,140,255,0.08); border-radius:50%;"></div>
-      <div style="display:flex; align-items:center; gap:14px; position:relative; z-index:1;">
-        <div style="width:52px; height:52px; background:white; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow: 0 3px 12px rgba(100,120,220,0.15); flex-shrink:0; border: 1.5px solid #d0d8ff;">⚙️</div>
-        <div>
-          <div style="font-size:17px; font-weight:800; color:#2a3070; letter-spacing:-0.4px; margin-bottom:3px;">설정</div>
-          <div style="font-size:12px; color:#7080c0; font-weight:500;">나만의 비서로 커스텀해요 🐰</div>
-        </div>
-        <div style="margin-left:auto; display:flex; gap:6px; font-size:18px; opacity:0.7;">
-          <span style="animation: floatY 3s ease-in-out infinite;">🔧</span>
-          <span style="animation: floatY 3s ease-in-out 1s infinite;">✨</span>
-        </div>
-      </div>
-    </div>
+  <div class="header">
+    <span class="mascot">⚙️</span>
+    <h1>설정</h1>
+    <p class="greeting">나만의 비서로 커스텀해요</p>
   </div>
-
 
   <div class="section">
     <div class="section-title">👤 내 정보</div>
     <div class="card">
-      <div style="display:flex; flex-direction:column; gap:16px;">
-
-        <!-- 닉네임 -->
+      <div style="display:flex; flex-direction:column; gap:14px;">
         <div>
-          <label style="font-size:12px; color:var(--text-light); font-weight:600; display:block; margin-bottom:6px;">닉네임</label>
-          <input type="text" id="setting-name" class="todo-input" style="width:100%;" oninput="updateUserName(this.value)" placeholder="모찌가 부를 이름을 알려줘요">
+          <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">이름</label>
+          <input type="text" id="setting-name" class="todo-input" style="width:100%;" oninput="updateUserName(this.value)" placeholder="이름을 입력해줘요">
         </div>
-
-        <!-- 성별 + 연령대 나란히 -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div>
-            <label style="font-size:12px; color:var(--text-light); font-weight:600; display:block; margin-bottom:6px;">성별</label>
-            <div style="display:flex; gap:6px;" id="gender-btns">
-              <button class="profile-chip" data-val="여성" onclick="selectChip('gender-btns', this, 'profile_gender')">👩 여성</button>
-              <button class="profile-chip" data-val="남성" onclick="selectChip('gender-btns', this, 'profile_gender')">👨 남성</button>
-              <button class="profile-chip" data-val="비공개" onclick="selectChip('gender-btns', this, 'profile_gender')">🤐</button>
-            </div>
-          </div>
-          <div>
-            <label style="font-size:12px; color:var(--text-light); font-weight:600; display:block; margin-bottom:6px;">연령대</label>
-            <div style="display:flex; gap:5px; flex-wrap:wrap;" id="age-btns">
-              <button class="profile-chip" data-val="10대" onclick="selectChip('age-btns', this, 'profile_age')">10대</button>
-              <button class="profile-chip" data-val="20대" onclick="selectChip('age-btns', this, 'profile_age')">20대</button>
-              <button class="profile-chip" data-val="30대" onclick="selectChip('age-btns', this, 'profile_age')">30대</button>
-              <button class="profile-chip" data-val="40대" onclick="selectChip('age-btns', this, 'profile_age')">40대</button>
-              <button class="profile-chip" data-val="50대+" onclick="selectChip('age-btns', this, 'profile_age')">50대+</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 거주지 -->
         <div>
-          <label style="font-size:12px; color:var(--text-light); font-weight:600; display:block; margin-bottom:6px;">거주 지역</label>
-          <input type="text" id="profile-location" class="todo-input" style="width:100%;" placeholder="예: 경기 고양시, 서울 마포구" oninput="saveBasicProfile()">
+          <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">목표 기상 시간</label>
+          <input type="time" class="time-input" value="07:00" style="width:100%; font-size:16px;">
         </div>
-
-        <!-- 수면 목표 -->
         <div>
-          <label style="font-size:12px; color:var(--text-light); font-weight:600; display:block; margin-bottom:8px;">💤 수면 목표</label>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div>
-              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px;">목표 취침</div>
-              <input type="time" id="goal-sleep-time" class="time-input" value="23:30" style="width:100%; font-size:15px;" onchange="saveBasicProfile()">
-            </div>
-            <div>
-              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px;">목표 기상</div>
-              <input type="time" id="goal-wake-time" class="time-input" value="07:00" style="width:100%; font-size:15px;" onchange="saveBasicProfile()">
-            </div>
-          </div>
+          <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">목표 취침 시간</label>
+          <input type="time" class="time-input" value="23:30" style="width:100%; font-size:16px;">
         </div>
-
       </div>
     </div>
   </div>
@@ -1744,15 +1523,15 @@
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">하는 일 / 직업</label>
-        <input type="text" id="profile-job" class="todo-input" style="width:100%;" placeholder="예: 프리랜서 디자이너, 회사원, 학생" oninput="saveProfile()">
+        <input type="text" id="profile-job" class="todo-input" style="width:100%;" placeholder="예: 쇼피 셀러, 급식 납품 사업, 도시락 유튜브 운영" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">요즘 목표</label>
-        <input type="text" id="profile-goal" class="todo-input" style="width:100%;" placeholder="예: 건강한 루틴 만들기, 수입 늘리기" oninput="saveProfile()">
+        <input type="text" id="profile-goal" class="todo-input" style="width:100%;" placeholder="예: 쇼피 매출 늘리기, 건강 루틴 만들기" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">관심사 / 좋아하는 것</label>
-        <input type="text" id="profile-interest" class="todo-input" style="width:100%;" placeholder="예: 맛집, 운동, 독서, 여행" oninput="saveProfile()">
+        <input type="text" id="profile-interest" class="todo-input" style="width:100%;" placeholder="예: 맛집, 운동, 쇼핑, 여행" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:8px;">💬 모찌한테 더 하고 싶은 말</label>
@@ -1779,77 +1558,59 @@
         <div id="learned-profile-list" style="font-size:12px; color:var(--text); line-height:1.8; background:var(--purple-light); border-radius:10px; padding:10px 12px;"></div>
         <button onclick="clearLearnedProfile()" style="margin-top:8px; font-size:11px; color:var(--text-light); background:none; border:1px solid var(--border); border-radius:8px; padding:4px 10px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">초기화</button>
       </div>
-      <!-- 프로필 전체 초기화 -->
-      <button onclick="resetAllProfile()" style="margin-top:14px; width:100%; padding:10px; border-radius:10px; border:1px solid #fdd; background:white; color:#c03; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">🗑 프로필 전체 초기화</button>
     </div>
   </div>
 
-
   <div class="section">
-    <div class="section-title">🎨 테마</div>
+    <div class="section-title">💼 사업 관리</div>
     <div class="card">
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" id="theme-btns">
-
-          <!-- 보라 (기본) -->
-          <div class="theme-btn selected" onclick="setTheme(this,'purple')" data-theme="purple"
-            style="background:linear-gradient(135deg,#c9b8f5,#7C5CBF); border:3px solid #7C5CBF;">
-            <span class="theme-btn-name">🔮 보라</span>
-            <span class="theme-btn-desc">기본 테마</span>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
+          <div>
+            <div style="font-size:14px; font-weight:500; color:var(--text);">🥘 급식 납품 사업</div>
+            <div style="font-size:12px; color:var(--text-light);">경기 북부 · 어머니와 함께</div>
           </div>
-
-          <!-- 민트 -->
-          <div class="theme-btn" onclick="setTheme(this,'mint')" data-theme="mint"
-            style="background:linear-gradient(135deg,#a8f0d8,#1a9e6e);">
-            <span class="theme-btn-name">🌿 민트</span>
-            <span class="theme-btn-desc">청량한 초록</span>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
+          <div>
+            <div style="font-size:14px; font-weight:500; color:var(--text);">🍱 도시락 채널</div>
+            <div style="font-size:12px; color:var(--text-light);">콘텐츠 서포트</div>
           </div>
-
-          <!-- 로즈 -->
-          <div class="theme-btn" onclick="setTheme(this,'rose')" data-theme="rose"
-            style="background:linear-gradient(135deg,#ffc2d4,#d63a6e);">
-            <span class="theme-btn-name">🌸 로즈</span>
-            <span class="theme-btn-desc">따뜻한 핑크</span>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0;">
+          <div>
+            <div style="font-size:14px; font-weight:500; color:var(--text);">🛍 쇼피</div>
+            <div style="font-size:12px; color:var(--text-light);">동남아 이커머스 · 신규</div>
           </div>
-
-          <!-- 스카이 -->
-          <div class="theme-btn" onclick="setTheme(this,'sky')" data-theme="sky"
-            style="background:linear-gradient(135deg,#b3e0ff,#1a78c2);">
-            <span class="theme-btn-name">☁️ 스카이</span>
-            <span class="theme-btn-desc">맑은 하늘</span>
-          </div>
-
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 로그아웃 -->
   <div class="section">
-    <button id="logout-btn" onclick="logout()" style="width:100%; padding:14px; border-radius:14px; border:1.5px solid #fdd; background:white; color:#c03; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">로그아웃</button>
+    <div class="section-title">🎨 테마</div>
+    <div class="card">
+      <div style="display:flex; gap:12px; justify-content:center; padding:8px 0;">
+        <div onclick="setTheme(this,'#D4C5F9','#9B7FD4')" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#D4C5F9,#9B7FD4);cursor:pointer;border:3px solid var(--purple);box-shadow:0 2px 8px rgba(155,127,212,0.4);"></div>
+        <div onclick="setTheme(this,'#C5F2E8','#2E7D32')" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#C5F2E8,#4CAF50);cursor:pointer;border:3px solid transparent;"></div>
+        <div onclick="setTheme(this,'#FFD6C0','#E65100')" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FFD6C0,#FF5722);cursor:pointer;border:3px solid transparent;"></div>
+        <div onclick="setTheme(this,'#FFB5C8','#C62828')" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FFB5C8,#E91E63);cursor:pointer;border:3px solid transparent;"></div>
+      </div>
+    </div>
   </div>
 
-</div>
-
-<!-- 🎉 축하 오버레이 -->
-<!-- ── 튜토리얼 오버레이 ── -->
-<div id="tutorial-overlay" style="display:none; position:fixed; inset:0; background:rgba(20,15,40,0.75); z-index:9999; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);">
-  <div id="tutorial-box" style="position:absolute; bottom:0; left:0; right:0; background:white; border-radius:28px 28px 0 0; padding:32px 24px 40px; max-height:90vh; overflow-y:auto; box-shadow:0 -8px 40px rgba(0,0,0,0.18);">
-
-    <!-- 진행 도트 -->
-    <div style="display:flex; gap:6px; justify-content:center; margin-bottom:24px;" id="tut-dots"></div>
-
-    <!-- 슬라이드 컨테이너 -->
-    <div id="tut-slides"></div>
-
-    <!-- 버튼 -->
-    <div style="display:flex; gap:10px; margin-top:28px;">
-      <button id="tut-skip-btn" onclick="tutSkip()" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">건너뛰기</button>
-      <button id="tut-next-btn" onclick="tutNext()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.35);">다음 →</button>
+  <div class="section">
+    <div class="card" style="text-align:center; background:var(--white); border:1px solid var(--border);">
+      <div style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px;">윤주의 하루 비서 🌸</div>
+      <div style="font-size:12px; color:var(--text-light);">Claude가 만들어준 나만의 앱</div>
     </div>
   </div>
 </div>
 
+<!-- 🎉 축하 오버레이 -->
 <div class="confetti-overlay" id="confetti-overlay"></div>
 <div class="celebrate-banner" id="celebrate-banner">
   <span class="cb-emoji" id="cb-emoji">🎉</span>
@@ -1900,8 +1661,8 @@
 <div class="diary-overlay" id="diary-overlay" onclick="closeDiaryOverlay(event)">
   <div class="diary-sheet" id="diary-sheet">
     <div class="diary-sheet-handle"></div>
-    <!-- 컬러 테이프 장식 -->
-    <div style="height:4px; background:linear-gradient(90deg, #c5a8ff, #ffb5d8, #ffd6a0, #a8f0d0); border-radius:2px; margin-bottom:18px;"></div>
+
+    <!-- 헤더: 날짜 + 수정/닫기 버튼 -->
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
       <div class="diary-sheet-date" id="ds-date" style="margin-bottom:0;"></div>
       <div style="display:flex; gap:8px;">
@@ -1916,11 +1677,7 @@
 
     <!-- 읽기 모드 -->
     <div id="ds-read-mode">
-      <div style="position:relative; background:#fdfaff; border:1.5px solid #ecdeff; border-radius:14px; overflow:hidden; padding:12px 14px 12px 56px;">
-        <div style="position:absolute; inset:0; background-image:repeating-linear-gradient(to bottom, transparent, transparent 27px, #f0eaff 27px, #f0eaff 28px); background-position:0 10px; pointer-events:none;"></div>
-        <div style="position:absolute; left:44px; top:0; bottom:0; width:1.5px; background:#ffd6e8; pointer-events:none;"></div>
-        <div class="diary-sheet-body" id="ds-body" style="position:relative; z-index:1; line-height:27px;"></div>
-      </div>
+      <div class="diary-sheet-body" id="ds-body"></div>
     </div>
 
     <!-- 수정 모드 -->
@@ -1957,13 +1714,12 @@
 </div>
 
 <script>
-  // ── API 키 ──
+  // ── 상수 ──
   const CLAUDE_API_KEY = 'REPLACE_WITH_YOUR_API_KEY';
-
-  // ── Supabase 초기화 (전역) ──
   const SUPABASE_URL = 'https://subjdjbrdjdikjaqjafi.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YmpkamJyZGpkaWtqYXFqYWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjM5MTAsImV4cCI6MjA4ODYzOTkxMH0.x6ZwV3w7qdqnd_Tf2Blh9o6ppoH5zbDyd9tAY1tVeRI';
-  let sb; // supabase 로드 후 초기화
+  let sb; // Supabase client (CDN 로드 후 초기화)
+  let _currentUser = null;
 
   // ── 일기 감정 선택 ──
   let viewingDate = null; // null = 오늘
@@ -2035,55 +1791,6 @@
     if (nameInput) nameInput.value = savedName;
   }
 
-  // ── 기본 정보 칩 선택 ──
-  function selectChip(groupId, btn, storageKey) {
-    document.querySelectorAll(`#${groupId} .profile-chip`).forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    localStorage.setItem(storageKey, btn.dataset.val);
-  }
-
-  async function saveBasicProfile() {
-    const gender = document.querySelector('#gender-btns .profile-chip.selected')?.dataset.val || '';
-    const age_group = document.querySelector('#age-btns .profile-chip.selected')?.dataset.val || '';
-    const location = document.getElementById('profile-location')?.value || '';
-    const sleep_time = document.getElementById('goal-sleep-time')?.value || '23:30';
-    const wake_time = document.getElementById('goal-wake-time')?.value || '07:00';
-
-    localStorage.setItem('profile_gender', gender);
-    localStorage.setItem('profile_age', age_group);
-    localStorage.setItem('profile_location', location);
-    localStorage.setItem('goal_sleep_time', sleep_time);
-    localStorage.setItem('goal_wake_time', wake_time);
-
-    if (_currentUser) {
-      await sb.from('profiles').update({ gender, age_group, location, sleep_time, wake_time })
-        .eq('id', _currentUser.id);
-    }
-
-    // 저장 피드백
-    const btn = document.querySelector('[onclick="saveBasicProfile()"]');
-    if (btn) { const orig = btn.textContent; btn.textContent = '✅ 저장됐어요!'; setTimeout(() => btn.textContent = orig, 1500); }
-  }
-
-  function loadBasicProfile() {
-    // 칩 복원
-    const gender = localStorage.getItem('profile_gender');
-    if (gender) document.querySelectorAll('#gender-btns .profile-chip').forEach(b => { if (b.dataset.val === gender) b.classList.add('selected'); });
-    const age = localStorage.getItem('profile_age');
-    if (age) document.querySelectorAll('#age-btns .profile-chip').forEach(b => { if (b.dataset.val === age) b.classList.add('selected'); });
-    // 텍스트/시간 복원
-    const loc = localStorage.getItem('profile_location');
-    if (loc && document.getElementById('profile-location')) document.getElementById('profile-location').value = loc;
-    const sleepT = localStorage.getItem('goal_sleep_time');
-    if (sleepT && document.getElementById('goal-sleep-time')) document.getElementById('goal-sleep-time').value = sleepT;
-    const wakeT = localStorage.getItem('goal_wake_time');
-    if (wakeT && document.getElementById('goal-wake-time')) document.getElementById('goal-wake-time').value = wakeT;
-  }
-
-  window.selectChip = selectChip;
-  window.saveBasicProfile = saveBasicProfile;
-  setTimeout(loadBasicProfile, 120);
-
   // ── 프로필 저장/불러오기 ──
   function saveProfile() {
     const profile = {
@@ -2143,22 +1850,6 @@
   }
 
   window.saveProfile = saveProfile;
-  function resetAllProfile() {
-    if (!confirm('프로필을 모두 초기화할까요?')) return;
-    ['profile-job','profile-goal','profile-interest','profile-memo'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-    // 칩 선택 해제
-    document.querySelectorAll('#gender-btns .profile-chip, #age-btns .profile-chip').forEach(b => b.classList.remove('selected'));
-    const locEl = document.getElementById('profile-location');
-    if (locEl) locEl.value = '';
-    // localStorage 삭제
-    ['mochi_profile','mochi_learned','profile_gender','profile_age','profile_location'].forEach(k => localStorage.removeItem(k));
-    renderLearnedProfile();
-  }
-  window.resetAllProfile = resetAllProfile;
-
   window.clearLearnedProfile = clearLearnedProfile;
 
   // ── ChatGPT 프롬프트 가이드 ──
@@ -2339,7 +2030,7 @@ ${recentMsgs}
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 300,
@@ -2436,7 +2127,7 @@ ${recentMsgs}
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 400,
@@ -2569,7 +2260,7 @@ ${recentMsgs}
 
   setTimeout(loadProfile, 100);
 
-  // ── 날씨 (Open-Meteo, 현재 위치 기반) ──
+  // ── 날씨 (Open-Meteo, 고양시 기준) ──
   const WMO = {
     0:'☀️ 맑음', 1:'🌤 대체로 맑음', 2:'⛅ 부분 흐림', 3:'☁️ 흐림',
     45:'🌫 안개', 48:'🌫 안개',
@@ -2580,47 +2271,17 @@ ${recentMsgs}
     85:'🌨 눈 소나기', 86:'🌨 눈 소나기',
     95:'⛈ 뇌우', 96:'⛈ 뇌우', 99:'⛈ 뇌우',
   };
-
-  async function fetchWeatherAt(lat, lon, locationName) {
+  async function fetchWeather() {
     try {
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&timezone=Asia%2FSeoul`);
+      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.658&longitude=126.832&current=temperature_2m,weathercode&timezone=Asia%2FSeoul');
       const data = await res.json();
       const temp = Math.round(data.current.temperature_2m);
       const code = data.current.weathercode;
       const desc = WMO[code] || '🌤 날씨';
-      document.getElementById('weather-text').textContent = `${desc} · ${locationName} ${temp}°C`;
+      document.getElementById('weather-text').textContent = `${desc} · 고양시 ${temp}°C`;
     } catch(e) {
       document.getElementById('weather-text').textContent = '🌤 날씨를 불러올 수 없어요';
     }
-  }
-
-  async function fetchWeather() {
-    if (!navigator.geolocation) {
-      fetchWeatherAt(37.658, 126.832, '내 위치');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude: lat, longitude: lon } = pos.coords;
-        // 역지오코딩으로 지역명 가져오기
-        let locationName = '내 위치';
-        try {
-          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ko`);
-          const geoData = await geoRes.json();
-          const addr = geoData.address;
-          locationName = addr.city || addr.town || addr.county || addr.state || '내 위치';
-          // 한국 행정구역 정리 (시/구/군만)
-          if (addr.city_district) locationName = addr.city_district;
-          else if (addr.suburb) locationName = addr.suburb;
-        } catch(e) {}
-        fetchWeatherAt(lat, lon, locationName);
-      },
-      () => {
-        // 위치 거부 시 기본값
-        fetchWeatherAt(37.658, 126.832, '내 위치');
-      },
-      { timeout: 5000 }
-    );
   }
   fetchWeather();
 
@@ -2673,16 +2334,6 @@ ${recentMsgs}
   }
 
   // ── 일기 기능 ──
-  function parseEmotion(raw) {
-    if (!raw) return { emoji: '', label: '' };
-    try {
-      const parsed = JSON.parse(raw);
-      if (parsed.emoji !== undefined) return parsed;
-    } catch(e) {}
-    // 구형 포맷 (이모지 공백 라벨) 호환
-    const parts = raw.trim().split(' ');
-    return { emoji: parts[0] || '', label: parts.slice(1).join(' ') || '' };
-  }
   let diaryOffset = 0; // 0 = 오늘, -1 = 어제, ...
 
   function diaryKey(offset) {
@@ -2700,40 +2351,19 @@ ${recentMsgs}
     return `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}(${days[d.getDay()]})`;
   }
 
-  async function renderDiary() {
+  function renderDiary() {
     document.getElementById('diary-date-label').textContent = diaryDateLabel(diaryOffset);
     document.getElementById('diary-next-btn').style.opacity = diaryOffset >= 0 ? '0.3' : '1';
     document.getElementById('diary-next-btn').disabled = diaryOffset >= 0;
 
+    const raw = localStorage.getItem(diaryKey(diaryOffset));
     const writeMode = document.getElementById('diary-write-mode');
     const viewMode = document.getElementById('diary-view-mode');
     const editBtn = document.getElementById('diary-edit-btn');
 
-    let data = null;
-
-    // Supabase에서 먼저 불러오기
-    if (_currentUser) {
-      const d = new Date(); d.setDate(d.getDate() + diaryOffset);
-      const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      const { data: dbDiary } = await sb.from('diaries')
-        .select('*').eq('user_id', _currentUser.id).eq('date', dateStr).maybeSingle();
-      if (dbDiary) {
-        const emo = parseEmotion(dbDiary.emotion);
-        data = { text: dbDiary.content, emotion: emo.emoji, emotionLabel: emo.label, mood: '', moodLabel: '' };
-        // localStorage도 동기화
-        localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(data));
-      }
-    }
-
-    // localStorage 폴백
-    if (!data) {
-      const raw = localStorage.getItem(diaryKey(diaryOffset));
-      if (raw) {
-        try { data = JSON.parse(raw); } catch(e) { data = { text: raw, mood: '' }; }
-      }
-    }
-
-    if (data && data.text) {
+    if (raw) {
+      let data;
+      try { data = JSON.parse(raw); } catch(e) { data = { text: raw, mood: '' }; }
       writeMode.style.display = 'none';
       viewMode.style.display = 'block';
       const d = new Date(); d.setDate(d.getDate() + diaryOffset);
@@ -2741,12 +2371,13 @@ ${recentMsgs}
       document.getElementById('diary-view-date').textContent =
         `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}(${days[d.getDay()]})`;
       document.getElementById('diary-view-text').textContent = data.text || '';
-      editBtn.style.display = 'block';
+      editBtn.style.display = 'block'; // 과거도 수정 가능
       renderDiaryMeta(data);
     } else {
       viewMode.style.display = 'none';
-      writeMode.style.display = 'block';
+      writeMode.style.display = 'block'; // 과거도 새로 쓸 수 있게
       editBtn.style.display = 'none';
+      // 날짜 바뀔 때 input 초기화
       document.getElementById('diary-input').value = '';
       document.querySelectorAll('.diary-emotion-btn').forEach(b => b.classList.remove('selected'));
       const btn = document.getElementById('diary-save-btn');
@@ -2769,36 +2400,29 @@ ${recentMsgs}
     const emotionBtn = document.querySelector('.diary-emotion-btn.selected');
     const emotion = emotionBtn ? emotionBtn.dataset.emotion : '';
     const emotionLabel = emotionBtn ? emotionBtn.dataset.label : '';
+
     const moodBtn = document.querySelector('.mood-mini.selected');
     const moodEmoji = moodBtn ? moodBtn.textContent.trim() : '';
     const moodLabels = { '5': '최고', '4': '좋음', '3': '보통', '2': '별로', '1': '힘듦' };
     const moodLabel = moodBtn ? (moodLabels[moodBtn.dataset.mood] || '') : '';
 
     const diaryData = { text, emotion, emotionLabel, mood: moodEmoji, moodLabel, savedAt: new Date().toISOString() };
-
-    // UI 즉시 반응
-    const btn = document.getElementById('diary-save-btn');
-    btn.innerHTML = '✅ 저장됐어요!';
-    btn.style.background = '#4CAF50';
-
-    // localStorage 즉시 저장
     localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(diaryData));
 
-    // Supabase 저장 후 목록 갱신
+    // Supabase 저장
     if (_currentUser) {
       const d = new Date(); d.setDate(d.getDate() + diaryOffset);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      await sb.from('diaries').upsert({
-        user_id: _currentUser.id,
-        date: dateStr,
-        emotion: JSON.stringify({ emoji: emotion, label: emotionLabel }),
-        content: text,
-      }, { onConflict: 'user_id,date' });
-      _recordCache = {};
-      _emotionCache = {};
-      renderDiaryList();
+      const emotionJson = JSON.stringify({ emoji: emotion, label: emotionLabel });
+      await sb.from('diaries').upsert(
+        { user_id: _currentUser.id, date: dateStr, content: text, emotion: emotionJson },
+        { onConflict: 'user_id,date' }
+      );
     }
 
+    const btn = document.getElementById('diary-save-btn');
+    btn.innerHTML = '✅ 저장됐어요!';
+    btn.style.background = '#4CAF50';
     setTimeout(() => showDiaryView(diaryData), 700);
   }
 
@@ -2835,36 +2459,23 @@ ${recentMsgs}
     renderDiaryMeta(data);
   }
 
-  async function diaryStartEdit() {
+  function diaryStartEdit() {
     document.getElementById('diary-view-mode').style.display = 'none';
     document.getElementById('diary-write-mode').style.display = 'block';
     document.getElementById('diary-edit-btn').style.display = 'none';
-
-    // Supabase에서 현재 일기 불러오기
-    let text = '', emotion = '';
-    if (_currentUser) {
-      const d = new Date(); d.setDate(d.getDate() + diaryOffset);
-      const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      const { data: dbDiary } = await sb.from('diaries').select('*').eq('user_id', _currentUser.id).eq('date', dateStr).maybeSingle();
-      if (dbDiary) {
-        const emo = parseEmotion(dbDiary.emotion);
-        text = dbDiary.content || '';
-        emotion = emo.emoji;
-      }
-    } else {
-      const raw = localStorage.getItem(diaryKey(diaryOffset));
-      if (raw) {
-        try { const data = JSON.parse(raw); text = data.text || ''; emotion = data.emotion || ''; } catch(e) {}
-      }
+    // 저장된 감정 복원
+    const raw = localStorage.getItem(diaryKey(diaryOffset));
+    if (raw) {
+      try {
+        const data = JSON.parse(raw);
+        document.getElementById('diary-input').value = data.text || '';
+        if (data.emotion) {
+          document.querySelectorAll('.diary-emotion-btn').forEach(b => {
+            b.classList.toggle('selected', b.dataset.emotion === data.emotion);
+          });
+        }
+      } catch(e) {}
     }
-
-    document.getElementById('diary-input').value = text;
-    if (emotion) {
-      document.querySelectorAll('.diary-emotion-btn').forEach(b => {
-        b.classList.toggle('selected', b.dataset.emotion === emotion);
-      });
-    }
-
     const btn = document.getElementById('diary-save-btn');
     btn.innerHTML = '📔 오늘 마음일기 저장하기';
     btn.style.background = 'var(--purple)';
@@ -2878,17 +2489,22 @@ ${recentMsgs}
 
 
   // Todos
-  let todos = [];
-  let nextId = 1;
+  let todos = [
+    { id: 1, text: '쇼피 상품 등록 1개', tag: 'shopee', done: false },
+    { id: 2, text: '급식 거래처 발주 확인', tag: 'gupsal', done: false },
+    { id: 3, text: '도시락 영상 아이디어 메모', tag: 'dosirak', done: false },
+    { id: 4, text: '산책 30분', tag: 'personal', done: false },
+  ];
+  let nextId = 5;
   let currentFilter = 'all';
   let selectedTag = 'personal';
 
   // ── 태그 관리 ──
   let customTags = JSON.parse(localStorage.getItem('mochi_tags') || 'null') || [
-    { id: 'personal',  emoji: '🏠', label: '일상',    color: '#F0EAFF', textColor: '#6040A0' },
-    { id: 'work',      emoji: '💼', label: '업무',    color: '#E8F0FF', textColor: '#2040A0' },
-    { id: 'health',    emoji: '🏃', label: '건강',    color: '#E8F5E9', textColor: '#2A6E2A' },
-    { id: 'family',    emoji: '👨‍👩‍👧', label: '가족',   color: '#FFF3E0', textColor: '#C05000' },
+    { id: 'personal',  emoji: '',   label: '개인',    color: '#F0EAFF', textColor: '#6040A0' },
+    { id: 'shopee',    emoji: '🛍', label: '쇼피',    color: '#FFF0E0', textColor: '#C05000' },
+    { id: 'gupsal',    emoji: '🥘', label: '급식',    color: '#EAF5EA', textColor: '#2A6E2A' },
+    { id: 'dosirak',   emoji: '🍱', label: '도시락',  color: '#FFEAEE', textColor: '#A02030' },
     { id: 'mochi_rec', emoji: '💗', label: '모찌추천', color: '#FFE8F8', textColor: '#901060' },
   ];
   // 기존 localStorage에 모찌추천 태그 없으면 자동 추가
@@ -3080,21 +2696,26 @@ ${recentMsgs}
     }
   }
 
-  function addTodo() {
+  async function addTodo() {
     const input = document.getElementById('todo-input');
     const text = input.value.trim();
     if (!text) return;
-    const dateStr = getCurrentDateStr();
+    const today = new Date().toISOString().slice(0,10);
+    const dateStr = viewingDate
+      ? `${viewingDate.y}-${String(viewingDate.m+1).padStart(2,'0')}-${String(viewingDate.d).padStart(2,'0')}`
+      : today;
     const tempId = 'tmp_' + Date.now();
     todos.push({ id: tempId, text, tag: selectedTag, done: false, date: dateStr });
     input.value = '';
     renderTodos();
-    // Supabase 백그라운드 동기화
+    // Supabase 동기화 (await로 id 확정 후 재저장)
     if (_currentUser) {
-      sb.from('todos').insert({ text, tag: selectedTag, done: false, date: dateStr, user_id: _currentUser.id })
-        .select().single().then(({ data, error }) => {
-          if (!error && data) todos = todos.map(t => t.id === tempId ? { ...t, id: data.id } : t);
-        });
+      const { data, error } = await sb.from('todos')
+        .insert({ text, tag: selectedTag, done: false, date: dateStr, user_id: _currentUser.id })
+        .select().single();
+      if (!error && data) {
+        todos = todos.map(t => t.id === tempId ? { ...t, id: data.id } : t);
+      }
     }
   }
 
@@ -3123,16 +2744,9 @@ ${recentMsgs}
   renderTodos();
   renderTagTabs();
   renderTagSelector();
-  // renderWeeklyProgress는 loadToday 완료 후 호출됨
+  renderWeeklyProgress();
 
-  // 주간 달성률 (localStorage 기반 - 잘 됐던 버전과 동일한 로직)
-  let _weeklyRenderTimer = null;
   function renderWeeklyProgress() {
-    clearTimeout(_weeklyRenderTimer);
-    _weeklyRenderTimer = setTimeout(_doRenderWeeklyProgress, 80);
-  }
-
-  function _doRenderWeeklyProgress() {
     const n = new Date();
     const base = viewingDate
       ? new Date(viewingDate.y, viewingDate.m, viewingDate.d)
@@ -3151,65 +2765,88 @@ ${recentMsgs}
     const titleEl = weekCard ? weekCard.querySelector('span') : null;
     if (titleEl) titleEl.textContent = isThisWeek ? '📊 이번 주 달성률' : `📊 ${base.getMonth()+1}월 ${Math.ceil(base.getDate()/7)}주 달성률`;
 
-    const dayLabels = ['월','화','수','목','금','토','일'];
     const bars = document.getElementById('weekly-bars');
     if (!bars) return;
-    bars.innerHTML = '';
 
-    let totalAll = 0, doneAll = 0;
+    const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const from = fmt(week[0]);
+    const to = fmt(week[6]);
 
-    week.forEach((d, idx) => {
-      const key = `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
-      const isToday = d.toDateString() === n.toDateString();
-      const isBaseDay = d.toDateString() === base.toDateString();
-      const dMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const nMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
-      const isFuture = dMidnight > nMidnight;
+    const render = (weekTodosMap) => {
+      bars.innerHTML = '';
+      const dayLabels = ['월','화','수','목','금','토','일'];
+      let totalAll = 0, doneAll = 0;
 
-      let dayTodos;
-      if (isBaseDay) {
-        // 현재 보고 있는 날짜는 메모리 todos 사용 (최신 상태)
-        dayTodos = todos;
-      } else if (isToday) {
-        dayTodos = todos;
-      } else {
-        dayTodos = (() => { try { return JSON.parse(localStorage.getItem(key)||'{}').todos || []; } catch(e) { return []; } })();
-      }
+      week.forEach((d, idx) => {
+        const dateKey = fmt(d);
+        const isToday = d.toDateString() === n.toDateString();
+        const isBaseDay = d.toDateString() === base.toDateString();
+        const dMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const nMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+        const isFuture = dMidnight > nMidnight;
 
-      const total = dayTodos.length;
-      const done = dayTodos.filter(t => t.done).length;
-      totalAll += total;
-      doneAll += done;
-      const pct = total > 0 ? Math.round(done / total * 100) : null;
+        // 현재 보고 있는 날(baseDay)은 메모리 todos 사용 (가장 최신)
+        let dayTodos;
+        if (isBaseDay) {
+          dayTodos = todos;
+        } else {
+          dayTodos = weekTodosMap[dateKey] || [];
+        }
 
-      const size = 36, r = 14, c = size / 2;
-      const circ = 2 * Math.PI * r;
-      const filled = pct !== null ? (pct / 100) * circ : 0;
-      const isComplete = pct === 100;
-      const strokeColor = isComplete ? '#7C4DFF' : '#C4B5FD';
+        const total = dayTodos.length;
+        const done = dayTodos.filter(t => t.done).length;
+        totalAll += total;
+        doneAll += done;
+        const pct = total > 0 ? Math.round(done / total * 100) : null;
 
-      const col = document.createElement('div');
-      col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
-      col.innerHTML = `
-        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-          <circle cx="${c}" cy="${c}" r="${r}" fill="${isBaseDay ? '#F3EEFF' : '#F5F5F7'}" stroke="none"/>
-          ${pct !== null ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="3"
-            stroke-dasharray="${filled} ${circ - filled}"
-            stroke-dashoffset="${circ / 4}"
-            stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/>` : ''}
-          <text x="${c}" y="${c+1}" text-anchor="middle" dominant-baseline="middle"
-            font-size="${pct === null ? '11' : '9'}" fill="${isBaseDay ? 'var(--purple)' : '#888'}" font-family="'Noto Sans KR',sans-serif" font-weight="${isBaseDay?'700':'500'}">
-            ${pct === null ? (isFuture ? '' : '-') : `${pct}%`}
-          </text>
-        </svg>
-        <span style="font-size:11px;font-weight:${isBaseDay?'700':'400'};color:${isBaseDay?'var(--purple)':'var(--text-light)'};">${dayLabels[idx]}</span>
-      `;
-      bars.appendChild(col);
-    });
+        const size = 36, r = 14, c = size / 2;
+        const circ = 2 * Math.PI * r;
+        const filled = pct !== null ? (pct / 100) * circ : 0;
+        const isComplete = pct === 100;
+        const strokeColor = isComplete ? '#7C4DFF' : '#C4B5FD';
 
-    const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
-    const el = document.getElementById('weekly-overall-pct');
-    if (el) el.textContent = totalAll > 0 ? `${doneAll}/${totalAll} 완료 · ${overallPct}%` : '기록 없음';
+        const col = document.createElement('div');
+        col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+        col.innerHTML = `
+          <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+            <circle cx="${c}" cy="${c}" r="${r}" fill="${isBaseDay ? '#F3EEFF' : '#F5F5F7'}" stroke="none"/>
+            ${pct !== null ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="3"
+              stroke-dasharray="${filled} ${circ - filled}"
+              stroke-dashoffset="${circ / 4}"
+              stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/>` : ''}
+            <text x="${c}" y="${c+1}" text-anchor="middle" dominant-baseline="middle"
+              font-size="${pct === null ? '11' : '9'}" fill="${isBaseDay ? 'var(--purple)' : '#888'}" font-family="'Noto Sans KR',sans-serif" font-weight="${isBaseDay?'700':'500'}">
+              ${pct === null ? (isFuture ? '' : '-') : `${pct}%`}
+            </text>
+          </svg>
+          <span style="font-size:11px;font-weight:${isBaseDay?'700':'400'};color:${isBaseDay?'var(--purple)':'var(--text-light)'};">${dayLabels[idx]}</span>
+        `;
+        bars.appendChild(col);
+      });
+
+      const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
+      const el = document.getElementById('weekly-overall-pct');
+      if (el) el.textContent = totalAll > 0 ? `${doneAll}/${totalAll} 완료 · ${overallPct}%` : '기록 없음';
+    };
+
+    // Supabase에서 이번 주 전체 데이터 쿼리
+    if (_currentUser && sb) {
+      sb.from('todos').select('date,done,text,tag').eq('user_id', _currentUser.id).gte('date', from).lte('date', to)
+        .then(({ data }) => {
+          const map = {};
+          week.forEach(d => { map[fmt(d)] = []; });
+          (data || []).forEach(t => { if (map[t.date]) map[t.date].push(t); });
+          render(map);
+        });
+    } else {
+      // 로그인 전이면 localStorage fallback
+      const map = {};
+      week.forEach(d => {
+        const key = `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+        map[fmt(d)] = (() => { try { return JSON.parse(localStorage.getItem(key)||'{}').todos || []; } catch(e) { return []; } })();
+      });
+      render(map);
+    }
   }
 
   // Page navigation
@@ -3221,14 +2858,7 @@ ${recentMsgs}
     if (btn) btn.classList.add('active');
     window.scrollTo(0, 0);
     if (page === 'idea') renderIdeas();
-    if (page === 'diarylist') {
-      // 즉시 비우고 로딩 표시
-      const container = document.getElementById('diarylist-container');
-      const monthTabsWrap = document.getElementById('diary-month-tabs');
-      if (container) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);font-size:14px;">🐰 불러오는 중...</div>';
-      if (monthTabsWrap) monthTabsWrap.innerHTML = '';
-      renderDiaryList();
-    }
+    if (page === 'diarylist') renderDiaryList();
   }
 
   // ── 일기 목록 렌더 ──
@@ -3249,48 +2879,30 @@ ${recentMsgs}
 
   let diarySelectedMonth = null; // 'YYYY-M' 형식
 
-  async function renderDiaryList() {
+  function renderDiaryList() {
     const container = document.getElementById('diarylist-container');
     const empty = document.getElementById('diarylist-empty');
     const monthTabsWrap = document.getElementById('diary-month-tabs');
     container.innerHTML = '';
 
     const dayNames = ['일','월','화','수','목','금','토'];
-    let allEntries = [];
+    const allEntries = [];
 
-    if (_currentUser) {
-      const { data: dbDiaries } = await sb.from('diaries')
-        .select('*').eq('user_id', _currentUser.id).order('date', { ascending: false })
-        .limit(1000);
-      if (dbDiaries) {
-        allEntries = dbDiaries.map(d => {
-          const parts = d.date.split('-');
-          const emo = parseEmotion(d.emotion);
-          return {
-            year: parseInt(parts[0]), month: parseInt(parts[1]), day: parseInt(parts[2]),
-            text: d.content || '',
-            emotion: emo.emoji,
-            emotionLabel: emo.label,
-            mood: '', moodLabel: ''
-          };
-        }).filter(e => e.text);
-      }
-    } else {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key.startsWith('diary_')) continue;
-        try {
-          const parts = key.split('_');
-          const year = parseInt(parts[1]), month = parseInt(parts[2]), day = parseInt(parts[3]);
-          const raw = localStorage.getItem(key);
-          let data;
-          try { data = JSON.parse(raw); } catch(e) { data = { text: raw, mood: '' }; }
-          if (!data.text) continue;
-          allEntries.push({ year, month, day, text: data.text, emotion: data.emotion || '', emotionLabel: data.emotionLabel || '', mood: data.mood || '', moodLabel: data.moodLabel || '' });
-        } catch(e) {}
-      }
-      allEntries.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day));
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key.startsWith('diary_')) continue;
+      try {
+        const parts = key.split('_');
+        const year = parseInt(parts[1]), month = parseInt(parts[2]), day = parseInt(parts[3]);
+        const raw = localStorage.getItem(key);
+        let data;
+        try { data = JSON.parse(raw); } catch(e) { data = { text: raw, mood: '' }; }
+        if (!data.text) continue;
+        allEntries.push({ year, month, day, text: data.text, emotion: data.emotion || '', emotionLabel: data.emotionLabel || '', mood: data.mood || '', moodLabel: data.moodLabel || '' });
+      } catch(e) {}
     }
+
+    allEntries.sort((a, b) => new Date(b.year, b.month-1, b.day) - new Date(a.year, a.month-1, a.day));
 
     if (allEntries.length === 0) {
       empty.style.display = 'block';
@@ -3317,7 +2929,7 @@ ${recentMsgs}
     monthSet.forEach(m => {
       const isSelected = m.key === diarySelectedMonth;
       const btn = document.createElement('button');
-      btn.style.cssText = `flex-shrink:0; padding:7px 18px; border-radius:20px; border:1.5px solid ${isSelected ? 'var(--purple)' : '#e8e0f5'}; background:${isSelected ? 'var(--purple)' : 'white'}; color:${isSelected ? 'white' : '#9b84c8'}; font-size:13px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; transition:all 0.15s; box-shadow: ${isSelected ? '0 2px 8px rgba(124,92,191,0.25)' : 'none'};`;
+      btn.style.cssText = `flex-shrink:0; padding:7px 16px; border-radius:20px; border:1.5px solid ${isSelected ? 'var(--purple)' : 'var(--border)'}; background:${isSelected ? 'var(--purple)' : 'white'}; color:${isSelected ? 'white' : 'var(--text-light)'}; font-size:13px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; transition:all 0.15s;`;
       btn.textContent = `${m.year === new Date().getFullYear() ? '' : m.year + '년 '}${m.month}월`;
       btn.onclick = () => { diarySelectedMonth = m.key; renderDiaryList(); };
       monthTabsWrap.appendChild(btn);
@@ -3338,7 +2950,7 @@ ${recentMsgs}
     document.getElementById('diary-letter-closed').style.display = 'block';
     document.getElementById('diary-letter-open').style.display = 'none';
     document.getElementById('diary-analysis-body').textContent = '';
-    analysisBtn.textContent = '열기 →';
+    analysisBtn.textContent = '💌 편지 열기';
     analysisBtn.disabled = false;
 
     // 일기 카드 렌더
@@ -3356,20 +2968,16 @@ ${recentMsgs}
       const sideColor = e.emotion ? emotionColor.tc : 'var(--purple)';
       const emotionTag = e.emotion ? `<span style="font-size:11px;color:${emotionColor.tc};background:${emotionColor.bg};padding:2px 8px;border-radius:20px;font-weight:600;">${e.emotion} ${e.emotionLabel}</span>` : '';
       card.innerHTML = `
-        <div class="dlc-side"></div>
+        <div class="dlc-side" style="background:${sideColor};">
+          <div class="dlc-day-num">${e.day}</div>
+          <div class="dlc-day-name">${dayLabel}요일</div>
+        </div>
         <div class="dlc-body">
           <div class="dlc-header">
-            <div class="dlc-date-badge">
-              <span class="dlc-date-num">${e.day}</span>
-              <div class="dlc-date-sub">
-                <span class="dlc-date-month">${e.month}월</span>
-                <span class="dlc-date-dow">${dayLabel}요일</span>
-              </div>
-            </div>
+            <span class="dlc-date">${e.month}월</span>
             ${emotionTag}
-            <span class="dlc-day">${isToday ? '✨ 오늘' : e.year + '년'}</span>
+            <span class="dlc-day">${isToday ? '✨ 오늘' : e.year+'년'}</span>
           </div>
-          <div class="dlc-divider"></div>
           <div class="dlc-preview">${preview}${e.text.length > 60 ? '...' : ''}</div>
         </div>
       `;
@@ -3410,7 +3018,7 @@ ${recentMsgs}
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 700,
@@ -3446,7 +3054,7 @@ ${diaryText}`
   function closeDiaryLetter() {
     document.getElementById('diary-letter-open').style.display = 'none';
     const btn = document.getElementById('diary-analysis-btn');
-    btn.textContent = '열기 →';
+    btn.textContent = '💌 다시 읽기';
     btn.disabled = false;
     document.getElementById('diary-letter-closed').style.display = 'block';
   }
@@ -3540,23 +3148,12 @@ ${diaryText}`
     document.getElementById('ds-cancel-btn').style.display = 'inline-block';
   }
 
-  async function saveOverlayEdit() {
+  function saveOverlayEdit() {
     const e = _overlayEntry;
     const newText = document.getElementById('ds-edit-textarea').value.trim();
     if (!newText) return;
 
-    // Supabase 저장
-    if (_currentUser) {
-      const dateStr = `${e.year}-${String(e.month).padStart(2,'0')}-${String(e.day).padStart(2,'0')}`;
-      sb.from('diaries').upsert({
-        user_id: _currentUser.id,
-        date: dateStr,
-        emotion: JSON.stringify({ emoji: e.emotion || '', label: e.emotionLabel || '' }),
-        content: newText,
-      }, { onConflict: 'user_id,date' });
-    }
-
-    // localStorage 백업
+    // localStorage 저장
     const key = `diary_${e.year}_${e.month}_${e.day}`;
     const existing = JSON.parse(localStorage.getItem(key) || '{}');
     existing.text = newText;
@@ -3604,23 +3201,14 @@ ${diaryText}`
   window.cancelOverlayEdit = cancelOverlayEdit;
 
   // Ideas
-  let ideas = [];
-  let nextIdeaId = 1;
-
-  // 태그 배경색 팔레트 (AI가 고름)
-  const TAG_PALETTE = [
-    { bg: '#FFF0E0', tc: '#C05000' }, { bg: '#FCE4EC', tc: '#C62828' },
-    { bg: '#E8F5E9', tc: '#2E7D32' }, { bg: '#E8D5FF', tc: '#6A1B9A' },
-    { bg: '#FFF9C4', tc: '#F57F17' }, { bg: '#E3F2FD', tc: '#1565C0' },
-    { bg: '#F3E5F5', tc: '#7B1FA2' }, { bg: '#E0F7FA', tc: '#00695C' },
-    { bg: '#FBE9E7', tc: '#BF360C' }, { bg: '#F9FBE7', tc: '#558B2F' },
+  let ideas = [
+    { id: 1, title: '쇼피 첫 상품 아이디어', content: '동남아에서 인기 있는 한국 뷰티 제품 소싱해보기. K-beauty 트렌드 활용!', category: 'shopee', date: '2026.03.09' },
+    { id: 2, title: '도시락 채널 콘텐츠 기획', content: '남편 도시락 리뷰에 스토리 추가하기. 준비 과정 비하인드 숏폼 만들면 좋을 것 같아!', category: 'dosirak', date: '2026.03.08' },
   ];
-  function pickTagColor(tagText) {
-    // 태그 텍스트 기반 일관된 색상 선택
-    let hash = 0;
-    for (let c of tagText) hash = (hash * 31 + c.charCodeAt(0)) & 0xffff;
-    return TAG_PALETTE[hash % TAG_PALETTE.length];
-  }
+  let nextIdeaId = 3;
+  const catLabels = { shopee: '🛍 쇼피', gupsal: '🥘 급식', dosirak: '🍱 도시락', biz: '💼 비즈니스', life: '✨ 라이프' };
+  const catColors = { shopee: '#FFE0B2', gupsal: '#E8F5E9', dosirak: '#FCE4EC', biz: '#E8D5FF', life: '#FFF9C4' };
+  const catTextColors = { shopee: '#E65100', gupsal: '#2E7D32', dosirak: '#C62828', biz: '#6A1B9A', life: '#F57F17' };
 
   function renderIdeas() {
     const list = document.getElementById('idea-list');
@@ -3629,217 +3217,38 @@ ${diaryText}`
     [...ideas].reverse().forEach(idea => {
       const div = document.createElement('div');
       div.className = 'idea-card';
-      div.dataset.ideaId = idea.id;
-      const tagColor = idea.tagColor || pickTagColor(idea.tag || '').bg;
-      const tagTextColor = idea.tagTextColor || pickTagColor(idea.tag || '').tc;
-      const tagLabel = idea.tag || '기타';
       div.innerHTML = `
         <div class="idea-card-title">${idea.title}</div>
         <div class="idea-card-content">${idea.content || '내용 없음'}</div>
         <div class="idea-card-footer">
-          <span class="todo-tag" style="background:${tagColor};color:${tagTextColor};">${tagLabel}</span>
+          <span class="todo-tag" style="background:${catColors[idea.category]};color:${catTextColors[idea.category]}">${catLabels[idea.category]}</span>
           <span class="idea-date">${idea.date}</span>
-        </div>
-        <div class="idea-feedback-wrap" id="fb-wrap-${idea.id}" style="margin-top:12px;">
-          <button class="idea-feedback-btn" onclick="requestIdeaFeedback(${idea.id}, this)">
-            🐰 모찌 피드백 받기
-          </button>
-          <div class="idea-feedback-body" id="fb-body-${idea.id}" style="display:none;"></div>
         </div>
       `;
       list.appendChild(div);
     });
   }
 
-  async function addIdea() {
+  function addIdea() {
     const title = document.getElementById('idea-title').value.trim();
     const content = document.getElementById('idea-content').value.trim();
+    const category = document.getElementById('idea-category').value;
     if (!title) return;
-
-    const saveBtn = document.getElementById('idea-save-btn');
-    const saveIcon = document.getElementById('idea-save-icon');
-    const saveLabel = document.getElementById('idea-save-label');
-    saveBtn.disabled = true;
-    saveIcon.textContent = '🐰';
-    saveLabel.textContent = '모찌가 태그 붙이는 중...';
-    saveBtn.style.opacity = '0.7';
-
     const today = new Date();
     const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
-
-    // AI 태그 생성 (이건 어쩔 수 없이 await - AI 응답 필요)
-    let tag = '💡 아이디어';
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 15,
-          system: `아이디어에 어울리는 태그를 딱 하나만 만들어요. 이모지 1개 + 짧은 한국어 단어(2~4글자) 형식으로. 예시: 🎬 콘텐츠, 🛍 이커머스, 📦 물류, 💰 수익화, 🤝 협업, 📱 SNS, 🍱 식품, 🌿 라이프. 태그 텍스트만 출력, 다른 말 없이.`,
-          messages: [{ role: 'user', content: `제목: ${title}\n내용: ${content || '없음'}` }]
-        })
-      });
-      const data = await res.json();
-      const raw = (data.content?.[0]?.text || '').trim();
-      if (raw.length < 20) tag = raw;
-    } catch(e) {}
-
-    const { bg, tc } = pickTagColor(tag);
-    const tempId = 'tmp_' + Date.now();
-
-    // 낙관적 업데이트 - UI 즉시 반영
-    ideas.unshift({ id: tempId, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
+    ideas.push({ id: nextIdeaId++, title, content, category, date: dateStr });
     document.getElementById('idea-title').value = '';
     document.getElementById('idea-content').value = '';
-    saveIcon.textContent = '✅';
-    saveLabel.textContent = `${tag} 태그로 저장됐어요!`;
-    saveBtn.style.background = '#4CAF50';
-    saveBtn.style.opacity = '1';
-    renderIdeas();
-
-    // 백그라운드 DB 저장
-    if (_currentUser) {
-      sb.from('ideas').insert({
-        user_id: _currentUser.id, title, content, tag,
-        tag_color: bg, tag_text_color: tc
-      }).select().single().then(({ data: saved, error }) => {
-        if (!error && saved) {
-          ideas = ideas.map(i => i.id === tempId ? { ...i, id: saved.id } : i);
-        }
-      });
-    }
-
-    setTimeout(() => {
-      saveIcon.textContent = '💡';
-      saveLabel.textContent = '아이디어 저장하기';
-      saveBtn.style.background = 'var(--purple)';
-      saveBtn.disabled = false;
-    }, 2000);
-
     renderIdeas();
   }
 
-  async function requestIdeaFeedback(ideaId, btn) {
-    const idea = ideas.find(i => i.id === ideaId);
-    if (!idea) return;
-
-    const bodyEl = document.getElementById(`fb-body-${ideaId}`);
-    const wrapEl = document.getElementById(`fb-wrap-${ideaId}`);
-
-    // 이미 열려있으면 토글 닫기
-    if (bodyEl.style.display === 'block') {
-      bodyEl.style.display = 'none';
-      btn.textContent = '🐰 모찌 피드백 받기';
-      btn.classList.remove('loading');
-      return;
-    }
-
-    // 로딩 상태
-    btn.textContent = '🐰 생각 중...';
-    btn.disabled = true;
-    btn.classList.add('loading');
-
-    const userName = localStorage.getItem('mochi_user_name') || '';
-    const profile = (() => { try { return JSON.parse(localStorage.getItem('mochi_profile') || '{}'); } catch(e) { return {}; } })();
-    const profileStr = [profile.job, profile.goal].filter(Boolean).join(' / ');
-
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 400,
-          system: `당신은 모찌예요. ${userName || '사용자'}의 든든한 친구이자 비즈니스 파트너로서 아이디어 피드백을 줘요. 따뜻하고 응원하는 말투를 유지하면서도, 현실적으로 보완하면 좋을 점이나 리스크는 솔직하게 짚어줘요. 좋은 점 한 가지, 신경 쓸 점 한 가지, 짧은 응원 한 마디 순서로. 2~3문장으로 간결하게. 이모지는 1~2개만.`,
-          messages: [{
-            role: 'user',
-            content: `아이디어 제목: ${idea.title}
-태그: ${idea.tag || '없음'}
-내용: ${idea.content || '(내용 없음)'}
-${profileStr ? '배경: ' + profileStr : ''}
-
-이 아이디어에 대해 솔직하게 피드백해줘.`
-          }]
-        })
-      });
-      const data = await res.json();
-      const text = data.content?.[0]?.text || '피드백을 가져오지 못했어요 😅';
-
-      bodyEl.innerHTML = `<div class="idea-feedback-text">${text.replace(/\n/g, '<br>')}</div>`;
-      bodyEl.style.display = 'block';
-      btn.textContent = '접기 ∧';
-      btn.disabled = false;
-      btn.classList.remove('loading');
-    } catch(e) {
-      bodyEl.innerHTML = `<div class="idea-feedback-text" style="color:#e57373;">잠깐 오류가 났어요. 다시 눌러줘요!</div>`;
-      bodyEl.style.display = 'block';
-      btn.textContent = '🐰 모찌 피드백 받기';
-      btn.disabled = false;
-      btn.classList.remove('loading');
-    }
+  // 설정 테마
+  function setTheme(el, light, dark) {
+    document.querySelectorAll('[onclick^="setTheme"]').forEach(e => e.style.border = '3px solid transparent');
+    el.style.border = `3px solid ${dark}`;
+    document.documentElement.style.setProperty('--purple', dark);
+    document.documentElement.style.setProperty('--lavender', light);
   }
-  window.requestIdeaFeedback = requestIdeaFeedback;
-
-  // 테마 정의
-  const THEMES = {
-    purple: {
-      accent: '#7C5CBF', accentLight: '#EAE4FF', accentMid: '#9B7FD4',
-      bg: '#F4F4F6', border: '#EBEBEF',
-      headerFrom: 'rgba(124,92,191,0.92)', headerMid: 'rgba(180,120,210,0.88)', headerTo: 'rgba(255,160,180,0.82)',
-      selectedBorder: '#7C5CBF',
-    },
-    mint: {
-      accent: '#1a9e6e', accentLight: '#d4f5e9', accentMid: '#2ecc98',
-      bg: '#F4F4F6', border: '#EBEBEF',
-      headerFrom: 'rgba(20,140,100,0.92)', headerMid: 'rgba(46,180,140,0.88)', headerTo: 'rgba(160,240,210,0.82)',
-      selectedBorder: '#1a9e6e',
-    },
-    rose: {
-      accent: '#d63a6e', accentLight: '#ffe0ec', accentMid: '#e8608a',
-      bg: '#F4F4F6', border: '#EBEBEF',
-      headerFrom: 'rgba(200,50,100,0.92)', headerMid: 'rgba(230,90,130,0.88)', headerTo: 'rgba(255,180,200,0.82)',
-      selectedBorder: '#d63a6e',
-    },
-    sky: {
-      accent: '#1a78c2', accentLight: '#ddeeff', accentMid: '#3a9fe8',
-      bg: '#F4F4F6', border: '#EBEBEF',
-      headerFrom: 'rgba(20,100,190,0.92)', headerMid: 'rgba(50,140,220,0.88)', headerTo: 'rgba(140,200,255,0.82)',
-      selectedBorder: '#1a78c2',
-    },
-  };
-
-  function setTheme(el, name) {
-    const t = THEMES[name];
-    if (!t) return;
-    const r = document.documentElement;
-    r.style.setProperty('--purple', t.accent);
-    r.style.setProperty('--purple-light', t.accentLight);
-    r.style.setProperty('--lavender', t.accentLight);
-    r.style.setProperty('--cream', t.bg);
-    r.style.setProperty('--border', t.border);
-    r.style.setProperty('--theme-accent', t.accent);
-    r.style.setProperty('--theme-accent-light', t.accentLight);
-    r.style.setProperty('--theme-accent-mid', t.accentMid);
-    r.style.setProperty('--theme-bg', t.bg);
-    r.style.setProperty('--theme-card-border', t.border);
-    r.style.setProperty('--theme-header-from', t.headerFrom);
-    r.style.setProperty('--theme-header-mid', t.headerMid);
-    r.style.setProperty('--theme-header-to', t.headerTo);
-    // 선택 표시
-    document.querySelectorAll('.theme-btn').forEach(b => { b.classList.remove('selected'); b.style.border = '3px solid transparent'; });
-    el.classList.add('selected');
-    el.style.border = `3px solid ${t.selectedBorder}`;
-    // 저장
-    localStorage.setItem('mochi_theme', name);
-  }
-
-  // 저장된 테마 복원
-  (function() {
-    const saved = localStorage.getItem('mochi_theme') || 'purple';
-    const btn = document.querySelector(`[data-theme="${saved}"]`);
-    if (btn) setTheme(btn, saved);
-  })();
 
   // 🎉 폭죽 애니메이션
   function launchConfetti(emoji = '🎉', title = '할 일 완료!', sub = '최고예요 🐰💜') {
@@ -3886,7 +3295,7 @@ ${profileStr ? '배경: ' + profileStr : ''}
   // 전역 참조도 동기화
   setMood = window.setMood;
 
-  // 💾 날짜별 저장 (localStorage = source of truth)
+  // 💾 날짜별 로컬 저장
   const TODAY_KEY = () => {
     const d = new Date();
     return `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
@@ -3901,15 +3310,12 @@ ${profileStr ? '배경: ' + profileStr : ''}
       savedAt: new Date().toISOString(),
     };
     try { localStorage.setItem(TODAY_KEY(), JSON.stringify(data)); } catch(e) {}
-    // Supabase 백그라운드 동기화 (수면 데이터)
-    const today = new Date().toISOString().slice(0,10);
-    try { localStorage.setItem('mochi_sleep_' + today, JSON.stringify({ sleepTime: data.sleepTime, wakeTime: data.wakeTime })); } catch(e) {}
   }
 
   async function loadToday() {
     const today = new Date().toISOString().slice(0,10);
 
-    // 1. localStorage에서 즉시 로드 (빠른 응답)
+    // 1. localStorage 즉시 로드 (빠른 응답)
     try {
       const raw = localStorage.getItem(TODAY_KEY());
       if (raw) {
@@ -3921,53 +3327,51 @@ ${profileStr ? '배경: ' + profileStr : ''}
       }
     } catch(e) {}
 
-    // 2. Supabase에서 최신 데이터로 덮어쓰기 (동기화)
+    // 2. Supabase 최신 데이터로 동기화
     if (!_currentUser) return;
 
-    const { data: dbTodos } = await sb.from('todos')
-      .select('*').eq('user_id', _currentUser.id).eq('date', today);
+    const { data: dbTodos } = await sb.from('todos').select('*').eq('user_id', _currentUser.id).eq('date', today);
     if (dbTodos) {
-      todos = dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
+      const tmpItems = todos.filter(t => String(t.id).startsWith('tmp_'));
+      todos = [...dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date })), ...tmpItems];
       nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0), 0) + 1 : 1;
       renderTodos();
+      saveToday(); // DB 데이터로 localStorage 갱신
     }
 
-    const { data: dbIdeas } = await sb.from('ideas')
-      .select('*').eq('user_id', _currentUser.id).order('created_at', { ascending: false });
+    const { data: dbIdeas } = await sb.from('ideas').select('*').eq('user_id', _currentUser.id).order('created_at', { ascending: false });
     if (dbIdeas?.length) {
       ideas = dbIdeas.map(i => ({ id: i.id, title: i.title, content: i.content, tag: i.tag, tagColor: i.tag_color, tagTextColor: i.tag_text_color, date: i.created_at?.slice(0,10).replace(/-/g,'.') }));
       nextIdeaId = ideas.length + 1;
-      renderIdeas();
+      if (typeof renderIdeas === 'function') renderIdeas();
     }
 
-    const { data: dbDiary } = await sb.from('diaries')
-      .select('*').eq('user_id', _currentUser.id).eq('date', today).maybeSingle();
+    const { data: dbDiary } = await sb.from('diaries').select('*').eq('user_id', _currentUser.id).eq('date', today).maybeSingle();
     if (dbDiary) {
       document.getElementById('diary-input').value = dbDiary.content || '';
-      const emo = parseEmotion(dbDiary.emotion);
-      const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emo.emoji}"]`);
+      const emoObj = typeof dbDiary.emotion === 'string' ? (() => { try { return JSON.parse(dbDiary.emotion); } catch(e) { return { emoji: dbDiary.emotion }; } })() : (dbDiary.emotion || {});
+      const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emoObj.emoji}"]`);
       if (btn) { document.querySelectorAll('.diary-emotion-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
     }
-
-    try {
-      const sleepRaw = localStorage.getItem('mochi_sleep_' + today);
-      if (sleepRaw) {
-        const s = JSON.parse(sleepRaw);
-        if (s.sleepTime) document.getElementById('sleep-time').value = s.sleepTime;
-        if (s.wakeTime) { document.getElementById('wake-time').value = s.wakeTime; calcSleep(); }
-      }
-    } catch(e) {}
   }
 
   function showSaveBadge() { }
 
-  // updateProgress 오버라이드 - 저장 + 주간달성률 + 축하
+  // 할 일 완료 시 축하 + 저장 연동
   const _origUpdateProgress = updateProgress;
   updateProgress = function() {
     const wasDone = todos.length > 0 && todos.every(t => t.done);
+
+    // ① progress bar 업데이트
     _origUpdateProgress();
+
+    // ② 저장 먼저 (localStorage에 최신 상태 기록)
     saveToday();
+
+    // ③ 저장 후 주간 달성률 렌더
     renderWeeklyProgress();
+
+    // ④ 축하 애니메이션
     const isDone = todos.length > 0 && todos.every(t => t.done);
     if (isDone && !wasDone) {
       launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
@@ -3975,134 +3379,14 @@ ${profileStr ? '배경: ' + profileStr : ''}
   };
 
   // 오늘 기록 불러오기
-  setTimeout(() => loadToday().then(() => renderWeeklyProgress()), 800);
-
-  // ── 튜토리얼 ──
-  const TUT_SLIDES = [
-    {
-      emoji: '🐰',
-      title: '안녕하세요! 저는 모찌예요',
-      desc: '매일의 할 일, 마음일기, 아이디어까지\n모찌가 옆에서 함께 도와줄게요 💜\n\n총 5개 탭으로 이루어진 앱이에요.\n지금부터 하나씩 소개해드릴게요!',
-    },
-    {
-      emoji: '✏️',
-      title: '먼저 닉네임을 알려주세요!',
-      desc: '모찌가 어떻게 불러드릴까요?',
-      input: { id: 'tut-name-input', placeholder: '예: 윤주, 쥬, 언니 ...', storageKey: 'mochi_user_name' },
-    },
-    {
-      emoji: '📋',
-      title: '오늘 탭 — 하루를 한눈에',
-      desc: '• 수면시간 · 컨디션을 기록해요\n• 오늘 할 일을 태그별로 관리해요\n• 모찌와 채팅으로 뭐든 물어봐요\n• 마음일기를 매일 한 줄씩 써요\n\n💬 "오늘 뭐부터 해야 해?" 라고 물어보면\n모찌가 우선순위를 같이 고민해줘요!',
-    },
-    {
-      emoji: '📔',
-      title: '마음일기 탭 — 감정을 기록해요',
-      desc: '• 날짜별 감정 이모지 + 한 줄 일기\n• 한 달치 기록을 모아서 볼 수 있어요\n• 모찌가 한 달을 돌아보는 편지를 써줘요 🌸\n\n쌓일수록 나만의 감정 히스토리가 돼요.\n오늘 하루 어땠는지 꼭 기록해보세요!',
-    },
-    {
-      emoji: '💡',
-      title: '아이디어 노트 — 모찌 피드백까지',
-      desc: '• 떠오르는 아이디어를 바로 메모해요\n• 저장하면 AI가 자동으로 태그를 붙여줘요\n\n🐰 모찌 피드백 기능:\n저장된 아이디어마다 "모찌 피드백 받기"\n버튼을 누르면 좋은 점, 신경 쓸 점,\n응원 한 마디를 솔직하게 말해줘요!',
-    },
-    {
-      emoji: '⚙️',
-      title: '설정 탭 — 꼭 채워주세요!',
-      desc: '📌 모찌에게 나 소개하기를 작성하면\n대화할 때 나에게 딱 맞는 맞춤 답변을\n받을 수 있어요.\n\n직업, 관심사, 목표를 알수록\n모찌가 훨씬 더 잘 도와줄 수 있어요 🐰\n\n설정 탭에서 바로 입력해보세요!',
-      highlight: true,
-    },
-    {
-      emoji: '🎉',
-      title: '준비 완료!',
-      desc: '이제 모찌와 함께 하루를 시작해봐요.\n\n먼저 설정 탭에서 나를 소개하고\n오늘 탭에서 할 일을 추가해보세요 💜',
-      last: true,
-    },
-  ];
-
-  let tutStep = 0;
-
-  function renderTutSlides() {
-    const slidesEl = document.getElementById('tut-slides');
-    const dotsEl = document.getElementById('tut-dots');
-    const s = TUT_SLIDES[tutStep];
-
-    // 도트
-    dotsEl.innerHTML = TUT_SLIDES.map((_, i) =>
-      `<div style="width:${i===tutStep?'20':'8'}px;height:8px;border-radius:4px;background:${i===tutStep?'var(--purple)':'#ddd'};transition:all 0.3s;"></div>`
-    ).join('');
-
-    // 하이라이트 박스 (설정 슬라이드)
-    const highlightBox = s.highlight ? `
-      <div style="background:linear-gradient(135deg,#f0ebff,#ffe8f5);border-radius:14px;padding:14px 16px;margin-top:16px;border:1.5px solid #d8c8ff;text-align:left;">
-        <div style="font-size:12px;font-weight:800;color:var(--purple);margin-bottom:6px;">⚙️ 설정 → 모찌에게 나 소개하기</div>
-        <div style="font-size:12px;color:#7060a0;line-height:1.7;">직업 · 목표 · 관심사를 입력할수록<br>모찌의 답변이 나에게 딱 맞아져요!</div>
-      </div>` : '';
-
-    slidesEl.innerHTML = `
-      <div style="text-align:center; padding:0 4px;">
-        <div style="font-size:48px; margin-bottom:14px; animation:floatY 2s ease-in-out infinite;">${s.emoji}</div>
-        <div style="font-size:19px; font-weight:800; color:var(--text); margin-bottom:12px; letter-spacing:-0.4px;">${s.title}</div>
-        <div style="font-size:13.5px; color:#555; line-height:1.9; white-space:pre-line; text-align:left; background:#f8f7fc; border-radius:14px; padding:16px 18px;">${s.desc}</div>
-        ${highlightBox}
-        ${s.input ? `
-          <input id="${s.input.id}" type="text" class="todo-input"
-            placeholder="${s.input.placeholder}"
-            style="width:100%; margin-top:20px; font-size:16px; text-align:center; font-weight:700; box-sizing:border-box;"
-            value="${localStorage.getItem(s.input.storageKey)||''}"
-            oninput="localStorage.setItem('${s.input.storageKey}', this.value); const ni=document.getElementById('setting-name'); if(ni) ni.value=this.value; if(typeof updateUserName==='function') updateUserName(this.value);">
-        ` : ''}
-      </div>
-    `;
-
-    const nextBtn = document.getElementById('tut-next-btn');
-    const skipBtn = document.getElementById('tut-skip-btn');
-    if (s.last) {
-      nextBtn.textContent = '시작하기 🐰';
-      nextBtn.style.background = 'linear-gradient(135deg, var(--purple), #c060d0)';
-      skipBtn.style.display = 'none';
-    } else {
-      nextBtn.textContent = '다음 →';
-      nextBtn.style.background = 'var(--purple)';
-      skipBtn.style.display = '';
-    }
-
-    if (s.input) setTimeout(() => document.getElementById(s.input.id)?.focus(), 200);
-  }
-
-  function tutNext() {
-    if (tutStep < TUT_SLIDES.length - 1) {
-      tutStep++;
-      renderTutSlides();
-    } else {
-      tutFinish();
-    }
-  }
-
-  function tutSkip() { tutFinish(); }
-
-  function tutFinish() {
-    localStorage.setItem('mochi_tutorial_done', '1');
-    document.getElementById('tutorial-overlay').style.display = 'none';
-    const saved = localStorage.getItem('mochi_user_name') || '';
-    const ni = document.getElementById('setting-name');
-    if (ni) ni.value = saved;
-    if (saved && typeof updateUserName === 'function') updateUserName(saved);
-    const settingsBtn = document.querySelector('.nav-btn[onclick*="settings"]');
-    if (settingsBtn && typeof showPage === 'function') showPage('settings', settingsBtn);
-  }
-
-  // 첫 실행 튜토리얼은 loginUser()에서 새 계정일 때 자동 실행
-
-  window.tutNext = tutNext;
-  window.tutSkip = tutSkip;
+  // loadToday는 enterApp에서 호출됨 (Supabase 로그인 후)
 
   // ===== 토끼 AI 채팅 =====
 
   function getAppState() {
     const done = todos.filter(t => t.done).length;
     const total = todos.length;
-    const tagLabels = getTagLabels();
-    const pending = todos.filter(t => !t.done).map(t => `${t.text}(${tagLabels[t.tag]||t.tag})`).join(', ');
+    const pending = todos.filter(t => !t.done).map(t => `${t.text}(${catLabels[t.tag]||t.tag})`).join(', ');
     const sleepTime = document.getElementById('sleep-time')?.value || '미입력';
     const wakeTime = document.getElementById('wake-time')?.value || '미입력';
     const moodEl = document.querySelector('.emoji-btn.selected');
@@ -4297,7 +3581,7 @@ ${todoList}
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -4513,35 +3797,17 @@ ${todoList}
     renderCalendar();
   }
 
-  // Supabase 기록 캐시 (캘린더용)
-  let _recordCache = {}; // 'YYYY-MM-DD' -> true/false
-  let _emotionCache = {}; // 'YYYY-MM-DD' -> emoji
-
-  async function loadMonthCache(year, month) {
-    if (!_currentUser) return;
-    const from = `${year}-${String(month+1).padStart(2,'0')}-01`;
-    const to = `${year}-${String(month+1).padStart(2,'0')}-${new Date(year, month+1, 0).getDate()}`;
-
-    const [{ data: diaries }, { data: todoData }] = await Promise.all([
-      sb.from('diaries').select('date,emotion').eq('user_id', _currentUser.id).gte('date', from).lte('date', to),
-      sb.from('todos').select('date').eq('user_id', _currentUser.id).gte('date', from).lte('date', to)
-    ]);
-
-    (diaries || []).forEach(d => {
-      _recordCache[d.date] = true;
-      const emoParts = parseEmotion(d.emotion);
-      _emotionCache[d.date] = emoParts.emoji || '';
-    });
-    (todoData || []).forEach(t => { _recordCache[t.date] = true; });
-  }
-
   function hasRecord(y, m, d) {
-    const key = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    return !!_recordCache[key];
+    // diary 기록
+    if (localStorage.getItem(`diary_${y}_${m+1}_${d}`)) return true;
+    // mochi(오늘기록) 기록
+    const mk = `mochi_${y}_${m+1}_${d}`;
+    const raw = localStorage.getItem(mk);
+    if (!raw) return false;
+    try { const data = JSON.parse(raw); return !!(data.sleepTime || (data.todos && data.todos.length)); } catch(e) { return false; }
   }
 
-  async function renderCalendar() {
-    await loadMonthCache(calYear, calMonth);
+  function renderCalendar() {
     const n = new Date();
     document.getElementById('cal-month-label').textContent = `${calYear}년 ${calMonth+1}월`;
     const grid = document.getElementById('cal-grid');
@@ -4549,6 +3815,7 @@ ${todoList}
     const firstDay = new Date(calYear, calMonth, 1).getDay();
     const lastDate = new Date(calYear, calMonth+1, 0).getDate();
 
+    // 빈 칸
     for (let i = 0; i < firstDay; i++) {
       const empty = document.createElement('div');
       empty.className = 'cal-day empty';
@@ -4567,16 +3834,23 @@ ${todoList}
         (isSelected && !isToday ? ' selected' : '') +
         (hasRec ? ' has-record' : '') +
         (dow === 0 ? ' sunday' : dow === 6 ? ' saturday' : '');
+      // 미래 흐림 제거
 
-      const dateKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const emotionEmoji = _emotionCache[dateKey] || '';
+      // 감정 이모지 표시
+      const diaryRaw = localStorage.getItem(`diary_${calYear}_${calMonth+1}_${d}`);
+      let emotionEmoji = '';
+      if (diaryRaw) {
+        try { const dd = JSON.parse(diaryRaw); emotionEmoji = dd.emotion || ''; } catch(e) {}
+      }
 
       cell.innerHTML = `
         <span>${d}</span>
         ${isToday ? `<span style="font-size:9px;font-weight:700;color:white;margin-top:1px;display:block;line-height:1;">오늘</span>` : ''}
       `;
 
-      cell.onclick = () => openDaylog(calYear, calMonth, d);
+      if (true) {  // 미래 포함 모든 날짜 클릭 가능
+        cell.onclick = () => openDaylog(calYear, calMonth, d);
+      }
       grid.appendChild(cell);
     }
   }
@@ -4584,33 +3858,6 @@ ${todoList}
   // ── 날짜별 보기 ──
   function viewingKey(y, m, d) { return `mochi_${y}_${m+1}_${d}`; }
 
-  // ══════════════════════════════════════
-  // 날짜 & 할일 통합 관리 (새 설계)
-  // ══════════════════════════════════════
-
-  // 지금 보고 있는 날짜 (null = 오늘)
-  // viewingDate는 위에 선언돼있음
-
-  // 현재 보고 있는 날짜의 dateStr 반환
-  function getCurrentDateStr() {
-    if (viewingDate) {
-      return `${viewingDate.y}-${String(viewingDate.m+1).padStart(2,'0')}-${String(viewingDate.d).padStart(2,'0')}`;
-    }
-    return new Date().toISOString().slice(0,10);
-  }
-
-  // 특정 날짜의 할일을 DB에서 불러와 todos에 세팅
-  async function loadTodosForDate(dateStr) {
-    if (!_currentUser) return;
-    const { data: dbTodos } = await sb.from('todos')
-      .select('*').eq('user_id', _currentUser.id).eq('date', dateStr);
-    todos = (dbTodos || []).map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
-    nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0)) + 1 : 1;
-    renderTodos();
-    renderTagTabs();
-  }
-
-  // 오늘로 돌아오기
   function returnToToday() {
     viewingDate = null;
     diaryOffset = 0;
@@ -4623,16 +3870,17 @@ ${todoList}
     renderCalendar();
   }
 
-  // 특정 날짜로 이동
   function openDaylog(y, m, d) {
     const n = new Date();
     const isToday = y === n.getFullYear() && m === n.getMonth() && d === n.getDate();
 
     document.getElementById('cal-overlay').style.display = 'none';
+
     if (isToday) { returnToToday(); return; }
 
     viewingDate = { y, m, d };
 
+    // 날짜 뱃지 업데이트
     const dayNames = ['일','월','화','수','목','금','토'];
     const dow = new Date(y, m, d).getDay();
     const isFuture = new Date(y, m, d) > new Date(n.getFullYear(), n.getMonth(), n.getDate());
@@ -4640,39 +3888,27 @@ ${todoList}
     document.getElementById('date-badge').textContent = `${label} ${y}년 ${m+1}월 ${d}일 (${dayNames[dow]})`;
     document.getElementById('return-today-btn').style.display = 'inline-block';
 
-    // localStorage에서 해당 날짜 데이터 로드
+    // 해당 날짜 데이터 불러와서 화면 교체
     const raw = localStorage.getItem(viewingKey(y, m, d));
     let data = {};
     try { if (raw) data = JSON.parse(raw); } catch(e) {}
+
+    // 할 일 교체
     todos = data.todos || [];
     nextId = todos.length ? Math.max(...todos.map(t => t.id || 0)) + 1 : 1;
     renderTodos();
     renderTagTabs();
 
-    // Supabase에서 최신 데이터로 덮어쓰기 (백그라운드)
-    if (_currentUser) {
-      const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      sb.from('todos').select('*').eq('user_id', _currentUser.id).eq('date', dateStr)
-        .then(({ data: dbTodos }) => {
-          if (dbTodos) {
-            todos = dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
-            nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0)) + 1 : 1;
-            renderTodos();
-            renderTagTabs();
-            renderWeeklyProgress();
-          }
-        });
-    }
-
-    // 일기 offset 계산
+    // 마음일기 교체 - 자정 기준으로 offset 계산
     const todayMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
     const targetMidnight = new Date(y, m, d);
     diaryOffset = Math.round((targetMidnight - todayMidnight) / 86400000);
     renderDiary();
-    renderWeeklyProgress();
+
+    // 할 일 렌더 완료
   }
 
-  // saveToday 오버라이드 - viewingDate 기준으로 저장
+  // saveToday가 viewingDate 기준으로 저장하도록 오버라이드
   const _origSaveToday = saveToday;
   saveToday = function() {
     if (!viewingDate) { _origSaveToday(); return; }
@@ -4681,7 +3917,6 @@ ${todoList}
     existing.todos = todos;
     existing.savedAt = new Date().toISOString();
     localStorage.setItem(viewingKey(y,m,d), JSON.stringify(existing));
-    // Supabase 백그라운드 동기화 - 변경된 todos만 업데이트
     renderCalendar();
   };
 
@@ -4691,9 +3926,6 @@ ${todoList}
 
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  let _currentUser = null;
-
-  // 구글 로그인
   async function loginWithGoogle() {
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
@@ -4706,8 +3938,6 @@ ${todoList}
   }
   window.loginWithGoogle = loginWithGoogle;
 
-  // 닉네임 저장 (첫 로그인)
-  // 온보딩 칩 선택
   function selectObChip(el) {
     const group = el.dataset.group;
     document.querySelectorAll(`.ob-chip[data-group="${group}"]`).forEach(b => b.classList.remove('selected'));
@@ -4715,7 +3945,6 @@ ${todoList}
   }
   window.selectObChip = selectObChip;
 
-  // 온보딩 스텝 이동
   function obNext(step) {
     if (step === 0) {
       const nick = document.getElementById('nickname-input').value.trim();
@@ -4726,7 +3955,6 @@ ${todoList}
     }
     document.getElementById(`ob-step-${step}`).style.display = 'none';
     document.getElementById(`ob-step-${step+1}`).style.display = 'flex';
-    document.getElementById(`ob-dot-${step}`).style.background = 'var(--purple)';
     document.getElementById(`ob-dot-${step+1}`).style.background = 'var(--purple)';
   }
   window.obNext = obNext;
@@ -4742,33 +3970,22 @@ ${todoList}
     const nick = document.getElementById('nickname-input').value.trim();
     const errEl = document.getElementById('nickname-error');
     errEl.style.display = 'none';
-    if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block';
-      document.getElementById('ob-step-3').style.display = 'none';
-      document.getElementById('ob-step-0').style.display = 'flex'; return; }
+    if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
 
-    // 중복 체크
     const { data: existing } = await sb.from('profiles').select('id').eq('nickname', nick).maybeSingle();
-    if (existing) {
-      errEl.textContent = '이미 사용 중인 닉네임이에요';
-      errEl.style.display = 'block';
-      document.getElementById('ob-step-3').style.display = 'none';
-      document.getElementById('ob-step-0').style.display = 'flex';
-      return;
-    }
+    if (existing) { errEl.textContent = '이미 사용 중인 닉네임이에요'; errEl.style.display = 'block'; return; }
 
     const gender = document.querySelector('.ob-chip[data-group="gender"].selected')?.dataset.val || '';
     const age_group = document.querySelector('.ob-chip[data-group="age"].selected')?.dataset.val || '';
     const location = document.getElementById('ob-location')?.value.trim() || '';
     const sleep_time = document.getElementById('ob-sleep')?.value || '23:00';
     const wake_time = document.getElementById('ob-wake')?.value || '07:00';
+    const avatars = ['🐰','🐱','🐻','🦊','🐼','🐸','🐨','🦁'];
+    const avatar = avatars[Math.floor(Math.random() * avatars.length)];
 
-    const { error } = await sb.from('profiles').insert({
-      id: _currentUser.id, nickname: nick, avatar: randomAvatar(),
-      gender, age_group, location, sleep_time, wake_time
-    });
+    const { error } = await sb.from('profiles').insert({ id: _currentUser.id, nickname: nick, avatar, gender, age_group, location, sleep_time, wake_time });
     if (error) { errEl.textContent = '저장 실패: ' + error.message; errEl.style.display = 'block'; return; }
 
-    // localStorage에도 동기화
     localStorage.setItem('profile_gender', gender);
     localStorage.setItem('profile_age', age_group);
     localStorage.setItem('profile_location', location);
@@ -4780,32 +3997,20 @@ ${todoList}
   }
   window.saveNickname = saveNickname;
 
-  function randomAvatar() {
-    const list = ['🐰','🐱','🐻','🦊','🐼','🐸','🐨','🦁'];
-    return list[Math.floor(Math.random() * list.length)];
-  }
-
-  // 앱 진입
   async function enterApp(nickname, isNew = false) {
-    // 스플래시 제거
     const splash = document.getElementById('splash');
     if (splash) splash.remove();
-
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('nickname-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
 
-    // 닉네임 동기화
     localStorage.setItem('mochi_user_name', nickname);
     if (typeof updateUserName === 'function') updateUserName(nickname);
     const ni = document.getElementById('setting-name');
     if (ni) ni.value = nickname;
-
-    // 로그아웃 버튼
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.textContent = `${nickname} · 로그아웃`;
 
-    // 기존 사용자면 Supabase에서 프로필 불러와 localStorage 동기화
     if (!isNew && _currentUser) {
       const { data: prof } = await sb.from('profiles').select('*').eq('id', _currentUser.id).maybeSingle();
       if (prof) {
@@ -4817,19 +4022,16 @@ ${todoList}
       }
     }
 
-    // 새 계정이면 튜토리얼
     if (isNew) {
-      tutStep = 0;
-      document.getElementById('tutorial-overlay').style.display = 'block';
-      setTimeout(renderTutSlides, 100);
+      const tutEl = document.getElementById('tutorial-overlay');
+      if (tutEl) { tutEl.style.display = 'block'; if (typeof renderTutSlides === 'function') setTimeout(renderTutSlides, 100); }
     }
 
     if (typeof loadBasicProfile === 'function') setTimeout(loadBasicProfile, 100);
     if (typeof loadProfile === 'function') setTimeout(loadProfile, 120);
-    if (typeof loadToday === 'function') setTimeout(loadToday, 200);
+    setTimeout(() => loadToday().then(() => renderWeeklyProgress()), 200);
   }
 
-  // 로그아웃
   async function logout() {
     if (!confirm('로그아웃 할까요?')) return;
     await sb.auth.signOut();
@@ -4839,79 +4041,38 @@ ${todoList}
   }
   window.logout = logout;
 
-  function showLoginScreen() {
-    document.getElementById('login-screen').style.display = 'block';
-  }
-
   // ── 앱 시작: 세션 확인 ──
   (async function initAuth() {
-    // 로딩 중 스플래시
     document.body.insertAdjacentHTML('beforeend', `
       <div id="splash" style="position:fixed;inset:0;background:var(--theme-bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;">
         <div style="font-size:52px;animation:floatY 1.5s ease-in-out infinite;">🐰</div>
         <div style="font-size:14px;color:var(--text-light);margin-top:12px;">모찌 불러오는 중...</div>
       </div>
     `);
-
-    const hideSplash = () => {
-      const s = document.getElementById('splash');
-      if (s) s.remove();
-    };
+    const hideSplash = () => { const s = document.getElementById('splash'); if (s) s.remove(); };
 
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       _currentUser = session.user;
       const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
       hideSplash();
-      if (profile) {
-        enterApp(profile.nickname, false);
-      } else {
-        document.getElementById('nickname-screen').style.display = 'block';
-      }
+      if (profile) { enterApp(profile.nickname, false); }
+      else { document.getElementById('nickname-screen').style.display = 'block'; }
     } else {
       hideSplash();
       document.getElementById('login-screen').style.display = 'block';
     }
 
-    // OAuth 리디렉트 후 처리 (새 로그인만)
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session && !_currentUser) {
         _currentUser = session.user;
         const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
         hideSplash();
-        if (profile) {
-          enterApp(profile.nickname, false);
-        } else {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('nickname-screen').style.display = 'block';
-        }
+        if (profile) { enterApp(profile.nickname, false); }
+        else { document.getElementById('login-screen').style.display = 'none'; document.getElementById('nickname-screen').style.display = 'block'; }
       }
     });
   })();
-
-  // ── 모든 window 등록 (모든 함수 정의 후) ──
-  window.addTodo = addTodo;
-  window.addIdea = addIdea;
-  window.saveDiaryManual = saveDiaryManual;
-  window.toggleTodo = toggleTodo;
-  window.deleteTodo = deleteTodo;
-  window.filterTodo = filterTodo;
-  window.selectTag = selectTag;
-  window.diaryNav = diaryNav;
-  window.calNav = calNav;
-  window.openCalendar = openCalendar;
-  window.closeCalOverlay = closeCalOverlay;
-  window.setTheme = setTheme;
-  window.showPage = showPage;
-  window.returnToToday = returnToToday;
-  window.selectDiaryEmotion = selectDiaryEmotion;
-  window.addCustomTag = addCustomTag;
-  window.deleteTag = deleteTag;
-  window.closeTagModal = closeTagModal;
-  window.openDaylog = openDaylog;
-  window.closeDiaryOverlay = closeDiaryOverlay;
-  window.saveDiary = saveDiary;
-  window.diaryStartEdit = diaryStartEdit;
 
 </script>
 </div><!-- /app-wrapper -->
