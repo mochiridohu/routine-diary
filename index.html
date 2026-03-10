@@ -1401,8 +1401,8 @@
     overflow-y: auto;
   }
 
-  /* Gemini 키 모달 */
-  #gemini-key-modal > div {
+  /* Claude 키 모달 */
+  #anthropic-key-modal > div {
     width: calc(100% - 32px) !important;
     max-width: 400px !important;
     margin: 0 16px !important;
@@ -1895,21 +1895,21 @@
 
 
   <div class="section">
-    <div class="section-title">🤖 AI 설정</div>
+    <div class="section-title">🤖 AI 설정 (Claude)</div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="font-size:28px;">✨</div>
+        <div style="font-size:28px;">⚡</div>
         <div>
-          <div style="font-size:14px;font-weight:800;color:var(--text);">Gemini API 연결</div>
+          <div style="font-size:14px;font-weight:800;color:var(--text);">Claude API 연결</div>
           <div style="font-size:12px;color:var(--text-light);margin-top:2px;">모찌의 AI 기능을 활성화해요</div>
         </div>
       </div>
-      <div id="gemini-key-section"></div>
+      <div id="anthropic-key-section"></div>
       <div style="margin-top:12px;padding:12px;background:var(--cream);border-radius:10px;font-size:11px;color:var(--text-light);line-height:1.8;">
-        📌 <b>무료로 사용하는 방법</b><br>
-        1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--purple);font-weight:700;">Google AI Studio</a> 접속<br>
-        2. "Get API key" 클릭<br>
-        3. 발급된 키(AIza...)를 위에 입력
+        📌 <b>API 키 발급 방법</b><br>
+        1. <a href="https://console.anthropic.com/api-keys" target="_blank" style="color:var(--purple);font-weight:700;">console.anthropic.com</a> 접속<br>
+        2. "Create Key" 클릭<br>
+        3. 발급된 키(sk-ant-...)를 위에 입력
       </div>
     </div>
   </div>
@@ -3837,14 +3837,22 @@ ${diaryText}`,
 
     try {
       const text = await callGemini({
-        systemPrompt: `당신은 모찌예요. ${userName || '사용자'}의 든든한 친구이자 비즈니스 파트너로서 아이디어 피드백을 줘요. 따뜻하고 응원하는 말투를 유지하면서도, 현실적으로 보완하면 좋을 점이나 리스크는 솔직하게 짚어줘요. 좋은 점 한 가지, 신경 쓸 점 한 가지, 짧은 응원 한 마디 순서로. 2~3문장으로 간결하게. 이모지는 1~2개만.`,
+        systemPrompt: `당신은 모찌예요. ${userName || '사용자'}의 든든한 친구이자 비즈니스 파트너예요. 반드시 한국어로만 답해요.
+아이디어 피드백은 아래 4가지 항목으로 구성해줘요. 각 항목은 이모지+제목으로 시작하고, 1~2문장으로 간결하게.
+
+✅ 잘한 점: 이 아이디어의 가장 강력한 강점 한 가지
+⚠️ 보완할 점: 현실적으로 리스크나 약점 한 가지 (솔직하게)
+🛠 구체적 솔루션: 보완점을 해결할 수 있는 실질적인 방법 1~2가지
+🚀 다음 액션: 지금 당장 해볼 수 있는 첫 번째 행동 1가지 (최대한 구체적으로)
+
+말투는 따뜻하고 친근하게, 너무 딱딱하지 않게. 이모지는 항목당 1개만.`,
         userPrompt: `아이디어 제목: ${idea.title}
 태그: ${idea.tag || '없음'}
 내용: ${idea.content || '(내용 없음)'}
 ${profileStr ? '배경: ' + profileStr : ''}
 
-이 아이디어에 대해 솔직하게 피드백해줘.`,
-        maxTokens: 400
+이 아이디어에 대해 위 형식으로 피드백해줘.`,
+        maxTokens: 600
       }) || '피드백을 가져오지 못했어요 😅';
 
       bodyEl.innerHTML = `<div class="idea-feedback-text">${text.replace(/\n/g, '<br>')}</div>`;
@@ -4138,7 +4146,7 @@ ${profileStr ? '배경: ' + profileStr : ''}
     const settingsBtn = document.querySelector('.nav-btn[onclick*="settings"]');
     if (settingsBtn && typeof showPage === 'function') showPage('settings', settingsBtn);
     // 튜토리얼 끝나고 API 키 없으면 모달 표시
-    if (!GEMINI_API_KEY) setTimeout(() => showApiKeyModal(), 400);
+    if (!ANTHROPIC_API_KEY) setTimeout(() => showApiKeyModal(), 400);
   }
 
   // 첫 실행 튜토리얼은 loginUser()에서 새 계정일 때 자동 실행
@@ -4232,93 +4240,102 @@ ${profileStr ? '배경: ' + profileStr : ''}
   // ═══════════════════════════════════════════
   // 🤖 GEMINI API 설정
   // ═══════════════════════════════════════════
-  let GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || '';
+  let ANTHROPIC_API_KEY = localStorage.getItem('anthropic_api_key') || '';
 
-  // Gemini API 범용 호출 함수
+  // Claude API 범용 호출 함수
   async function callGemini({ systemPrompt, userPrompt, maxTokens = 1000 }) {
-    if (!GEMINI_API_KEY) {
+    if (!ANTHROPIC_API_KEY) {
       showApiKeyModal();
       throw new Error('API 키가 없어요');
     }
-    const model = 'gemini-2.0-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-
-    const contents = [{ role: 'user', parts: [{ text: userPrompt }] }];
     const body = {
-      contents,
-      generationConfig: { maxOutputTokens: maxTokens },
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: userPrompt }]
     };
-    if (systemPrompt) {
-      body.systemInstruction = { parts: [{ text: systemPrompt }] };
-    }
+    if (systemPrompt) body.system = systemPrompt;
 
-    const res = await fetch(url, {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message || 'Gemini API 오류');
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (data.error) throw new Error(data.error.message || 'Claude API 오류');
+    return data.content?.[0]?.text || '';
   }
 
-  // Gemini API 멀티턴 채팅 (챗봇용)
+  // Claude API 멀티턴 채팅 (챗봇용)
   async function callGeminiChat({ systemPrompt, history, userText, maxTokens = 1000 }) {
-    if (!GEMINI_API_KEY) {
+    if (!ANTHROPIC_API_KEY) {
       showApiKeyModal();
       throw new Error('API 키가 없어요');
     }
-    const model = 'gemini-2.0-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-
-    // history: [{role:'user',content:'...'},{role:'assistant',content:'...'},...]
-    const contents = history.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
-    contents.push({ role: 'user', parts: [{ text: userText }] });
-
-    const body = {
-      contents,
-      generationConfig: { maxOutputTokens: maxTokens },
-    };
-    if (systemPrompt) {
-      body.systemInstruction = { parts: [{ text: systemPrompt }] };
+    // Claude는 user/assistant 교대 필요
+    const messages = [];
+    history.forEach(m => {
+      const role = m.role === 'assistant' ? 'assistant' : 'user';
+      if (messages.length > 0 && messages[messages.length-1].role === role) return;
+      messages.push({ role, content: m.content || ' ' });
+    });
+    // 마지막이 assistant면 user 메시지 추가
+    if (messages.length > 0 && messages[messages.length-1].role === 'assistant') {
+      messages.push({ role: 'user', content: userText });
+    } else if (messages.length === 0 || messages[messages.length-1].role === 'user') {
+      // 연속 user 방지: 마지막 user에 이어붙이거나 새로 추가
+      messages.push({ role: 'user', content: userText });
     }
 
-    const res = await fetch(url, {
+    const body = {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      messages
+    };
+    if (systemPrompt) body.system = systemPrompt;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message || 'Gemini API 오류');
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (data.error) throw new Error(data.error.message || 'Claude API 오류');
+    return data.content?.[0]?.text || '';
   }
 
   // API 키 모달 표시
   function showApiKeyModal() {
-    let modal = document.getElementById('gemini-key-modal');
+    let modal = document.getElementById('anthropic-key-modal');
     if (!modal) {
       modal = document.createElement('div');
-      modal.id = 'gemini-key-modal';
+      modal.id = 'anthropic-key-modal';
       modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
       modal.innerHTML = `
         <div style="background:white;border-radius:20px;padding:28px 24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
           <div style="font-size:32px;text-align:center;margin-bottom:10px;">🔑</div>
-          <div style="font-size:17px;font-weight:800;color:#1A1A2E;text-align:center;margin-bottom:6px;">Gemini API 키를 입력해주세요</div>
+          <div style="font-size:17px;font-weight:800;color:#1A1A2E;text-align:center;margin-bottom:6px;">Claude API 키를 입력해주세요</div>
           <div style="font-size:12px;color:#888;text-align:center;margin-bottom:20px;line-height:1.7;">
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--purple);font-weight:700;">Google AI Studio</a>에서 무료로 발급받을 수 있어요.<br>
+            <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--purple);font-weight:700;">console.anthropic.com</a>에서 발급받을 수 있어요. (신규 가입 시 $5 무료 크레딧!)<br>
             키는 이 기기에만 저장되며 외부로 전송되지 않아요.
           </div>
-          <input id="gemini-key-input" type="password" placeholder="AIza..." 
+          <input id="anthropic-key-input" type="password" placeholder="sk-ant-..." 
             style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;box-sizing:border-box;margin-bottom:12px;"
-            value="${GEMINI_API_KEY}"
+            value="${ANTHROPIC_API_KEY}"
             oninput="this.style.borderColor='var(--purple)'"
           >
-          <div id="gemini-key-error" style="color:#e05;font-size:12px;margin-bottom:8px;display:none;text-align:center;"></div>
-          <button onclick="saveGeminiKey()" style="width:100%;padding:13px;background:var(--purple);color:white;border:none;border-radius:12px;font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer;">저장하고 시작하기</button>
-          <button onclick="document.getElementById('gemini-key-modal').remove()" style="width:100%;padding:10px;background:none;color:#aaa;border:none;font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:6px;">나중에 설정할게요</button>
+          <div id="anthropic-key-error" style="color:#e05;font-size:12px;margin-bottom:8px;display:none;text-align:center;"></div>
+          <button onclick="saveAnthropicKey()" style="width:100%;padding:13px;background:var(--purple);color:white;border:none;border-radius:12px;font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer;">저장하고 시작하기</button>
+          <button onclick="document.getElementById('anthropic-key-modal').remove()" style="width:100%;padding:10px;background:none;color:#aaa;border:none;font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:6px;">나중에 설정할게요</button>
         </div>
       `;
       document.body.appendChild(modal);
@@ -4327,42 +4344,42 @@ ${profileStr ? '배경: ' + profileStr : ''}
     }
   }
 
-  function saveGeminiKey() {
-    const key = document.getElementById('gemini-key-input').value.trim();
-    const errEl = document.getElementById('gemini-key-error');
-    if (!key || !key.startsWith('AIza')) {
-      errEl.textContent = '올바른 Gemini API 키를 입력해주세요 (AIza로 시작)';
+  function saveAnthropicKey() {
+    const key = document.getElementById('anthropic-key-input').value.trim();
+    const errEl = document.getElementById('anthropic-key-error');
+    if (!key || !key.startsWith('sk-ant-')) {
+      errEl.textContent = '올바른 Claude API 키를 입력해주세요 (sk-ant-로 시작)';
       errEl.style.display = 'block';
       return;
     }
-    GEMINI_API_KEY = key;
-    localStorage.setItem('gemini_api_key', key);
-    document.getElementById('gemini-key-modal').remove();
-    addMsg('rabbit', '🔑 API 키가 저장됐어요! 이제 모찌가 제대로 대화할 수 있어요 🐰💜');
+    ANTHROPIC_API_KEY = key;
+    localStorage.setItem('anthropic_api_key', key);
+    document.getElementById('anthropic-key-modal').remove();
+    addMsg('rabbit', '🔑 Claude API 키가 저장됐어요! 이제 모찌가 제대로 대화할 수 있어요 🐰💜');
   }
-  window.saveGeminiKey = saveGeminiKey;
+  window.saveAnthropicKey = saveAnthropicKey;
   window.showApiKeyModal = showApiKeyModal;
 
   // 설정 페이지에 API 키 관리 섹션 추가 (나중에 렌더)
-  function renderGeminiKeySection() {
-    const wrap = document.getElementById('gemini-key-section');
+  function renderAnthropicKeySection() {
+    const wrap = document.getElementById('anthropic-key-section');
     if (!wrap) return;
-    const hasKey = !!GEMINI_API_KEY;
+    const hasKey = !!ANTHROPIC_API_KEY;
     wrap.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:13px;font-weight:700;color:${hasKey?'#2E7D32':'#e05'};">
-          ${hasKey ? '✅ Gemini API 연결됨' : '⚠️ API 키 미설정'}
+          ${hasKey ? '✅ Claude API 연결됨' : '⚠️ Claude API 키 미설정'}
         </div>
         <button onclick="showApiKeyModal()" style="padding:6px 14px;background:var(--purple);color:white;border:none;border-radius:10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer;">
           ${hasKey ? '🔑 키 변경' : '🔑 키 입력'}
         </button>
       </div>
-      ${hasKey ? `<div style="font-size:11px;color:#888;word-break:break-all;">키: ${GEMINI_API_KEY.slice(0,8)}••••••••</div>` : ''}
+      ${hasKey ? `<div style="font-size:11px;color:#888;word-break:break-all;">키: ${ANTHROPIC_API_KEY.slice(0,8)}••••••••</div>` : ''}
     `;
   }
-  setTimeout(renderGeminiKeySection, 200);
+  setTimeout(renderAnthropicKeySection, 200);
 
-  // ── 모찌 Gemini API 연동 ──
+  // ── 모찌 Claude API 연동 ──
   const chatHistory = [];
 
   function getMochiSystemPrompt() {
@@ -4386,110 +4403,80 @@ ${profileStr ? '배경: ' + profileStr : ''}
     const learned = getLearnedProfile();
     const learnedLines = learned.length ? learned.map(f => `- ${f}`).join('\n') : '- (아직 없음)';
 
-    return `당신은 ${nameLabel}의 하루 비서이자 가장 친한 친구 "모찌"예요. 🐰
-귀엽고 따뜻하고 짧은 말투로 대화해요. 존댓말이지만 딱딱하지 않고 편안하게요.
-"~해요", "~이에요", "~잖아요", "~어요?" 같은 부드러운 말투 사용.
+    return `You are "모찌", a warm and friendly AI assistant. You MUST follow ALL rules below without exception.
 
-## ${nameLabel}에 대해 알고 있는 것
+[CRITICAL: LANGUAGE RULE - NEVER BREAK THIS]
+- Every single character in your response must be Korean (한국어) or emoji only.
+- FORBIDDEN languages: English words, Chinese characters (漢字), Japanese (hiragana/katakana/kanji), Thai script (ใ ไ ท etc), Arabic, any non-Korean text.
+- This applies to EVERY field: message, choices, learnedFact — ALL must be 100% Korean + emoji only.
+- Wrong example: "ใหม่로운" or "新しい" or "new" → NEVER do this.
+- Correct example: "새로운" → always use pure Korean words.
+- If you are about to write a non-Korean word, STOP and replace it with the Korean equivalent.
+
+[모찌 캐릭터]
+- ${nameLabel}의 하루 비서이자 가장 친한 친구 🐰
+- 말투: 따뜻하고 친근한 존댓말. "~해요", "~이에요", "~잖아요", "~어요?" 자연스럽게.
+- 이모지 적당히 섞어서 생동감 있게 (문장마다 1~2개).
+- 짧고 리듬감 있게. 2~3문장이면 충분.
+- 딱딱한 말 금지: "확인되었습니다" ❌ → "확인했어요! 🐰" ✅
+- 너무 사무적이거나 AI스러운 말투 금지.
+
+[${nameLabel} 정보]
 ${profileLines}
 
-## 대화에서 배운 것
+[대화에서 배운 것]
 ${learnedLines}
 
-## 오늘 앱 상태
-- 할 일 (${state.done}/${state.total}개 완료):
-${todoList}
-- 수면: ${sleepTime} ~ ${wakeTime}
+[오늘 앱 상태]
+할 일 (${state.done}/${state.total}개 완료): ${todoList}
+수면: ${sleepTime} ~ ${wakeTime}
 
----
+[행동 원칙]
+- 알고 있는 정보 자연스럽게 1개만 대화에 연결 ("원래 ${nameLabel}은 ~잖아요 🐰")
+- 고민/감정엔 공감 먼저, 조언은 나중에
+- 할 일 언급되면 addTodos에 자동 추가
+- 질문은 한 번에 딱 하나만
 
-## 💡 모찌의 핵심 원칙: "나를 잘 아는 친구처럼 말하기"
+[출력 형식 - JSON만, 다른 텍스트 절대 없이]
+{"message":"따뜻한 한국어 메시지 + 이모지","choices":["😊 좋았어요!","😔 좀 힘들었어요","💡 얘기할게요"],"actions":{"addTodos":[],"completeTodos":[],"setSleepTime":null,"setWakeTime":null,"suggestions":[],"learnedFact":null}}
 
-모찌는 ${nameLabel}에 대해 알고 있는 정보를 **적극적으로 대화에 꺼내**.
-단순히 정보를 저장하는 게 아니라, 대화할 때마다 "나 너 알아"라는 느낌을 줘야 해.
-
-### 어떻게 꺼내나?
-- 칭찬할 때: "${nameLabel}은 원래 한 번 마음먹으면 끝까지 하잖아요 💪"
-- 걱정할 때: "${nameLabel} 완벽주의 성향 있잖아요, 그래서 더 힘든 거 아닐까요?"
-- 제안할 때: "쇼피 신경 많이 쓰고 있잖아요, 오늘 그거 먼저 하는 게 좋을 것 같아요"
-- 마무리할 때: "요즘 목표가 매출 늘리기잖아요, 오늘 그쪽으로 뭔가 했어요?"
-- 위로할 때: "원래 ${nameLabel} 이럴 때 더 잘 해내더라고요 🐰"
-
-### 상황별 연결 방법
-- **할 일 정리** → 목표/직업 정보와 연결해서 우선순위 제안
-- **고민 털어놓기** → 알고 있는 성격/패턴으로 공감 ("${nameLabel} 이런 거 예민하게 느끼잖아요")
-- **칭찬/완료** → 알고 있는 강점 꺼내서 강화 ("역시 ${nameLabel}이야~")
-- **지쳐 보일 때** → 알고 있는 고민이나 상황 언급하며 위로
-- **새로운 대화** → 저번에 나눈 내용/목표 자연스럽게 이어받기
-
-### 중요한 규칙
-- 모른다고 느껴지는 말은 하지 말 것 ("혹시 어떤 일 하세요?" 같은 거 절대 금지)
-- 알고 있는 정보가 없을 땐 → 이번 대화에서 알아내서 learnedFact에 저장
-- 정보를 억지로 다 꺼내지 말고, 대화 흐름에서 **자연스럽게 1가지만** 연결
-- "${nameLabel}은 ~잖아", "원래 ${nameLabel}은 ~" 표현 자주 사용
-
----
-
-## 모찌의 역할 (상황에 따라 자연스럽게 전환)
-
-### 1. 비서 역할 🗂
-- 할 일 파악: 두서없이 말해도 할 일 뽑아서 추가
-- 완료 처리: "운동 했어", "쇼피 끝냈어" → 자동 완료 체크
-- 수면 기록: "12시에 자서 7시 반에 일어남" → 시간 자동 입력
-- 우선순위 제안: 할 일 많을 때 ${nameLabel} 목표 기반으로 뭐부터 할지 제안
-
-### 2. 친구 역할 💜
-- 고민/감정 털어놓으면: 조언보다 공감 먼저, 알고 있는 성격과 연결해서 공감
-- 지쳐 보이면: 쉬라고 말해주고 작은 것도 칭찬
-- 일상 대화도 자연스럽게 받아줘요
-
-### 3. 사업 파트너 역할 💼
-- 쇼피, 급식 납품, 도시락 채널 관련 아이디어 현실적으로 상의
-- 무작정 긍정하지 말고 솔직한 시각도 줘요
-
-### 4. 하루 마무리 역할 🌙
-- 오늘 잘한 것 1가지는 꼭 찾아서 말해줘요 (알고 있는 목표/상황과 연결해서)
-- 오늘 하루를 ${nameLabel} 말투로 짧게 정리해줘요
-
----
-
-## 응답 형식 (반드시 JSON만, 다른 텍스트 없이)
-{
-  "message": "${nameLabel}에게 보내는 메시지 (2~3문장, 귀엽고 따뜻하게, 알고 있는 정보 자연스럽게 1개 연결)",
-  "choices": ["선택지1", "선택지2", "선택지3"],
-  "actions": {
-    "addTodos": ["추가할 할 일"],
-    "completeTodos": ["완료 처리할 할 일"],
-    "setSleepTime": "HH:MM 또는 null",
-    "setWakeTime": "HH:MM 또는 null",
-    "suggestions": ["자연스러운 타이밍에만 1~2개"],
-    "learnedFact": "이번 대화에서 새로 알게 된 중요한 사실 (없으면 null)"
-  }
-}
-
-- choices: 사용자가 타이핑 없이 바로 누를 수 있는 짧은 답변 선택지 2~3개. **거의 매번 포함할 것** — 대화를 이어가거나 감정/상황을 선택할 수 있게. 형식은 이모지+짧은 말 (예: "😊 좋았어요!", "😔 좀 힘들었어요", "💡 아이디어 있어요", "✅ 할 일 정리해줘요", "😴 좀 쉬고 싶어요")
-- choices는 대화 맥락에 딱 맞게: 질문 후엔 답변 선택지, 감정 얘기엔 공감 선택지, 할 일 후엔 "더 있어" / "이게 다야" 같은 선택지
-- choices가 null인 경우는 대화가 완전히 마무리됐을 때만
-- 감정/고민 대화엔 actions 전부 null
-- 질문은 한 번에 하나만
-- learnedFact: 직업, 목표, 성격, 고민, 습관 등 기억할 만한 것만 1줄로`;
+choices 규칙:
+- 반드시 한국어+이모지 조합으로 2~3개
+- 예시: "😊 좋았어요!", "😔 힘들었어요", "✅ 할 일 추가할게요", "💬 더 얘기할게요", "😴 쉬고 싶어요"
+- 대화 완전히 끝났을 때만 null`;
   }
 
   async function sendChatAPI(userText) {
     chatHistory.push({ role: 'user', content: userText });
 
+    // 연속 같은 role 제거
+    const cleanHistory = [];
+    for (const m of chatHistory.slice(0, -1)) {
+      const geminiRole = m.role === 'assistant' ? 'model' : 'user';
+      if (cleanHistory.length > 0 && cleanHistory[cleanHistory.length - 1].role === geminiRole) continue;
+      cleanHistory.push({ role: geminiRole, content: m.content });
+    }
+    // 히스토리는 최근 10개만
+    const trimmedHistory = cleanHistory.slice(-10);
+
     const raw = await callGeminiChat({
       systemPrompt: getMochiSystemPrompt(),
-      history: chatHistory.slice(0, -1),
+      history: trimmedHistory,
       userText,
       maxTokens: 1000
     });
 
     let parsed;
     try {
-      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+      // 1. 코드블록 제거
+      let cleaned = raw.replace(/```json|```/g, '').trim();
+      // 2. JSON 객체 부분만 추출 (앞뒤 텍스트 제거)
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) cleaned = jsonMatch[0];
+      parsed = JSON.parse(cleaned);
     } catch(e) {
-      parsed = { message: raw, actions: {} };
+      // JSON 파싱 완전 실패 시 텍스트 그대로 메시지로
+      parsed = { message: raw.replace(/```json|```|\{[\s\S]*\}/g, '').trim() || raw || '모찌가 잘 못 들었어요 😅 다시 말해줄 수 있어요?', actions: {} };
     }
 
     chatHistory.push({ role: 'assistant', content: raw });
@@ -4535,8 +4522,18 @@ ${todoList}
       ).join('');
     }
 
-    // 선택지 버블
-    const choices = parsed.choices;
+    // 선택지에서 한국어 아닌 문자 포함된 항목 필터링 (태국어/한자/영어 혼입 방지)
+    let choices = parsed.choices;
+    if (Array.isArray(choices)) {
+      choices = choices.filter(c => {
+        if (typeof c !== 'string') return false;
+        // 태국어, 아랍어, 한자(CJK 통합 한자), 히라가나/카타카나 포함 시 제거
+        // 단, 한글(가-힣), 이모지, 공백, 숫자, 한국어 특수문자는 허용
+        const forbidden = /[฀-๿؀-ۿ一-鿿぀-ゟ゠-ヿ]/;
+        return !forbidden.test(c);
+      });
+      if (choices.length === 0) choices = null;
+    }
     return { msg, choices };
   }
 
@@ -4569,7 +4566,8 @@ ${todoList}
       if (choices?.length) renderChoices(choices);
     } catch(e) {
       removeTyping();
-      addMsg('rabbit', '앗, 모찌가 잠깐 졸았어요 😴 다시 말해줄 수 있어요?');
+      console.error('[모찌 오류]', e);
+      addMsg('rabbit', `⚠️ 오류: ${e.message || String(e)}`);
     }
     btn.disabled = false;
     input.focus();
@@ -4612,7 +4610,8 @@ ${todoList}
       if (choices?.length) renderChoices(choices);
     } catch(e) {
       removeTyping();
-      addMsg('rabbit', '앗, 모찌가 잠깐 졸았어요 😴 다시 말해줄 수 있어요?');
+      console.error('[모찌 오류]', e);
+      addMsg('rabbit', `⚠️ 오류: ${e.message || String(e)}`);
     }
     btn.disabled = false;
   }
