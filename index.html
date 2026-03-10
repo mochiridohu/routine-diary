@@ -251,10 +251,10 @@
 
   .time-input {
     width: 100%;
-    padding: 10px 12px;
+    padding: 10px 8px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    font-size: 20px;
+    font-size: 17px;
     font-family: 'Noto Sans KR', sans-serif;
     font-weight: 700;
     color: var(--text);
@@ -262,6 +262,8 @@
     text-align: center;
     outline: none;
     transition: border-color 0.2s;
+    box-sizing: border-box;
+    min-width: 0;
   }
   .time-input:focus { border-color: var(--purple); background: white; }
 
@@ -905,6 +907,8 @@
     border-radius: 14px;
     padding: 12px 14px;
     box-shadow: 0 2px 8px var(--shadow);
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .summary-label {
     font-size: 11px;
@@ -1582,26 +1586,30 @@
   </div>
 
   <!-- 수면 + 컨디션 -->
-  <div class="summary-row" style="margin-bottom:14px;">
-    <div class="summary-card sleep-summary">
+  <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+    <!-- 수면 카드 (full width) -->
+    <div class="summary-card sleep-summary" style="width:100%; box-sizing:border-box;">
       <div class="summary-label">🌙 수면</div>
-      <div class="summary-inputs">
-        <input type="time" class="time-input-sm" id="sleep-time" value="23:30" onchange="calcSleep()">
-        <span class="time-sep">→</span>
-        <input type="time" class="time-input-sm" id="wake-time" value="07:30" onchange="calcSleep()">
+      <div style="display:flex; align-items:center; gap:8px; width:100%;">
+        <input type="time" class="time-input-sm" id="sleep-time" value="23:30" onchange="calcSleep()" style="flex:1; min-width:0; font-size:15px; font-weight:700;">
+        <span style="font-size:13px; color:var(--text-light); flex-shrink:0;">→</span>
+        <input type="time" class="time-input-sm" id="wake-time" value="07:30" onchange="calcSleep()" style="flex:1; min-width:0; font-size:15px; font-weight:700;">
       </div>
-      <div class="summary-sub" id="sleep-duration">계산 중...</div>
+      <div class="summary-sub" id="sleep-duration" style="margin-top:6px;">계산 중...</div>
     </div>
-    <div class="summary-card mood-summary">
-      <div class="summary-label">💫 컨디션</div>
-      <div class="mood-mini-row">
-        <button class="mood-mini" data-mood="5" onclick="setMood(this)">🤩</button>
-        <button class="mood-mini" data-mood="4" onclick="setMood(this)">😊</button>
-        <button class="mood-mini" data-mood="3" onclick="setMood(this)">😐</button>
-        <button class="mood-mini" data-mood="2" onclick="setMood(this)">😔</button>
-        <button class="mood-mini" data-mood="1" onclick="setMood(this)">😩</button>
+    <!-- 컨디션 카드 (full width) -->
+    <div class="summary-card mood-summary" style="width:100%; box-sizing:border-box;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="summary-label" style="margin-bottom:0;">💫 컨디션</div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button class="mood-mini" data-mood="5" onclick="setMood(this)">🤩</button>
+          <button class="mood-mini" data-mood="4" onclick="setMood(this)">😊</button>
+          <button class="mood-mini" data-mood="3" onclick="setMood(this)">😐</button>
+          <button class="mood-mini" data-mood="2" onclick="setMood(this)">😔</button>
+          <button class="mood-mini" data-mood="1" onclick="setMood(this)">😩</button>
+        </div>
+        <div class="summary-sub" id="mood-label" style="margin-left:8px; white-space:nowrap;">선택해줘요</div>
       </div>
-      <div class="summary-sub" id="mood-label">선택해줘요</div>
     </div>
   </div>
 
@@ -1948,14 +1956,17 @@
         <!-- 수면 목표 -->
         <div>
           <label style="font-size:12px; color:var(--text-light); font-weight:600; display:block; margin-bottom:8px;">💤 수면 목표</label>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div>
-              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px;">목표 취침</div>
-              <input type="time" id="goal-sleep-time" class="time-input" value="23:30" style="width:100%; font-size:15px;" onchange="saveBasicProfile()">
-            </div>
-            <div>
-              <div style="font-size:11px; color:var(--text-light); margin-bottom:5px;">목표 기상</div>
-              <input type="time" id="goal-wake-time" class="time-input" value="07:00" style="width:100%; font-size:15px;" onchange="saveBasicProfile()">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:11px; color:var(--text-light); margin-bottom:5px;">목표 취침</div>
+                <input type="time" id="goal-sleep-time" class="time-input" value="23:30" style="width:100%; font-size:16px; box-sizing:border-box;" onchange="saveBasicProfile()">
+              </div>
+              <div style="flex-shrink:0; font-size:16px; color:var(--text-light); margin-top:16px;">→</div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:11px; color:var(--text-light); margin-bottom:5px;">목표 기상</div>
+                <input type="time" id="goal-wake-time" class="time-input" value="07:00" style="width:100%; font-size:16px; box-sizing:border-box;" onchange="saveBasicProfile()">
+              </div>
             </div>
           </div>
         </div>
@@ -2798,17 +2809,65 @@ ${recentMsgs}
     85:'🌨 눈 소나기', 86:'🌨 눈 소나기',
     95:'⛈ 뇌우', 96:'⛈ 뇌우', 99:'⛈ 뇌우',
   };
+  async function fetchWeatherByCoords(lat, lon, cityName) {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Seoul';
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&timezone=${encodeURIComponent(tz)}`);
+    const data = await res.json();
+    const temp = Math.round(data.current.temperature_2m);
+    const code = data.current.weathercode;
+    const desc = WMO[code] || '🌤 날씨';
+    document.getElementById('weather-text').textContent = `${desc} · ${cityName} ${temp}°C`;
+  }
+
   async function fetchWeather() {
-    try {
-      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.658&longitude=126.832&current=temperature_2m,weathercode&timezone=Asia%2FSeoul');
-      const data = await res.json();
-      const temp = Math.round(data.current.temperature_2m);
-      const code = data.current.weathercode;
-      const desc = WMO[code] || '🌤 날씨';
-      document.getElementById('weather-text').textContent = `${desc} · 고양시 ${temp}°C`;
-    } catch(e) {
-      document.getElementById('weather-text').textContent = '🌤 날씨를 불러올 수 없어요';
+    const el = document.getElementById('weather-text');
+    el.textContent = '📍 위치 확인 중...';
+
+    if (!navigator.geolocation) {
+      // GPS 미지원 → 고양시 기본값
+      await fetchWeatherByCoords(37.658, 126.832, '고양시');
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude: lat, longitude: lon } = pos.coords;
+          // Reverse geocoding: nominatim (무료, 무키)
+          let cityName = '';
+          try {
+            const geo = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ko`, {
+              headers: { 'User-Agent': 'MochiApp/1.0' }
+            });
+            const geoData = await geo.json();
+            const addr = geoData.address || {};
+            cityName = addr.city || addr.town || addr.village || addr.county || addr.state || '';
+          } catch(e) { cityName = '현재 위치'; }
+
+          await fetchWeatherByCoords(lat, lon, cityName || '현재 위치');
+        } catch(e) {
+          el.textContent = '🌤 날씨를 불러올 수 없어요';
+        }
+      },
+      async (err) => {
+        // 위치 권한 거부 → 설정에 저장된 지역 or 고양시
+        const savedLocation = localStorage.getItem('profile_location') || '';
+        if (savedLocation) {
+          try {
+            const geo = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(savedLocation)}&format=json&limit=1`, {
+              headers: { 'User-Agent': 'MochiApp/1.0' }
+            });
+            const results = await geo.json();
+            if (results.length > 0) {
+              await fetchWeatherByCoords(results[0].lat, results[0].lon, savedLocation);
+              return;
+            }
+          } catch(e) {}
+        }
+        await fetchWeatherByCoords(37.658, 126.832, '고양시');
+      },
+      { timeout: 8000, maximumAge: 300000 }
+    );
   }
   fetchWeather();
 
@@ -4078,6 +4137,8 @@ ${profileStr ? '배경: ' + profileStr : ''}
     if (saved && typeof updateUserName === 'function') updateUserName(saved);
     const settingsBtn = document.querySelector('.nav-btn[onclick*="settings"]');
     if (settingsBtn && typeof showPage === 'function') showPage('settings', settingsBtn);
+    // 튜토리얼 끝나고 API 키 없으면 모달 표시
+    if (!GEMINI_API_KEY) setTimeout(() => showApiKeyModal(), 400);
   }
 
   // 첫 실행 튜토리얼은 loginUser()에서 새 계정일 때 자동 실행
@@ -4865,9 +4926,6 @@ ${todoList}
         setTimeout(renderTutSlides, 100);
       }
     }
-
-    // Gemini API 키 없으면 안내
-    if (!GEMINI_API_KEY) setTimeout(() => showApiKeyModal(), 1500);
 
     // 앱 데이터 초기화
     if (typeof loadBasicProfile === 'function') setTimeout(loadBasicProfile, 100);
