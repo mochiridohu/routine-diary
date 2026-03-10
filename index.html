@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>윤주의 하루 비서 ✨</title>
+<title>모찌의 하루 비서 ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -643,18 +643,6 @@
   .profile-chip:hover { background: var(--lavender); border-color: var(--purple); color: var(--purple); }
   .profile-chip.selected { background: var(--purple); border-color: var(--purple); color: white; }
 
-  /* PIN 도트 */
-  .pin-dot {
-    width: 16px; height: 16px; border-radius: 50%; background: #ddd; transition: background 0.15s;
-  }
-  .pin-btn {
-    width: 72px; height: 72px; border-radius: 50%; border: none;
-    background: white; font-size: 22px; font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 700; color: var(--text); cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.1s;
-  }
-  .pin-btn:active { background: var(--purple); color: white; transform: scale(0.93); }
-
   .idea-feedback-btn {
     width: 100%;
     margin-top: 0;
@@ -1161,19 +1149,19 @@
     position: relative;
   }
   .cal-day:hover { background: var(--lavender); }
-  .cal-day.today { background: none; color: var(--purple); font-weight: 700; }
-  .cal-day.today:hover { background: var(--purple-light); }
+  .cal-day.today { background: var(--purple); color: white; font-weight: 700; }
+  .cal-day.today:hover { background: var(--purple); }
   .cal-day.selected { background: var(--purple-light); color: var(--purple); font-weight: 700; border: 2px solid var(--purple); }
   .cal-day.selected:hover { background: var(--purple-light); }
   .cal-day.has-record::after {
     content: ''; width: 5px; height: 5px; border-radius: 50%;
     background: var(--pink); position: absolute; bottom: 3px;
   }
-  .cal-day.today.has-record::after { background: var(--purple); }
+  .cal-day.today.has-record::after { background: white; }
   .cal-day.empty { cursor: default; }
   .cal-day.sunday { color: #E57373; }
   .cal-day.saturday { color: #5C9EE8; }
-  .cal-day.today.sunday { color: #E57373; } .cal-day.today.saturday { color: #5C9EE8; }
+  .cal-day.today.sunday, .cal-day.today.saturday { color: white; }
   .cal-day .cal-emotion { font-size: 12px; line-height: 1; }
 
   /* ── 일별 기록 ── */
@@ -1200,92 +1188,89 @@
   .memo-chip.selected { background: var(--purple); border-color: var(--purple); color: white; }
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
 <!-- ── 로그인 화면 ── -->
 <div id="login-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10000; overflow-y:auto;">
-  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-    <div style="font-size:64px; margin-bottom:16px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
-    <div style="font-size:24px; font-weight:900; color:var(--purple); letter-spacing:-0.5px; margin-bottom:8px;">모찌의 하루 비서</div>
-    <div style="font-size:14px; color:var(--text-light); margin-bottom:48px;">매일을 더 잘 살아가도록 도와줄게요</div>
-    <button onclick="loginWithGoogle()" style="display:flex; align-items:center; gap:12px; width:100%; max-width:320px; padding:16px 20px; border-radius:16px; border:1.5px solid var(--border); background:white; cursor:pointer; font-family:'Noto Sans KR',sans-serif; font-size:15px; font-weight:700; color:var(--text); box-shadow:0 2px 12px rgba(0,0,0,0.08);">
-      <img src="https://www.google.com/favicon.ico" width="20" height="20">
-      Google로 시작하기
+  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
+
+    <!-- 로고 -->
+    <div style="text-align:center; margin-bottom:40px;">
+      <div style="font-size:56px; margin-bottom:12px; animation:floatY 2.5s ease-in-out infinite;">🐰</div>
+      <div style="font-size:22px; font-weight:900; color:var(--purple); letter-spacing:-0.5px;">모찌의 하루 비서</div>
+      <div style="font-size:13px; color:var(--text-light); margin-top:6px;">계정을 선택하거나 새로 만들어요</div>
+    </div>
+
+    <!-- 계정 목록 -->
+    <div id="account-list" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
+
+    <!-- 새 계정 만들기 버튼 -->
+    <button onclick="showCreateAccount()" style="width:100%; padding:14px; border-radius:16px; border:2px dashed var(--purple); background:transparent; color:var(--purple); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; transition:all 0.2s;">
+      + 새 계정 만들기
     </button>
-    <div id="login-error" style="margin-top:16px; font-size:12px; color:#e05; display:none;"></div>
+
   </div>
 </div>
 
-<!-- ── 온보딩 화면 (첫 로그인) ── -->
-<div id="nickname-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
-  <div style="max-width:480px; margin:0 auto; padding:0 24px 60px; min-height:100vh; display:flex; flex-direction:column;">
-    <div style="padding:28px 0 20px; position:sticky; top:0; background:var(--theme-bg); z-index:1;">
-      <div style="display:flex; gap:6px; margin-bottom:20px;">
-        <div id="ob-dot-0" style="flex:1; height:4px; border-radius:4px; background:var(--purple);"></div>
-        <div id="ob-dot-1" style="flex:1; height:4px; border-radius:4px; background:var(--border);"></div>
-        <div id="ob-dot-2" style="flex:1; height:4px; border-radius:4px; background:var(--border);"></div>
-        <div id="ob-dot-3" style="flex:1; height:4px; border-radius:4px; background:var(--border);"></div>
+<!-- ── 계정 생성 화면 ── -->
+<div id="create-account-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
+  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
+
+    <div style="text-align:center; margin-bottom:36px;">
+      <div style="font-size:48px; margin-bottom:12px;">✨</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text); letter-spacing:-0.4px;">새 계정 만들기</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">닉네임</label>
+        <input id="ca-name" type="text" class="todo-input" style="width:100%; font-size:16px; box-sizing:border-box;" placeholder="예: 윤주, 엄마, 오빠">
       </div>
-    </div>
-    <div id="ob-step-0" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
-      <div style="font-size:52px; text-align:center; margin-bottom:16px;">🐰</div>
-      <div style="font-size:22px; font-weight:900; color:var(--text); text-align:center; margin-bottom:8px;">안녕하세요!</div>
-      <div style="font-size:14px; color:var(--text-light); text-align:center; margin-bottom:36px;">모찌가 어떻게 불러드릴까요?</div>
-      <input id="nickname-input" type="text" class="todo-input" style="width:100%; font-size:18px; text-align:center; font-weight:700; box-sizing:border-box;" placeholder="예: 윤주, 쥬, 언니" maxlength="12">
-      <div id="nickname-error" style="font-size:12px; color:#e05; margin-top:8px; text-align:center; display:none;"></div>
-      <button onclick="obNext(0)" style="margin-top:20px; width:100%; padding:15px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">다음 →</button>
-    </div>
-    <div id="ob-step-1" style="flex:1; display:none; flex-direction:column; justify-content:center;">
-      <div style="font-size:40px; text-align:center; margin-bottom:16px;">🙋</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:32px;">나에 대해 알려줘요</div>
-      <div style="margin-bottom:24px;">
-        <div style="font-size:13px; font-weight:700; color:var(--text-light); margin-bottom:10px;">성별</div>
-        <div style="display:flex; gap:8px;">
-          <button class="ob-chip" data-group="gender" data-val="female" onclick="selectObChip(this)">여성</button>
-          <button class="ob-chip" data-group="gender" data-val="male" onclick="selectObChip(this)">남성</button>
-          <button class="ob-chip" data-group="gender" data-val="private" onclick="selectObChip(this)">비공개</button>
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">비밀번호 <span style="font-weight:400;">(영문+숫자+특수문자 포함, 6자 이상)</span></label>
+        <div style="position:relative;">
+          <input id="ca-pw" type="password" class="todo-input" style="width:100%; box-sizing:border-box; padding-right:44px;" placeholder="예: Mochi@12">
+          <button onclick="toggleCaPw()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-light);" id="ca-pw-eye">👁</button>
         </div>
       </div>
-      <div style="margin-bottom:32px;">
-        <div style="font-size:13px; font-weight:700; color:var(--text-light); margin-bottom:10px;">연령대</div>
-        <div style="display:flex; flex-wrap:wrap; gap:8px;">
-          <button class="ob-chip" data-group="age" data-val="10대" onclick="selectObChip(this)">10대</button>
-          <button class="ob-chip" data-group="age" data-val="20대" onclick="selectObChip(this)">20대</button>
-          <button class="ob-chip" data-group="age" data-val="30대" onclick="selectObChip(this)">30대</button>
-          <button class="ob-chip" data-group="age" data-val="40대" onclick="selectObChip(this)">40대</button>
-          <button class="ob-chip" data-group="age" data-val="50대+" onclick="selectObChip(this)">50대+</button>
-        </div>
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-light); display:block; margin-bottom:7px;">비밀번호 확인</label>
+        <input id="ca-pw2" type="password" class="todo-input" style="width:100%; box-sizing:border-box;" placeholder="동일하게 입력해주세요">
       </div>
-      <div style="display:flex; gap:10px;">
-        <button onclick="obBack(1)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
-        <button onclick="obNext(1)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">다음 →</button>
-      </div>
+      <div id="ca-error" style="font-size:12px; color:#e05; display:none; text-align:center;"></div>
     </div>
-    <div id="ob-step-2" style="flex:1; display:none; flex-direction:column; justify-content:center;">
-      <div style="font-size:40px; text-align:center; margin-bottom:16px;">📍</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:32px;">어디 사세요?</div>
-      <input id="ob-location" type="text" class="todo-input" style="width:100%; box-sizing:border-box;" placeholder="예: 서울 마포구, 경기 고양시">
-      <div style="display:flex; gap:10px; margin-top:20px;">
-        <button onclick="obBack(2)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
-        <button onclick="obNext(2)" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">다음 →</button>
-      </div>
+
+    <div style="display:flex; gap:10px; margin-top:28px;">
+      <button onclick="hideCreateAccount()" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">취소</button>
+      <button onclick="createAccount()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">계정 만들기</button>
     </div>
-    <div id="ob-step-3" style="flex:1; display:none; flex-direction:column; justify-content:center;">
-      <div style="font-size:40px; text-align:center; margin-bottom:16px;">😴</div>
-      <div style="font-size:20px; font-weight:800; color:var(--text); text-align:center; margin-bottom:32px;">수면 목표를 설정해요</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:32px;">
-        <div><div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">취침 시간</div>
-          <input id="ob-sleep" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="23:00"></div>
-        <div><div style="font-size:12px; font-weight:700; color:var(--text-light); margin-bottom:8px;">기상 시간</div>
-          <input id="ob-wake" type="time" class="todo-input" style="width:100%; box-sizing:border-box;" value="07:00"></div>
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button onclick="obBack(3)" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">← 이전</button>
-        <button onclick="saveNickname()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">시작하기 🐰</button>
-      </div>
+  </div>
+</div>
+
+<!-- ── PIN 입력 화면 ── -->
+<div id="pin-screen" style="display:none; position:fixed; inset:0; background:var(--theme-bg); z-index:10001; overflow-y:auto;">
+  <div style="max-width:480px; margin:0 auto; padding:60px 24px 40px; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+
+    <div id="pin-avatar" style="font-size:52px; margin-bottom:10px;"></div>
+    <div id="pin-name" style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:6px;"></div>
+    <div style="font-size:13px; color:var(--text-light); margin-bottom:32px;">비밀번호를 입력해주세요</div>
+
+    <div style="width:100%; max-width:320px; position:relative;">
+      <input id="pin-input" type="password" class="todo-input"
+        style="width:100%; font-size:18px; letter-spacing:3px; text-align:center; box-sizing:border-box; padding-right:44px;"
+        placeholder="비밀번호 입력"
+        onkeydown="if(event.key==='Enter') checkPin()">
+      <button onclick="togglePinVisibility()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-light);" id="pin-eye">👁</button>
     </div>
+
+    <div id="pin-error" style="font-size:12px; color:#e05; margin-top:12px; display:none;">비밀번호가 틀렸어요 😢</div>
+
+    <button onclick="checkPin()" style="margin-top:20px; width:100%; max-width:320px; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:15px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.3);">
+      로그인
+    </button>
+
+    <button onclick="showLoginScreen()" style="margin-top:14px; background:none; border:none; color:var(--text-light); font-size:13px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">← 다른 계정</button>
   </div>
 </div>
 
@@ -1423,21 +1408,30 @@
   </div>
 
   <!-- 3. 마음일기 -->
-  <div class="card memo-card" style="margin-bottom:14px; padding:16px;">
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-      <div style="display:flex; align-items:center; gap:6px;">
-        <span style="font-size:13px; font-weight:700; color:var(--text);">📔 마음일기</span>
-        <span id="diary-date-label" style="font-size:13px; font-weight:700; color:var(--purple);"></span>
-        <button onclick="diaryNav(-1)" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light);padding:0 2px;">‹</button>
-        <button onclick="diaryNav(1)" id="diary-next-btn" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-light);padding:0 2px;">›</button>
+  <div style="background: white; border-radius: 20px; margin-bottom:14px; border: 1.5px solid #ecdeff; box-shadow: 0 2px 12px rgba(140,100,220,0.07); overflow: hidden;">
+    <!-- 일기장 상단 테이프 장식 -->
+    <div style="height: 6px; background: linear-gradient(90deg, #c5a8ff, #ffb5d8, #ffd6a0, #a8f0d0, #a8d4ff); opacity: 0.7;"></div>
+
+    <div style="padding: 16px 16px 0;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">📖</span>
+          <span style="font-size:14px; font-weight:800; color:#3d2a6e; letter-spacing:-0.3px;">마음일기</span>
+          <span id="diary-date-label" style="font-size:12px; font-weight:700; color:var(--purple); background:#f0eaff; padding:3px 9px; border-radius:20px;"></span>
+          <button onclick="diaryNav(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-light);padding:0 2px;line-height:1;">‹</button>
+          <button onclick="diaryNav(1)" id="diary-next-btn" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-light);padding:0 2px;line-height:1;">›</button>
+        </div>
+        <button id="diary-edit-btn" onclick="diaryStartEdit()" style="display:none; background:none; border:1.5px solid #ecdeff; border-radius:20px; padding:4px 12px; font-size:11px; color:var(--purple); cursor:pointer; font-family:'Noto Sans KR',sans-serif; font-weight:600;">✏️ 수정</button>
       </div>
-      <button id="diary-edit-btn" onclick="diaryStartEdit()" style="display:none; background:none; border:1px solid var(--border); border-radius:8px; padding:4px 10px; font-size:12px; color:var(--text-light); cursor:pointer; font-family:'Noto Sans KR',sans-serif;">✏️ 수정</button>
     </div>
 
     <!-- 작성 모드 -->
-    <div id="diary-write-mode">
-      <div style="margin-bottom:10px;">
-        <div style="font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px;">오늘의 감정</div>
+    <div id="diary-write-mode" style="padding: 0 16px 16px;">
+      <!-- 감정 선택 -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px; font-weight:700; color:#9b84c8; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; display:flex; align-items:center; gap:5px;">
+          <span>✨</span> 오늘의 감정
+        </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="diary-emotion-btn" data-emotion="😊" data-label="기쁨" onclick="selectDiaryEmotion(this)">😊 기쁨</button>
           <button class="diary-emotion-btn" data-emotion="😌" data-label="평온" onclick="selectDiaryEmotion(this)">😌 평온</button>
@@ -1449,18 +1443,29 @@
           <button class="diary-emotion-btn" data-emotion="🔥" data-label="의욕" onclick="selectDiaryEmotion(this)">🔥 의욕</button>
         </div>
       </div>
-      <textarea class="memo-textarea" id="diary-input" placeholder="오늘 하루 어땠어요? 자유롭게 적어봐요 ✏️" style="min-height:100px; border:1px solid var(--border); border-radius:10px; padding:12px; background:var(--cream);"></textarea>
-      <button id="diary-save-btn" onclick="saveDiaryManual()" style="width:100%; margin-top:12px; padding:12px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">📔 마음일기 저장하기</button>
+      <!-- 일기 입력 영역 (편지지 스타일) -->
+      <div style="position: relative; background: #fdfaff; border: 1.5px solid #ecdeff; border-radius: 14px; overflow: hidden;">
+        <!-- 줄노트 배경 -->
+        <div style="position:absolute; inset:0; background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, #f0eaff 27px, #f0eaff 28px); background-position: 0 10px; pointer-events:none; z-index:0;"></div>
+        <div style="position:absolute; left:46px; top:0; bottom:0; width:1.5px; background:#ffd6e8; pointer-events:none; z-index:0;"></div>
+        <textarea class="memo-textarea" id="diary-input" placeholder="오늘 하루 어땠어요? 자유롭게 적어봐요 ✏️" style="min-height:110px; position:relative; z-index:1; padding: 12px 14px 12px 58px; background:transparent; border:none; width:100%; box-sizing:border-box; border-radius:14px; line-height: 27px;"></textarea>
+      </div>
+      <button id="diary-save-btn" onclick="saveDiaryManual()" style="width:100%; margin-top:12px; padding:13px; background:linear-gradient(135deg, #7c5cbf, #b478d2); color:white; border:none; border-radius:14px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; letter-spacing:-0.2px; box-shadow: 0 3px 12px rgba(124,92,191,0.3);">📔 마음일기 저장하기</button>
     </div>
 
     <!-- 저장 완료 모드 -->
-    <div id="diary-view-mode" style="display:none;">
+    <div id="diary-view-mode" style="display:none; padding: 0 16px 16px;">
       <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px;">
         <span id="diary-view-date" style="font-size:12px; color:var(--text-light); font-weight:500;"></span>
-        <span style="margin-left:auto; font-size:11px; color:#2E7D32; background:var(--mint); padding:2px 8px; border-radius:20px; font-weight:600;">✓ 저장됨</span>
+        <span style="margin-left:auto; font-size:11px; color:#2E7D32; background:#e8f5e9; padding:3px 10px; border-radius:20px; font-weight:700; border:1px solid #c8e6c9;">✓ 저장됨</span>
       </div>
       <div id="diary-view-meta" style="display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;"></div>
-      <div id="diary-view-text" style="font-size:14px; color:var(--text); line-height:1.8; white-space:pre-wrap; background:var(--cream); border-radius:10px; padding:14px; min-height:80px;"></div>
+      <!-- 편지지 스타일 뷰 -->
+      <div style="position: relative; background: #fdfaff; border: 1.5px solid #ecdeff; border-radius: 14px; overflow: hidden;">
+        <div style="position:absolute; inset:0; background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, #f0eaff 27px, #f0eaff 28px); background-position: 0 10px; pointer-events:none;"></div>
+        <div style="position:absolute; left:46px; top:0; bottom:0; width:1.5px; background:#ffd6e8; pointer-events:none;"></div>
+        <div id="diary-view-text" style="font-size:14px; color:var(--text); line-height:27px; white-space:pre-wrap; padding:12px 14px 12px 58px; position:relative; z-index:1; min-height:80px;"></div>
+      </div>
     </div>
   </div>
 
@@ -1469,26 +1474,34 @@
 
 <!-- 아이디어 페이지 -->
 <div class="page" id="page-idea" style="display:none;">
-  <div class="header">
-    <span class="mascot">💡</span>
-    <h1>아이디어 노트</h1>
-    <p class="greeting">떠오르는 건 다 적어둬요!</p>
+
+  <!-- 마음일기 헤더와 동일한 스타일 -->
+  <div style="margin-bottom: 18px; position: relative;">
+    <div style="background: linear-gradient(135deg, #fff8ea 0%, #ffefd6 50%, #fff3fa 100%); border-radius: 20px; padding: 20px 20px 16px; border: 1.5px solid #ffe0a0; position: relative; overflow: hidden;">
+      <div style="position:absolute; top:-20px; right:-20px; width:90px; height:90px; background:rgba(255,200,80,0.1); border-radius:50%;"></div>
+      <div style="position:absolute; bottom:-10px; left:20px; width:60px; height:60px; background:rgba(255,180,100,0.1); border-radius:50%;"></div>
+      <div style="display:flex; align-items:center; gap:14px; position:relative; z-index:1;">
+        <div style="width:52px; height:52px; background:white; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow: 0 3px 12px rgba(255,160,60,0.18); flex-shrink:0; border: 1.5px solid #ffe0a0;">💡</div>
+        <div>
+          <div style="font-size:17px; font-weight:800; color:#6e3d0a; letter-spacing:-0.4px; margin-bottom:3px;">아이디어 노트</div>
+          <div style="font-size:12px; color:#c89040; font-weight:500;">떠오르는 건 다 적어둬요 ✨</div>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:6px; font-size:18px; opacity:0.7;">
+          <span style="animation: floatY 3s ease-in-out infinite;">🌟</span>
+          <span style="animation: floatY 3s ease-in-out 1s infinite;">💭</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="section">
     <div class="card" style="background: var(--white); border: 1px solid var(--border);">
-      <div style="display:flex; gap:8px; margin-bottom:12px;">
-        <input type="text" id="idea-title" class="todo-input" placeholder="아이디어 제목..." style="font-weight:600;">
-        <select id="idea-category" style="padding:8px 10px; border:2px solid rgba(155,127,212,0.2); border-radius:12px; font-family:'Nunito','Noto Sans KR',sans-serif; font-size:13px; background:white; color:var(--text); outline:none;">
-          <option value="shopee">🛍 쇼피</option>
-          <option value="gupsal">🥘 급식</option>
-          <option value="dosirak">🍱 도시락</option>
-          <option value="biz">💼 비즈니스</option>
-          <option value="life">✨ 라이프</option>
-        </select>
-      </div>
+      <input type="text" id="idea-title" class="todo-input" placeholder="아이디어 제목..." style="font-weight:600; width:100%; margin-bottom:10px;">
       <textarea id="idea-content" class="memo-textarea" placeholder="아이디어 내용을 자유롭게 적어요... ✏️" style="min-height:80px;"></textarea>
-      <button onclick="addIdea()" style="width:100%; margin-top:10px; padding:12px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s;">💡 아이디어 저장하기</button>
+      <button onclick="addIdea()" id="idea-save-btn" style="width:100%; margin-top:10px; padding:12px; background:var(--purple); color:white; border:none; border-radius:12px; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px;">
+        <span id="idea-save-icon">💡</span>
+        <span id="idea-save-label">아이디어 저장하기</span>
+      </button>
     </div>
   </div>
 
@@ -1500,11 +1513,27 @@
 
 <!-- 일기 목록 페이지 -->
 <div class="page" id="page-diarylist" style="display:none;">
-  <div class="header" style="padding:20px 0 14px; text-align:left; display:flex; align-items:center; gap:12px;">
-    <span style="font-size:32px;">📔</span>
-    <div>
-      <h1 style="font-size:18px; margin-bottom:2px;">마음일기 모아보기</h1>
-      <p class="greeting" style="font-size:12px;">매일의 기록이 쌓여가요 🌱</p>
+
+  <!-- 아기자기한 일기장 헤더 -->
+  <div style="margin-bottom: 18px; position: relative;">
+    <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fce8f3 50%, #fff5ea 100%); border-radius: 20px; padding: 20px 20px 16px; border: 1.5px solid #ecdeff; position: relative; overflow: hidden;">
+      <!-- 배경 장식 원 -->
+      <div style="position:absolute; top:-20px; right:-20px; width:90px; height:90px; background:rgba(180,140,255,0.1); border-radius:50%;"></div>
+      <div style="position:absolute; bottom:-10px; left:20px; width:60px; height:60px; background:rgba(255,180,200,0.12); border-radius:50%;"></div>
+
+      <div style="display:flex; align-items:center; gap:14px; position:relative; z-index:1;">
+        <!-- 일기장 아이콘 -->
+        <div style="width:52px; height:52px; background:white; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow: 0 3px 12px rgba(140,100,220,0.18); flex-shrink:0; border: 1.5px solid #ecdeff;">📔</div>
+        <div>
+          <div style="font-size:17px; font-weight:800; color:#3d2a6e; letter-spacing:-0.4px; margin-bottom:3px;">마음일기</div>
+          <div style="font-size:12px; color:#9b84c8; font-weight:500;">매일의 감정을 기록해요 🌱</div>
+        </div>
+        <!-- 오른쪽 장식 이모지들 -->
+        <div style="margin-left:auto; display:flex; gap:6px; font-size:18px; opacity:0.7;">
+          <span style="animation: floatY 3s ease-in-out infinite;">🌸</span>
+          <span style="animation: floatY 3s ease-in-out 1s infinite;">✨</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1513,54 +1542,47 @@
 
   <!-- 모찌 편지 카드 -->
   <div id="diary-analysis-wrap" style="margin-bottom:16px; display:none;">
-    <!-- 편지 봉투 버튼 (닫힌 상태) -->
-    <div id="diary-letter-closed" onclick="analyzeDiaryMonth()" style="cursor:pointer; background:white; border:2px solid var(--purple); border-radius:16px; overflow:hidden; transition:all 0.2s; box-shadow:0 2px 12px rgba(140,100,220,0.12);">
-      <!-- 봉투 상단 삼각형 -->
-      <div style="width:100%; height:44px; background:var(--purple); clip-path:polygon(0 0, 100% 0, 50% 100%); margin-bottom:-1px;"></div>
-      <div style="padding:14px 18px 16px; display:flex; align-items:center; justify-content:space-between;">
-        <div>
-          <div style="font-size:12px; color:var(--text-light); font-weight:600; margin-bottom:3px;">모찌가 보내는 편지 💌</div>
-          <div id="diary-analysis-title" style="font-size:14px; font-weight:700; color:var(--purple);"></div>
+    <!-- 심플 편지 카드 (닫힌 상태) -->
+    <div id="diary-letter-closed" onclick="analyzeDiaryMonth()" style="cursor:pointer; background:linear-gradient(135deg,#f5f0ff,#fce8f8); border:1.5px solid #ddd0f8; border-radius:18px; padding:16px 18px; transition:all 0.2s; box-shadow:0 2px 10px rgba(140,100,220,0.08);">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:42px; height:42px; background:white; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 2px 8px rgba(140,100,220,0.12); flex-shrink:0;">💌</div>
+        <div style="flex:1;">
+          <div style="font-size:11px; color:#9b84c8; font-weight:600; margin-bottom:3px;">모찌가 보내는 편지</div>
+          <div id="diary-analysis-title" style="font-size:14px; font-weight:800; color:#4a2d9e;"></div>
         </div>
-        <div id="diary-letter-btn-wrap">
-          <button id="diary-analysis-btn" style="padding:8px 14px; background:var(--purple); color:white; border:none; border-radius:10px; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; white-space:nowrap;">💌 편지 열기</button>
-        </div>
+        <button id="diary-analysis-btn" style="padding:9px 16px; background:var(--purple); color:white; border:none; border-radius:20px; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0; box-shadow:0 2px 8px rgba(124,92,191,0.3);">열기 →</button>
       </div>
     </div>
 
     <!-- 편지 열린 상태 -->
-    <div id="diary-letter-open" style="display:none; background:white; border:2px solid var(--purple); border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(140,100,220,0.15);">
+    <div id="diary-letter-open" style="display:none; background:white; border:1.5px solid #ddd0f8; border-radius:18px; overflow:hidden; box-shadow:0 4px 20px rgba(140,100,220,0.1);">
       <!-- 편지지 헤더 -->
-      <div style="background:var(--purple); padding:14px 18px; display:flex; align-items:center; justify-content:space-between;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:20px;">🐰</span>
+      <div style="background:linear-gradient(135deg,#7c5cbf,#b478d2); padding:14px 18px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; background:rgba(255,255,255,0.2); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;">🐰</div>
           <div>
-            <div style="font-size:11px; color:rgba(255,255,255,0.8); font-weight:500;">모찌가 보내는 편지</div>
-            <div id="diary-letter-month" style="font-size:14px; color:white; font-weight:700;"></div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.75); font-weight:500; margin-bottom:1px;">모찌가 보내는 편지</div>
+            <div id="diary-letter-month" style="font-size:14px; color:white; font-weight:800;"></div>
           </div>
         </div>
-        <button onclick="closeDiaryLetter()" style="background:rgba(255,255,255,0.2); border:none; border-radius:8px; padding:5px 10px; color:white; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">접기 ∧</button>
+        <button onclick="closeDiaryLetter()" style="background:rgba(255,255,255,0.18); border:none; border-radius:20px; padding:6px 14px; color:white; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">접기 ∧</button>
       </div>
       <!-- 편지지 내용 -->
-      <div style="padding:20px 20px 24px; background:linear-gradient(to bottom, #faf8ff, white);">
-        <!-- 줄 간격 효과 -->
-        <div style="position:relative;">
-          <div id="diary-analysis-body" style="font-size:14px; color:var(--text); line-height:2; position:relative; z-index:1; white-space:pre-line;"></div>
-        </div>
-        <!-- 서명 -->
-        <div style="margin-top:20px; text-align:right; padding-top:14px; border-top:1px dashed var(--border);">
+      <div style="padding:20px 20px 24px; background:linear-gradient(to bottom,#fdf9ff,white);">
+        <div id="diary-analysis-body" style="font-size:14px; color:var(--text); line-height:2; white-space:pre-line;"></div>
+        <div style="margin-top:20px; text-align:right; padding-top:14px; border-top:1px dashed #ede6ff;">
           <div style="font-size:12px; color:var(--text-light);">언제나 네 편,</div>
-          <div style="font-size:15px; font-weight:700; color:var(--purple); margin-top:2px;">모찌 🐰</div>
+          <div style="font-size:15px; font-weight:800; color:var(--purple); margin-top:2px;">모찌 🐰</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="diarylist-container" style="display:flex; flex-direction:column; gap:12px;"></div>
+  <div id="diarylist-container" style="display:flex; flex-direction:column; gap:10px;"></div>
   <div id="diarylist-empty" style="display:none; text-align:center; padding:60px 0; color:var(--text-light);">
-    <div style="font-size:48px; margin-bottom:12px;">🌙</div>
-    <div style="font-size:15px; font-weight:600; margin-bottom:6px;">아직 마음일기가 없어요</div>
-    <div style="font-size:13px;">오늘 첫 마음일기를 써봐요!</div>
+    <div style="font-size:52px; margin-bottom:14px;">🌙</div>
+    <div style="font-size:15px; font-weight:700; color:#9b84c8; margin-bottom:6px;">아직 마음일기가 없어요</div>
+    <div style="font-size:13px; color:var(--text-light);">오늘 첫 마음일기를 써봐요!</div>
   </div>
 </div>
 
@@ -1678,15 +1700,15 @@
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">하는 일 / 직업</label>
-        <input type="text" id="profile-job" class="todo-input" style="width:100%;" placeholder="예: 쇼피 셀러, 급식 납품 사업, 도시락 유튜브 운영" oninput="saveProfile()">
+        <input type="text" id="profile-job" class="todo-input" style="width:100%;" placeholder="예: 프리랜서 디자이너, 회사원, 학생" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">요즘 목표</label>
-        <input type="text" id="profile-goal" class="todo-input" style="width:100%;" placeholder="예: 쇼피 매출 늘리기, 건강 루틴 만들기" oninput="saveProfile()">
+        <input type="text" id="profile-goal" class="todo-input" style="width:100%;" placeholder="예: 건강한 루틴 만들기, 수입 늘리기" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:6px;">관심사 / 좋아하는 것</label>
-        <input type="text" id="profile-interest" class="todo-input" style="width:100%;" placeholder="예: 맛집, 운동, 쇼핑, 여행" oninput="saveProfile()">
+        <input type="text" id="profile-interest" class="todo-input" style="width:100%;" placeholder="예: 맛집, 운동, 독서, 여행" oninput="saveProfile()">
       </div>
       <div>
         <label style="font-size:12px; color:var(--text-light); font-weight:500; display:block; margin-bottom:8px;">💬 모찌한테 더 하고 싶은 말</label>
@@ -1713,6 +1735,8 @@
         <div id="learned-profile-list" style="font-size:12px; color:var(--text); line-height:1.8; background:var(--purple-light); border-radius:10px; padding:10px 12px;"></div>
         <button onclick="clearLearnedProfile()" style="margin-top:8px; font-size:11px; color:var(--text-light); background:none; border:1px solid var(--border); border-radius:8px; padding:4px 10px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;">초기화</button>
       </div>
+      <!-- 프로필 전체 초기화 -->
+      <button onclick="resetAllProfile()" style="margin-top:14px; width:100%; padding:10px; border-radius:10px; border:1px solid #fdd; background:white; color:#c03; font-size:12px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">🗑 프로필 전체 초기화</button>
     </div>
   </div>
 
@@ -1756,6 +1780,15 @@
     </div>
   </div>
 
+  <!-- 데이터 초기화 -->
+  <div class="section">
+    <div class="section-title">🗑 데이터 관리</div>
+    <div class="card" style="display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:12px; color:var(--text-light); line-height:1.6;">현재 계정의 모든 데이터(할 일, 일기, 아이디어, 프로필)를 삭제해요. 되돌릴 수 없어요!</div>
+      <button onclick="resetAllData()" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #fdd; background:white; color:#c03; font-size:13px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">⚠️ 전체 데이터 초기화</button>
+    </div>
+  </div>
+
   <!-- 로그아웃 -->
   <div class="section">
     <button id="logout-btn" onclick="logout()" style="width:100%; padding:14px; border-radius:14px; border:1.5px solid #fdd; background:white; color:#c03; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer;">로그아웃</button>
@@ -1764,6 +1797,24 @@
 </div>
 
 <!-- 🎉 축하 오버레이 -->
+<!-- ── 튜토리얼 오버레이 ── -->
+<div id="tutorial-overlay" style="display:none; position:fixed; inset:0; background:rgba(20,15,40,0.75); z-index:9999; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);">
+  <div id="tutorial-box" style="position:absolute; bottom:0; left:0; right:0; background:white; border-radius:28px 28px 0 0; padding:32px 24px 40px; max-height:90vh; overflow-y:auto; box-shadow:0 -8px 40px rgba(0,0,0,0.18);">
+
+    <!-- 진행 도트 -->
+    <div style="display:flex; gap:6px; justify-content:center; margin-bottom:24px;" id="tut-dots"></div>
+
+    <!-- 슬라이드 컨테이너 -->
+    <div id="tut-slides"></div>
+
+    <!-- 버튼 -->
+    <div style="display:flex; gap:10px; margin-top:28px;">
+      <button id="tut-skip-btn" onclick="tutSkip()" style="flex:1; padding:14px; border-radius:14px; border:1.5px solid var(--border); background:white; color:var(--text-light); font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:600; cursor:pointer;">건너뛰기</button>
+      <button id="tut-next-btn" onclick="tutNext()" style="flex:2; padding:14px; border-radius:14px; border:none; background:var(--purple); color:white; font-size:14px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,191,0.35);">다음 →</button>
+    </div>
+  </div>
+</div>
+
 <div class="confetti-overlay" id="confetti-overlay"></div>
 <div class="celebrate-banner" id="celebrate-banner">
   <span class="cb-emoji" id="cb-emoji">🎉</span>
@@ -1814,8 +1865,8 @@
 <div class="diary-overlay" id="diary-overlay" onclick="closeDiaryOverlay(event)">
   <div class="diary-sheet" id="diary-sheet">
     <div class="diary-sheet-handle"></div>
-
-    <!-- 헤더: 날짜 + 수정/닫기 버튼 -->
+    <!-- 컬러 테이프 장식 -->
+    <div style="height:4px; background:linear-gradient(90deg, #c5a8ff, #ffb5d8, #ffd6a0, #a8f0d0); border-radius:2px; margin-bottom:18px;"></div>
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
       <div class="diary-sheet-date" id="ds-date" style="margin-bottom:0;"></div>
       <div style="display:flex; gap:8px;">
@@ -1830,7 +1881,11 @@
 
     <!-- 읽기 모드 -->
     <div id="ds-read-mode">
-      <div class="diary-sheet-body" id="ds-body"></div>
+      <div style="position:relative; background:#fdfaff; border:1.5px solid #ecdeff; border-radius:14px; overflow:hidden; padding:12px 14px 12px 56px;">
+        <div style="position:absolute; inset:0; background-image:repeating-linear-gradient(to bottom, transparent, transparent 27px, #f0eaff 27px, #f0eaff 28px); background-position:0 10px; pointer-events:none;"></div>
+        <div style="position:absolute; left:44px; top:0; bottom:0; width:1.5px; background:#ffd6e8; pointer-events:none;"></div>
+        <div class="diary-sheet-body" id="ds-body" style="position:relative; z-index:1; line-height:27px;"></div>
+      </div>
     </div>
 
     <!-- 수정 모드 -->
@@ -1867,14 +1922,6 @@
 </div>
 
 <script>
-  // ── 상수 ──
-  const GEMINI_API_KEY = 'AIzaSyCGStfylvsSrwexeixePENIaYMYpG41YnA';
-  const GEMINI_URL = () => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-  const SUPABASE_URL = 'https://subjdjbrdjdikjaqjafi.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1YmpkamJyZGpkaWtqYXFqYWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjM5MTAsImV4cCI6MjA4ODYzOTkxMH0.x6ZwV3w7qdqnd_Tf2Blh9o6ppoH5zbDyd9tAY1tVeRI';
-  let sb; // Supabase client (CDN 로드 후 초기화)
-  let _currentUser = null;
-
   // ── 일기 감정 선택 ──
   let viewingDate = null; // null = 오늘
   function selectDiaryEmotion(btn) {
@@ -1945,6 +1992,41 @@
     if (nameInput) nameInput.value = savedName;
   }
 
+  // ── 기본 정보 칩 선택 ──
+  function selectChip(groupId, btn, storageKey) {
+    document.querySelectorAll(`#${groupId} .profile-chip`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    localStorage.setItem(storageKey, btn.dataset.val);
+  }
+
+  function saveBasicProfile() {
+    const location = document.getElementById('profile-location')?.value || '';
+    const sleepTime = document.getElementById('goal-sleep-time')?.value || '23:30';
+    const wakeTime = document.getElementById('goal-wake-time')?.value || '07:00';
+    localStorage.setItem('profile_location', location);
+    localStorage.setItem('goal_sleep_time', sleepTime);
+    localStorage.setItem('goal_wake_time', wakeTime);
+  }
+
+  function loadBasicProfile() {
+    // 칩 복원
+    const gender = localStorage.getItem('profile_gender');
+    if (gender) document.querySelectorAll('#gender-btns .profile-chip').forEach(b => { if (b.dataset.val === gender) b.classList.add('selected'); });
+    const age = localStorage.getItem('profile_age');
+    if (age) document.querySelectorAll('#age-btns .profile-chip').forEach(b => { if (b.dataset.val === age) b.classList.add('selected'); });
+    // 텍스트/시간 복원
+    const loc = localStorage.getItem('profile_location');
+    if (loc && document.getElementById('profile-location')) document.getElementById('profile-location').value = loc;
+    const sleepT = localStorage.getItem('goal_sleep_time');
+    if (sleepT && document.getElementById('goal-sleep-time')) document.getElementById('goal-sleep-time').value = sleepT;
+    const wakeT = localStorage.getItem('goal_wake_time');
+    if (wakeT && document.getElementById('goal-wake-time')) document.getElementById('goal-wake-time').value = wakeT;
+  }
+
+  window.selectChip = selectChip;
+  window.saveBasicProfile = saveBasicProfile;
+  setTimeout(loadBasicProfile, 120);
+
   // ── 프로필 저장/불러오기 ──
   function saveProfile() {
     const profile = {
@@ -2004,6 +2086,22 @@
   }
 
   window.saveProfile = saveProfile;
+  function resetAllProfile() {
+    if (!confirm('프로필을 모두 초기화할까요?')) return;
+    ['profile-job','profile-goal','profile-interest','profile-memo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    // 칩 선택 해제
+    document.querySelectorAll('#gender-btns .profile-chip, #age-btns .profile-chip').forEach(b => b.classList.remove('selected'));
+    const locEl = document.getElementById('profile-location');
+    if (locEl) locEl.value = '';
+    // localStorage 삭제
+    ['mochi_profile','mochi_learned','profile_gender','profile_age','profile_location'].forEach(k => localStorage.removeItem(k));
+    renderLearnedProfile();
+  }
+  window.resetAllProfile = resetAllProfile;
+
   window.clearLearnedProfile = clearLearnedProfile;
 
   // ── ChatGPT 프롬프트 가이드 ──
@@ -2182,7 +2280,18 @@ ${recentMsgs}
 ["예시1", "예시2", ...]`;
 
     try {
-      const raw = await callGemini(systemPrompt, userPrompt, 300);
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }]
+        })
+      });
+      const data = await res.json();
+      const raw = data.content?.[0]?.text || '[]';
       const chips = JSON.parse(raw.replace(/```json|```/g, '').trim());
 
       if (Array.isArray(chips) && chips.length) {
@@ -2214,7 +2323,7 @@ ${recentMsgs}
     // 이미 열려있으면 접기
     if (aiTodoOpen) {
       preview.style.display = 'none';
-      chevron.style.transform = 'rotate(0deg)';
+      chevron.style.transform = 'rotate(180deg)';
       aiTodoOpen = false;
       return;
     }
@@ -2268,7 +2377,16 @@ ${recentMsgs}
     const existingTodos = todos.map(t => t.text).join(', ') || '없음';
 
     try {
-      const _aiTodoPrompt = `아래 대화 내용을 읽고, 사용자가 오늘 해야 할 것 같은 할 일을 3~5개 추출하거나 추천해줘.
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 400,
+          system: `당신은 대화에서 할 일을 추출하는 도우미예요. 반드시 JSON만 출력하세요.`,
+          messages: [{
+            role: 'user',
+            content: `아래 대화 내용을 읽고, 사용자가 오늘 해야 할 것 같은 할 일을 3~5개 추출하거나 추천해줘.
 이미 있는 할 일은 제외. 대화에서 언급된 것 우선으로. 할 일은 짧고 구체적으로 (동사+목적어, 15자 이내).
 대화에서 충분한 정보를 얻지 못했다면 needMoreChat: true 로 표시해줘.
 
@@ -2281,9 +2399,14 @@ ${recentMsgs}
 ${recentMsgs}
 
 출력 형식 (JSON만):
-{"todos": ["할 일1", "할 일2"], "needMoreChat": false, "nudge": "대화가 더 필요하면 자연스러운 유도 한 줄 (needMoreChat true일 때만)"}`;
-      const _aiRaw = await callGemini('당신은 대화에서 할 일을 추출하는 도우미예요. 반드시 JSON만 출력하세요.', _aiTodoPrompt, 400);
-      const result = JSON.parse(_aiRaw.replace(/```json|```/g, '').trim());
+{"todos": ["할 일1", "할 일2"], "needMoreChat": false, "nudge": "대화가 더 필요하면 자연스러운 유도 한 줄 (needMoreChat true일 때만)"}`
+          }]
+        })
+      });
+
+      const data = await res.json();
+      const raw = data.content?.[0]?.text || '{}';
+      const result = JSON.parse(raw.replace(/```json|```/g, '').trim());
 
       if (result.needMoreChat) {
         // 대화 내용이 있어도 맥락이 부족하면 유도
@@ -2485,15 +2608,7 @@ ${recentMsgs}
     document.getElementById('diary-next-btn').style.opacity = diaryOffset >= 0 ? '0.3' : '1';
     document.getElementById('diary-next-btn').disabled = diaryOffset >= 0;
 
-    // viewingDate가 있으면 그 날짜의 키 사용, 없으면 diaryOffset 기준
-    let storageKey;
-    if (viewingDate) {
-      const { y, m, d } = viewingDate;
-      storageKey = `diary_${y}_${m+1}_${d}`;
-    } else {
-      storageKey = diaryKey(diaryOffset);
-    }
-    const raw = localStorage.getItem(storageKey);
+    const raw = localStorage.getItem(diaryKey(diaryOffset));
     const writeMode = document.getElementById('diary-write-mode');
     const viewMode = document.getElementById('diary-view-mode');
     const editBtn = document.getElementById('diary-edit-btn');
@@ -2522,11 +2637,9 @@ ${recentMsgs}
     }
   }
 
-  function saveDiary() {
-    saveDiaryManual();
-  }
+  function saveDiary() {}
 
-  async function saveDiaryManual() {
+  function saveDiaryManual() {
     const text = document.getElementById('diary-input').value.trim();
     if (!text) {
       const btn = document.getElementById('diary-save-btn');
@@ -2546,28 +2659,7 @@ ${recentMsgs}
     const moodLabel = moodBtn ? (moodLabels[moodBtn.dataset.mood] || '') : '';
 
     const diaryData = { text, emotion, emotionLabel, mood: moodEmoji, moodLabel, savedAt: new Date().toISOString() };
-
-    // viewingDate가 있으면 그 날짜 키에 저장, 없으면 diaryOffset 기준
-    let targetKey, dateStr;
-    if (viewingDate) {
-      const { y, m, d } = viewingDate;
-      targetKey = `diary_${y}_${m+1}_${d}`;
-      dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    } else {
-      targetKey = diaryKey(diaryOffset);
-      const dObj = new Date(); dObj.setDate(dObj.getDate() + diaryOffset);
-      dateStr = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')}`;
-    }
-    localStorage.setItem(targetKey, JSON.stringify(diaryData));
-
-    // Supabase 저장
-    if (_currentUser) {
-      const emotionJson = JSON.stringify({ emoji: emotion, label: emotionLabel });
-      await sb.from('diaries').upsert(
-        { user_id: _currentUser.id, date: dateStr, content: text, emotion: emotionJson },
-        { onConflict: 'user_id,date' }
-      );
-    }
+    localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(diaryData));
 
     const btn = document.getElementById('diary-save-btn');
     btn.innerHTML = '✅ 저장됐어요!';
@@ -2612,15 +2704,8 @@ ${recentMsgs}
     document.getElementById('diary-view-mode').style.display = 'none';
     document.getElementById('diary-write-mode').style.display = 'block';
     document.getElementById('diary-edit-btn').style.display = 'none';
-    // 저장된 감정 복원 (viewingDate 기준)
-    let storageKey;
-    if (viewingDate) {
-      const { y, m, d } = viewingDate;
-      storageKey = `diary_${y}_${m+1}_${d}`;
-    } else {
-      storageKey = diaryKey(diaryOffset);
-    }
-    const raw = localStorage.getItem(storageKey);
+    // 저장된 감정 복원
+    const raw = localStorage.getItem(diaryKey(diaryOffset));
     if (raw) {
       try {
         const data = JSON.parse(raw);
@@ -2645,22 +2730,17 @@ ${recentMsgs}
 
 
   // Todos
-  let todos = [
-    { id: 1, text: '쇼피 상품 등록 1개', tag: 'shopee', done: false },
-    { id: 2, text: '급식 거래처 발주 확인', tag: 'gupsal', done: false },
-    { id: 3, text: '도시락 영상 아이디어 메모', tag: 'dosirak', done: false },
-    { id: 4, text: '산책 30분', tag: 'personal', done: false },
-  ];
-  let nextId = 5;
+  let todos = [];
+  let nextId = 1;
   let currentFilter = 'all';
   let selectedTag = 'personal';
 
   // ── 태그 관리 ──
   let customTags = JSON.parse(localStorage.getItem('mochi_tags') || 'null') || [
-    { id: 'personal',  emoji: '',   label: '개인',    color: '#F0EAFF', textColor: '#6040A0' },
-    { id: 'shopee',    emoji: '🛍', label: '쇼피',    color: '#FFF0E0', textColor: '#C05000' },
-    { id: 'gupsal',    emoji: '🥘', label: '급식',    color: '#EAF5EA', textColor: '#2A6E2A' },
-    { id: 'dosirak',   emoji: '🍱', label: '도시락',  color: '#FFEAEE', textColor: '#A02030' },
+    { id: 'personal',  emoji: '🏠', label: '일상',    color: '#F0EAFF', textColor: '#6040A0' },
+    { id: 'work',      emoji: '💼', label: '업무',    color: '#E8F0FF', textColor: '#2040A0' },
+    { id: 'health',    emoji: '🏃', label: '건강',    color: '#E8F5E9', textColor: '#2A6E2A' },
+    { id: 'family',    emoji: '👨‍👩‍👧', label: '가족',   color: '#FFF3E0', textColor: '#C05000' },
     { id: 'mochi_rec', emoji: '💗', label: '모찌추천', color: '#FFE8F8', textColor: '#901060' },
   ];
   // 기존 localStorage에 모찌추천 태그 없으면 자동 추가
@@ -2823,69 +2903,33 @@ ${recentMsgs}
       const tagBg = tagObj ? tagObj.color : '#F0EAFF';
       const tagTc = tagObj ? tagObj.textColor : '#6040A0';
       li.innerHTML = `
-        <div class="todo-check ${todo.done ? 'checked' : ''}" style="min-width:28px;min-height:28px;width:28px;height:28px;"></div>
+        <div class="todo-check ${todo.done ? 'checked' : ''}" onclick="toggleTodo(${todo.id})"></div>
         <span class="todo-text ${todo.done ? 'done' : ''}">${todo.text}</span>
         <span class="todo-tag" style="background:${tagBg};color:${tagTc};">${tagLabels[todo.tag]||todo.tag}</span>
-        <button class="todo-delete" onclick="event.stopPropagation();deleteTodo(${todo.id})">×</button>
+        <button class="todo-delete" onclick="deleteTodo(${todo.id})">×</button>
       `;
-      // 체크박스 클릭: DOM 재생성 없이 직접 토글 (씹힘 방지)
-      const checkEl = li.querySelector('.todo-check');
-      checkEl.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const t = todos.find(t => t.id === todo.id);
-        if (!t) return;
-        t.done = !t.done;
-        checkEl.classList.toggle('checked', t.done);
-        const textEl = li.querySelector('.todo-text');
-        textEl.classList.toggle('done', t.done);
-        updateProgress(); // 달성률 즉시 반영
-        if (_currentUser && !String(todo.id).startsWith('tmp_')) {
-          sb.from('todos').update({ done: t.done }).eq('id', todo.id).eq('user_id', _currentUser.id);
-        }
-      });
       list.appendChild(li);
     });
     updateProgress();
   }
 
-  async function toggleTodo(id) {
+  function toggleTodo(id) {
     todos = todos.map(t => t.id === id ? {...t, done: !t.done} : t);
     renderTodos();
-    if (_currentUser && !String(id).startsWith('tmp_')) {
-      const todo = todos.find(t => t.id === id);
-      if (todo) await sb.from('todos').update({ done: todo.done }).eq('id', id).eq('user_id', _currentUser.id);
-    }
   }
 
-  async function deleteTodo(id) {
+  function deleteTodo(id) {
     todos = todos.filter(t => t.id !== id);
     renderTodos();
-    if (_currentUser && !String(id).startsWith('tmp_')) {
-      await sb.from('todos').delete().eq('id', id).eq('user_id', _currentUser.id);
-    }
   }
 
-  async function addTodo() {
+  function addTodo() {
     const input = document.getElementById('todo-input');
     const text = input.value.trim();
     if (!text) return;
-    const today = new Date().toISOString().slice(0,10);
-    const dateStr = viewingDate
-      ? `${viewingDate.y}-${String(viewingDate.m+1).padStart(2,'0')}-${String(viewingDate.d).padStart(2,'0')}`
-      : today;
-    const tempId = 'tmp_' + Date.now();
-    todos.push({ id: tempId, text, tag: selectedTag, done: false, date: dateStr });
+    todos.push({ id: nextId++, text, tag: selectedTag, done: false });
     input.value = '';
     renderTodos();
-    // Supabase 동기화 (await로 id 확정 후 재저장)
-    if (_currentUser) {
-      const { data, error } = await sb.from('todos')
-        .insert({ text, tag: selectedTag, done: false, date: dateStr, user_id: _currentUser.id })
-        .select().single();
-      if (!error && data) {
-        todos = todos.map(t => t.id === tempId ? { ...t, id: data.id } : t);
-      }
-    }
   }
 
   function filterTodo(tag, btn) {
@@ -2917,12 +2961,9 @@ ${recentMsgs}
 
   function renderWeeklyProgress() {
     const n = new Date();
-    // 호출 시점의 상태를 스냅샷으로 고정 (비동기 완료 후에도 이 값 사용)
-    const _viewingDate = viewingDate;
-    const _todosSnapshot = todos.slice();
-
-    const base = _viewingDate
-      ? new Date(_viewingDate.y, _viewingDate.m, _viewingDate.d)
+    // 기준 날짜: 다른 날 보고 있으면 그 날짜 기준, 아니면 오늘
+    const base = viewingDate
+      ? new Date(viewingDate.y, viewingDate.m, viewingDate.d)
       : new Date();
     const dow = base.getDay();
     const mondayOffset = dow === 0 ? -6 : 1 - dow;
@@ -2932,100 +2973,69 @@ ${recentMsgs}
       d.setDate(base.getDate() + mondayOffset + i);
       week.push(d);
     }
-
+    // 헤더 라벨 업데이트
     const isThisWeek = week.some(d => d.toDateString() === n.toDateString());
     const weekCard = document.getElementById('weekly-card');
     const titleEl = weekCard ? weekCard.querySelector('span') : null;
     if (titleEl) titleEl.textContent = isThisWeek ? '📊 이번 주 달성률' : `📊 ${base.getMonth()+1}월 ${Math.ceil(base.getDate()/7)}주 달성률`;
 
+    const dayLabels = ['월','화','수','목','금','토','일'];
     const bars = document.getElementById('weekly-bars');
     if (!bars) return;
+    bars.innerHTML = '';
 
-    const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const from = fmt(week[0]);
-    const to = fmt(week[6]);
+    let totalAll = 0, doneAll = 0;
 
-    const render = (weekTodosMap) => {
-      bars.innerHTML = '';
-      const dayLabels = ['월','화','수','목','금','토','일'];
-      let totalAll = 0, doneAll = 0;
+    week.forEach((d, idx) => {
+      const key = `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+      const isToday = d.toDateString() === n.toDateString();
+      const isBaseDay = d.toDateString() === base.toDateString();
+      const dMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const nMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+      const isFuture = dMidnight > nMidnight;
 
-      week.forEach((d, idx) => {
-        const dateKey = fmt(d);
-        const isToday = d.toDateString() === n.toDateString();
-        const isBaseDay = d.toDateString() === base.toDateString();
-        const dMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        const nMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
-        const isFuture = dMidnight > nMidnight;
+      let dayTodos;
+      if (isToday && !viewingDate) {
+        dayTodos = todos;
+      } else {
+        dayTodos = (() => { try { return JSON.parse(localStorage.getItem(key)||'{}').todos || []; } catch(e) { return []; } })();
+      }
+      const total = dayTodos.length;
+      const done = dayTodos.filter(t => t.done).length;
+      totalAll += total;
+      doneAll += done;
+      const pct = total > 0 ? Math.round(done / total * 100) : 0;
 
-        // 스냅샷된 viewingDate 기준으로 판단
-        let dayTodos;
-        if (isBaseDay && isToday) {
-          // 오늘을 보고 있을 때: 스냅샷 todos가 가장 최신
-          dayTodos = _todosSnapshot;
-        } else if (isBaseDay) {
-          // 다른 날짜를 보고 있을 때: DB/localStorage 데이터 우선, 없으면 스냅샷
-          dayTodos = (weekTodosMap[dateKey] && weekTodosMap[dateKey].length > 0)
-            ? weekTodosMap[dateKey]
-            : _todosSnapshot;
-        } else {
-          dayTodos = weekTodosMap[dateKey] || [];
-        }
+      // SVG 도넛 - 미래도 할일 있으면 표시
+      const size = 36, r = 14, c = size / 2;
+      const circ = 2 * Math.PI * r;
+      const filled = pct !== null ? (pct / 100) * circ : 0;
+      const isEmpty = pct === null;
+      const isComplete = pct === 100;
+      const strokeColor = isComplete ? '#7C4DFF' : '#C4B5FD';
 
-        const total = dayTodos.length;
-        const done = dayTodos.filter(t => t.done).length;
-        totalAll += total;
-        doneAll += done;
-        const pct = total > 0 ? Math.round(done / total * 100) : null;
+      const col = document.createElement('div');
+      col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+      col.innerHTML = `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+          <circle cx="${c}" cy="${c}" r="${r}" fill="${isBaseDay ? '#F3EEFF' : '#F5F5F7'}" stroke="none"/>
+          ${!isEmpty ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="3"
+            stroke-dasharray="${filled} ${circ - filled}"
+            stroke-dashoffset="${circ / 4}"
+            stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/>` : ''}
+          <text x="${c}" y="${c+1}" text-anchor="middle" dominant-baseline="middle"
+            font-size="${isEmpty ? '11' : '9'}" fill="${isBaseDay ? 'var(--purple)' : '#888'}" font-family="'Noto Sans KR',sans-serif" font-weight="${isBaseDay?'700':'500'}">
+            ${isEmpty ? '-' : `${pct}%`}
+          </text>
+        </svg>
+        <span style="font-size:11px;font-weight:${isBaseDay?'700':'400'};color:${isBaseDay?'var(--purple)':'var(--text-light)'};">${dayLabels[idx]}</span>
+      `;
+      bars.appendChild(col);
+    });
 
-        const size = 36, r = 14, c = size / 2;
-        const circ = 2 * Math.PI * r;
-        const filled = pct !== null ? (pct / 100) * circ : 0;
-        const isComplete = pct === 100;
-        const strokeColor = isComplete ? '#7C4DFF' : '#C4B5FD';
-
-        const col = document.createElement('div');
-        col.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
-        col.innerHTML = `
-          <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-            <circle cx="${c}" cy="${c}" r="${r}" fill="${isBaseDay ? '#F3EEFF' : '#F5F5F7'}" stroke="none"/>
-            ${pct !== null ? `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${strokeColor}" stroke-width="3"
-              stroke-dasharray="${filled} ${circ - filled}"
-              stroke-dashoffset="${circ / 4}"
-              stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/>` : ''}
-            <text x="${c}" y="${c+1}" text-anchor="middle" dominant-baseline="middle"
-              font-size="${pct === null ? '11' : '9'}" fill="${isBaseDay ? 'var(--purple)' : '#888'}" font-family="'Noto Sans KR',sans-serif" font-weight="${isBaseDay?'700':'500'}">
-              ${pct === null ? (isFuture ? '' : '-') : `${pct}%`}
-            </text>
-          </svg>
-          <span style="font-size:11px;font-weight:${isBaseDay?'700':'400'};color:${isBaseDay?'var(--purple)':'var(--text-light)'};">${dayLabels[idx]}</span>
-        `;
-        bars.appendChild(col);
-      });
-
-      const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
-      const el = document.getElementById('weekly-overall-pct');
-      if (el) el.textContent = totalAll > 0 ? `${doneAll}/${totalAll} 완료 · ${overallPct}%` : '기록 없음';
-    };
-
-    // Supabase에서 이번 주 전체 데이터 쿼리
-    if (_currentUser && sb) {
-      sb.from('todos').select('date,done,text,tag').eq('user_id', _currentUser.id).gte('date', from).lte('date', to)
-        .then(({ data }) => {
-          const map = {};
-          week.forEach(d => { map[fmt(d)] = []; });
-          (data || []).forEach(t => { if (map[t.date]) map[t.date].push(t); });
-          render(map);
-        });
-    } else {
-      // 로그인 전이면 localStorage fallback
-      const map = {};
-      week.forEach(d => {
-        const key = `mochi_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
-        map[fmt(d)] = (() => { try { return JSON.parse(localStorage.getItem(key)||'{}').todos || []; } catch(e) { return []; } })();
-      });
-      render(map);
-    }
+    const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
+    const el = document.getElementById('weekly-overall-pct');
+    if (el) el.textContent = totalAll > 0 ? `${doneAll}/${totalAll} 완료 · ${overallPct}%` : '기록 없음';
   }
 
   // Page navigation
@@ -3108,7 +3118,7 @@ ${recentMsgs}
     monthSet.forEach(m => {
       const isSelected = m.key === diarySelectedMonth;
       const btn = document.createElement('button');
-      btn.style.cssText = `flex-shrink:0; padding:7px 16px; border-radius:20px; border:1.5px solid ${isSelected ? 'var(--purple)' : 'var(--border)'}; background:${isSelected ? 'var(--purple)' : 'white'}; color:${isSelected ? 'white' : 'var(--text-light)'}; font-size:13px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; transition:all 0.15s;`;
+      btn.style.cssText = `flex-shrink:0; padding:7px 18px; border-radius:20px; border:1.5px solid ${isSelected ? 'var(--purple)' : '#e8e0f5'}; background:${isSelected ? 'var(--purple)' : 'white'}; color:${isSelected ? 'white' : '#9b84c8'}; font-size:13px; font-family:'Noto Sans KR',sans-serif; font-weight:700; cursor:pointer; transition:all 0.15s; box-shadow: ${isSelected ? '0 2px 8px rgba(124,92,191,0.25)' : 'none'};`;
       btn.textContent = `${m.year === new Date().getFullYear() ? '' : m.year + '년 '}${m.month}월`;
       btn.onclick = () => { diarySelectedMonth = m.key; renderDiaryList(); };
       monthTabsWrap.appendChild(btn);
@@ -3129,7 +3139,7 @@ ${recentMsgs}
     document.getElementById('diary-letter-closed').style.display = 'block';
     document.getElementById('diary-letter-open').style.display = 'none';
     document.getElementById('diary-analysis-body').textContent = '';
-    analysisBtn.textContent = '💌 편지 열기';
+    analysisBtn.textContent = '열기 →';
     analysisBtn.disabled = false;
 
     // 일기 카드 렌더
@@ -3147,16 +3157,20 @@ ${recentMsgs}
       const sideColor = e.emotion ? emotionColor.tc : 'var(--purple)';
       const emotionTag = e.emotion ? `<span style="font-size:11px;color:${emotionColor.tc};background:${emotionColor.bg};padding:2px 8px;border-radius:20px;font-weight:600;">${e.emotion} ${e.emotionLabel}</span>` : '';
       card.innerHTML = `
-        <div class="dlc-side" style="background:${sideColor};">
-          <div class="dlc-day-num">${e.day}</div>
-          <div class="dlc-day-name">${dayLabel}요일</div>
-        </div>
+        <div class="dlc-side"></div>
         <div class="dlc-body">
           <div class="dlc-header">
-            <span class="dlc-date">${e.month}월</span>
+            <div class="dlc-date-badge">
+              <span class="dlc-date-num">${e.day}</span>
+              <div class="dlc-date-sub">
+                <span class="dlc-date-month">${e.month}월</span>
+                <span class="dlc-date-dow">${dayLabel}요일</span>
+              </div>
+            </div>
             ${emotionTag}
-            <span class="dlc-day">${isToday ? '✨ 오늘' : e.year+'년'}</span>
+            <span class="dlc-day">${isToday ? '✨ 오늘' : e.year + '년'}</span>
           </div>
+          <div class="dlc-divider"></div>
           <div class="dlc-preview">${preview}${e.text.length > 60 ? '...' : ''}</div>
         </div>
       `;
@@ -3195,16 +3209,26 @@ ${recentMsgs}
     const userName = localStorage.getItem('mochi_user_name') || '';
 
     try {
-      const text = await callGemini(
-        '당신은 모찌예요. 사용자에게 이번 달 마음을 담아 따뜻한 편지를 써줘요. 친구처럼 편안하고 공감 어린 말투로, 이모지는 1~2개만 자연스럽게. 편지 형식으로 써요 (Dear~ 같은 형식 말고 자연스럽게 바로 본문으로).',
-        `${userName || '이 사람'}의 ${selYear}년 ${selMonth}월 마음일기 ${entries.length}개예요.
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 700,
+          system: `당신은 모찌예요. 사용자에게 이번 달 마음을 담아 따뜻한 편지를 써줘요. 친구처럼 편안하고 공감 어린 말투로, 이모지는 1~2개만 자연스럽게. 편지 형식으로 써요 (Dear~ 같은 형식 말고 자연스럽게 바로 본문으로).`,
+          messages: [{
+            role: 'user',
+            content: `${userName || '이 사람'}의 ${selYear}년 ${selMonth}월 마음일기 ${entries.length}개예요.
 이 달의 감정 흐름과 마음 상태를 읽고, 그 사람에게 모찌가 직접 전하는 따뜻한 편지를 써줘요.
 이번 달 자주 느낀 감정, 힘들었던 순간, 잘 해낸 것들을 짚어주고 응원을 담아줘요.
 4~5문장, 편지 말투로 자연스럽게.
 
-${diaryText}`,
-        700
-      ) || '편지를 불러오지 못했어요 😅';
+${diaryText}`
+          }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text || '편지를 불러오지 못했어요 😅';
 
       // 편지 열기 애니메이션
       letterClosed.style.display = 'none';
@@ -3223,7 +3247,7 @@ ${diaryText}`,
   function closeDiaryLetter() {
     document.getElementById('diary-letter-open').style.display = 'none';
     const btn = document.getElementById('diary-analysis-btn');
-    btn.textContent = '💌 다시 읽기';
+    btn.textContent = '열기 →';
     btn.disabled = false;
     document.getElementById('diary-letter-closed').style.display = 'block';
   }
@@ -3317,7 +3341,7 @@ ${diaryText}`,
     document.getElementById('ds-cancel-btn').style.display = 'inline-block';
   }
 
-  async function saveOverlayEdit() {
+  function saveOverlayEdit() {
     const e = _overlayEntry;
     const newText = document.getElementById('ds-edit-textarea').value.trim();
     if (!newText) return;
@@ -3330,22 +3354,9 @@ ${diaryText}`,
     existing.emotionLabel = e.emotionLabel;
     localStorage.setItem(key, JSON.stringify(existing));
 
-    // Supabase 저장
-    if (_currentUser && sb) {
-      const dateStr = `${e.year}-${String(e.month).padStart(2,'0')}-${String(e.day).padStart(2,'0')}`;
-      const emotionJson = JSON.stringify({ emoji: e.emotion, label: e.emotionLabel });
-      await sb.from('diaries').upsert(
-        { user_id: _currentUser.id, date: dateStr, content: newText, emotion: emotionJson },
-        { onConflict: 'user_id,date' }
-      );
-    }
-
-    // 날짜 무관하게 항상 홈탭 일기 갱신 (viewingDate 또는 diaryOffset이 맞는 날이면)
+    // 오늘 날짜면 메인 일기 탭도 갱신
     const now = new Date();
-    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const targetMidnight = new Date(e.year, e.month - 1, e.day);
-    const offsetDiff = Math.round((targetMidnight - todayMidnight) / 86400000);
-    if (offsetDiff === diaryOffset) {
+    if (e.year === now.getFullYear() && e.month === now.getMonth()+1 && e.day === now.getDate()) {
       renderDiary();
     }
 
@@ -3383,14 +3394,23 @@ ${diaryText}`,
   window.cancelOverlayEdit = cancelOverlayEdit;
 
   // Ideas
-  let ideas = [
-    { id: 1, title: '쇼피 첫 상품 아이디어', content: '동남아에서 인기 있는 한국 뷰티 제품 소싱해보기. K-beauty 트렌드 활용!', category: 'shopee', date: '2026.03.09' },
-    { id: 2, title: '도시락 채널 콘텐츠 기획', content: '남편 도시락 리뷰에 스토리 추가하기. 준비 과정 비하인드 숏폼 만들면 좋을 것 같아!', category: 'dosirak', date: '2026.03.08' },
+  let ideas = [];
+  let nextIdeaId = 1;
+
+  // 태그 배경색 팔레트 (AI가 고름)
+  const TAG_PALETTE = [
+    { bg: '#FFF0E0', tc: '#C05000' }, { bg: '#FCE4EC', tc: '#C62828' },
+    { bg: '#E8F5E9', tc: '#2E7D32' }, { bg: '#E8D5FF', tc: '#6A1B9A' },
+    { bg: '#FFF9C4', tc: '#F57F17' }, { bg: '#E3F2FD', tc: '#1565C0' },
+    { bg: '#F3E5F5', tc: '#7B1FA2' }, { bg: '#E0F7FA', tc: '#00695C' },
+    { bg: '#FBE9E7', tc: '#BF360C' }, { bg: '#F9FBE7', tc: '#558B2F' },
   ];
-  let nextIdeaId = 3;
-  const catLabels = { shopee: '🛍 쇼피', gupsal: '🥘 급식', dosirak: '🍱 도시락', biz: '💼 비즈니스', life: '✨ 라이프' };
-  const catColors = { shopee: '#FFE0B2', gupsal: '#E8F5E9', dosirak: '#FCE4EC', biz: '#E8D5FF', life: '#FFF9C4' };
-  const catTextColors = { shopee: '#E65100', gupsal: '#2E7D32', dosirak: '#C62828', biz: '#6A1B9A', life: '#F57F17' };
+  function pickTagColor(tagText) {
+    // 태그 텍스트 기반 일관된 색상 선택
+    let hash = 0;
+    for (let c of tagText) hash = (hash * 31 + c.charCodeAt(0)) & 0xffff;
+    return TAG_PALETTE[hash % TAG_PALETTE.length];
+  }
 
   function renderIdeas() {
     const list = document.getElementById('idea-list');
@@ -3399,65 +3419,200 @@ ${diaryText}`,
     [...ideas].reverse().forEach(idea => {
       const div = document.createElement('div');
       div.className = 'idea-card';
+      div.dataset.ideaId = idea.id;
+      const tagColor = idea.tagColor || pickTagColor(idea.tag || '').bg;
+      const tagTextColor = idea.tagTextColor || pickTagColor(idea.tag || '').tc;
+      const tagLabel = idea.tag || '기타';
       div.innerHTML = `
         <div class="idea-card-title">${idea.title}</div>
         <div class="idea-card-content">${idea.content || '내용 없음'}</div>
         <div class="idea-card-footer">
-          <span class="todo-tag" style="background:${catColors[idea.category]};color:${catTextColors[idea.category]}">${catLabels[idea.category]}</span>
+          <span class="todo-tag" style="background:${tagColor};color:${tagTextColor};">${tagLabel}</span>
           <span class="idea-date">${idea.date}</span>
+        </div>
+        <div class="idea-feedback-wrap" id="fb-wrap-${idea.id}" style="margin-top:12px;">
+          <button class="idea-feedback-btn" onclick="requestIdeaFeedback(${idea.id}, this)">
+            🐰 모찌 피드백 받기
+          </button>
+          <div class="idea-feedback-body" id="fb-body-${idea.id}" style="display:none;"></div>
         </div>
       `;
       list.appendChild(div);
     });
   }
 
-  function addIdea() {
+  async function addIdea() {
     const title = document.getElementById('idea-title').value.trim();
     const content = document.getElementById('idea-content').value.trim();
-    const category = document.getElementById('idea-category').value;
     if (!title) return;
+
+    const saveBtn = document.getElementById('idea-save-btn');
+    const saveIcon = document.getElementById('idea-save-icon');
+    const saveLabel = document.getElementById('idea-save-label');
+    saveBtn.disabled = true;
+    saveIcon.textContent = '🐰';
+    saveLabel.textContent = '모찌가 태그 붙이는 중...';
+    saveBtn.style.opacity = '0.7';
+
     const today = new Date();
     const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
-    ideas.push({ id: nextIdeaId++, title, content, category, date: dateStr });
+
+    // AI 자유 태그 생성
+    let tag = '💡 아이디어';
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 15,
+          system: `아이디어에 어울리는 태그를 딱 하나만 만들어요. 이모지 1개 + 짧은 한국어 단어(2~4글자) 형식으로. 예시: 🎬 콘텐츠, 🛍 이커머스, 📦 물류, 💰 수익화, 🤝 협업, 📱 SNS, 🍱 식품, 🌿 라이프. 태그 텍스트만 출력, 다른 말 없이.`,
+          messages: [{ role: 'user', content: `제목: ${title}\n내용: ${content || '없음'}` }]
+        })
+      });
+      const data = await res.json();
+      const raw = (data.content?.[0]?.text || '').trim();
+      if (raw.length < 20) tag = raw;
+    } catch(e) {}
+
+    const { bg, tc } = pickTagColor(tag);
+    ideas.push({ id: nextIdeaId++, title, content, tag, tagColor: bg, tagTextColor: tc, date: dateStr });
     document.getElementById('idea-title').value = '';
     document.getElementById('idea-content').value = '';
+
+    saveIcon.textContent = '✅';
+    saveLabel.textContent = `${tag} 태그로 저장됐어요!`;
+    saveBtn.style.background = '#4CAF50';
+    saveBtn.style.opacity = '1';
+    setTimeout(() => {
+      saveIcon.textContent = '💡';
+      saveLabel.textContent = '아이디어 저장하기';
+      saveBtn.style.background = 'var(--purple)';
+      saveBtn.disabled = false;
+    }, 2000);
+
     renderIdeas();
   }
 
-  // 설정 테마
+  async function requestIdeaFeedback(ideaId, btn) {
+    const idea = ideas.find(i => i.id === ideaId);
+    if (!idea) return;
+
+    const bodyEl = document.getElementById(`fb-body-${ideaId}`);
+    const wrapEl = document.getElementById(`fb-wrap-${ideaId}`);
+
+    // 이미 열려있으면 토글 닫기
+    if (bodyEl.style.display === 'block') {
+      bodyEl.style.display = 'none';
+      btn.textContent = '🐰 모찌 피드백 받기';
+      btn.classList.remove('loading');
+      return;
+    }
+
+    // 로딩 상태
+    btn.textContent = '🐰 생각 중...';
+    btn.disabled = true;
+    btn.classList.add('loading');
+
+    const userName = localStorage.getItem('mochi_user_name') || '';
+    const profile = (() => { try { return JSON.parse(localStorage.getItem('mochi_profile') || '{}'); } catch(e) { return {}; } })();
+    const profileStr = [profile.job, profile.goal].filter(Boolean).join(' / ');
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 400,
+          system: `당신은 모찌예요. ${userName || '사용자'}의 든든한 친구이자 비즈니스 파트너로서 아이디어 피드백을 줘요. 따뜻하고 응원하는 말투를 유지하면서도, 현실적으로 보완하면 좋을 점이나 리스크는 솔직하게 짚어줘요. 좋은 점 한 가지, 신경 쓸 점 한 가지, 짧은 응원 한 마디 순서로. 2~3문장으로 간결하게. 이모지는 1~2개만.`,
+          messages: [{
+            role: 'user',
+            content: `아이디어 제목: ${idea.title}
+태그: ${idea.tag || '없음'}
+내용: ${idea.content || '(내용 없음)'}
+${profileStr ? '배경: ' + profileStr : ''}
+
+이 아이디어에 대해 솔직하게 피드백해줘.`
+          }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text || '피드백을 가져오지 못했어요 😅';
+
+      bodyEl.innerHTML = `<div class="idea-feedback-text">${text.replace(/\n/g, '<br>')}</div>`;
+      bodyEl.style.display = 'block';
+      btn.textContent = '접기 ∧';
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    } catch(e) {
+      bodyEl.innerHTML = `<div class="idea-feedback-text" style="color:#e57373;">잠깐 오류가 났어요. 다시 눌러줘요!</div>`;
+      bodyEl.style.display = 'block';
+      btn.textContent = '🐰 모찌 피드백 받기';
+      btn.disabled = false;
+      btn.classList.remove('loading');
+    }
+  }
+  window.requestIdeaFeedback = requestIdeaFeedback;
+
+  // 테마 정의
   const THEMES = {
-    purple: { accent:'#7C5CBF', accentLight:'#EAE4FF', accentMid:'#9B7FD4', bg:'#F4F4F6', headerFrom:'rgba(124,92,191,0.92)', headerMid:'rgba(180,120,210,0.88)', headerTo:'rgba(255,160,180,0.82)' },
-    mint:   { accent:'#1a9e6e', accentLight:'#C5F2E8', accentMid:'#3db88a', bg:'#F2FAF7', headerFrom:'rgba(26,158,110,0.92)', headerMid:'rgba(60,190,140,0.88)', headerTo:'rgba(160,240,200,0.82)' },
-    rose:   { accent:'#d63a6e', accentLight:'#FFE4EF', accentMid:'#e06090', bg:'#FDF5F7', headerFrom:'rgba(214,58,110,0.92)', headerMid:'rgba(230,100,140,0.88)', headerTo:'rgba(255,190,210,0.82)' },
-    sky:    { accent:'#1a78c2', accentLight:'#D6EEFF', accentMid:'#3a99e2', bg:'#F3F8FD', headerFrom:'rgba(26,120,194,0.92)', headerMid:'rgba(60,150,220,0.88)', headerTo:'rgba(160,210,255,0.82)' },
+    purple: {
+      accent: '#7C5CBF', accentLight: '#EAE4FF', accentMid: '#9B7FD4',
+      bg: '#F4F4F6', border: '#EBEBEF',
+      headerFrom: 'rgba(124,92,191,0.92)', headerMid: 'rgba(180,120,210,0.88)', headerTo: 'rgba(255,160,180,0.82)',
+      selectedBorder: '#7C5CBF',
+    },
+    mint: {
+      accent: '#1a9e6e', accentLight: '#d4f5e9', accentMid: '#2ecc98',
+      bg: '#F4F4F6', border: '#EBEBEF',
+      headerFrom: 'rgba(20,140,100,0.92)', headerMid: 'rgba(46,180,140,0.88)', headerTo: 'rgba(160,240,210,0.82)',
+      selectedBorder: '#1a9e6e',
+    },
+    rose: {
+      accent: '#d63a6e', accentLight: '#ffe0ec', accentMid: '#e8608a',
+      bg: '#F4F4F6', border: '#EBEBEF',
+      headerFrom: 'rgba(200,50,100,0.92)', headerMid: 'rgba(230,90,130,0.88)', headerTo: 'rgba(255,180,200,0.82)',
+      selectedBorder: '#d63a6e',
+    },
+    sky: {
+      accent: '#1a78c2', accentLight: '#ddeeff', accentMid: '#3a9fe8',
+      bg: '#F4F4F6', border: '#EBEBEF',
+      headerFrom: 'rgba(20,100,190,0.92)', headerMid: 'rgba(50,140,220,0.88)', headerTo: 'rgba(140,200,255,0.82)',
+      selectedBorder: '#1a78c2',
+    },
   };
 
-  function setTheme(el, themeName) {
-    const t = THEMES[themeName] || THEMES.purple;
+  function setTheme(el, name) {
+    const t = THEMES[name];
+    if (!t) return;
     const r = document.documentElement;
     r.style.setProperty('--purple', t.accent);
     r.style.setProperty('--purple-light', t.accentLight);
     r.style.setProperty('--lavender', t.accentLight);
+    r.style.setProperty('--cream', t.bg);
+    r.style.setProperty('--border', t.border);
     r.style.setProperty('--theme-accent', t.accent);
     r.style.setProperty('--theme-accent-light', t.accentLight);
     r.style.setProperty('--theme-accent-mid', t.accentMid);
     r.style.setProperty('--theme-bg', t.bg);
-    r.style.setProperty('--cream', t.bg);
+    r.style.setProperty('--theme-card-border', t.border);
     r.style.setProperty('--theme-header-from', t.headerFrom);
     r.style.setProperty('--theme-header-mid', t.headerMid);
     r.style.setProperty('--theme-header-to', t.headerTo);
-    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
-    if (el) el.classList.add('selected');
-    localStorage.setItem('mochi_theme', themeName);
+    // 선택 표시
+    document.querySelectorAll('.theme-btn').forEach(b => { b.classList.remove('selected'); b.style.border = '3px solid transparent'; });
+    el.classList.add('selected');
+    el.style.border = `3px solid ${t.selectedBorder}`;
+    // 저장
+    localStorage.setItem('mochi_theme', name);
   }
 
   // 저장된 테마 복원
   (function() {
-    const saved = localStorage.getItem('mochi_theme');
-    if (saved && saved !== 'purple') {
-      const btn = document.querySelector(`.theme-btn[data-theme="${saved}"]`);
-      setTheme(btn, saved);
-    }
+    const saved = localStorage.getItem('mochi_theme') || 'purple';
+    const btn = document.querySelector(`[data-theme="${saved}"]`);
+    if (btn) setTheme(btn, saved);
   })();
 
   // 🎉 폭죽 애니메이션
@@ -3522,50 +3677,22 @@ ${diaryText}`,
     try { localStorage.setItem(TODAY_KEY(), JSON.stringify(data)); } catch(e) {}
   }
 
-  async function loadToday() {
-    const today = new Date().toISOString().slice(0,10);
-
-    // 1. localStorage 즉시 로드 (빠른 응답)
+  function loadToday() {
     try {
       const raw = localStorage.getItem(TODAY_KEY());
-      if (raw) {
-        const data = JSON.parse(raw);
-        if (data.todos?.length) { todos = data.todos; nextId = Math.max(...todos.map(t=>t.id||0), nextId) + 1; renderTodos(); }
-        if (data.sleepTime) document.getElementById('sleep-time').value = data.sleepTime;
-        if (data.wakeTime) { document.getElementById('wake-time').value = data.wakeTime; calcSleep(); }
-        if (data.ideas?.length) { ideas = data.ideas; nextIdeaId = Math.max(...ideas.map(i=>i.id||0), nextIdeaId) + 1; }
-      }
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data.todos) { todos = data.todos; nextId = Math.max(...todos.map(t=>t.id), nextId) + 1; renderTodos(); }
+      if (data.sleepTime) { document.getElementById('sleep-time').value = data.sleepTime; }
+      if (data.wakeTime) { document.getElementById('wake-time').value = data.wakeTime; calcSleep(); }
+      if (data.ideas) { ideas = data.ideas; nextIdeaId = Math.max(...ideas.map(i=>i.id), nextIdeaId) + 1; }
+      showSaveBadge();
     } catch(e) {}
-
-    // 2. Supabase 최신 데이터로 동기화
-    if (!_currentUser) return;
-
-    const { data: dbTodos } = await sb.from('todos').select('*').eq('user_id', _currentUser.id).eq('date', today);
-    if (dbTodos) {
-      const tmpItems = todos.filter(t => String(t.id).startsWith('tmp_'));
-      todos = [...dbTodos.map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date })), ...tmpItems];
-      nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0), 0) + 1 : 1;
-      renderTodos();
-      saveToday(); // DB 데이터로 localStorage 갱신
-    }
-
-    const { data: dbIdeas } = await sb.from('ideas').select('*').eq('user_id', _currentUser.id).order('created_at', { ascending: false });
-    if (dbIdeas?.length) {
-      ideas = dbIdeas.map(i => ({ id: i.id, title: i.title, content: i.content, tag: i.tag, tagColor: i.tag_color, tagTextColor: i.tag_text_color, date: i.created_at?.slice(0,10).replace(/-/g,'.') }));
-      nextIdeaId = ideas.length + 1;
-      if (typeof renderIdeas === 'function') renderIdeas();
-    }
-
-    const { data: dbDiary } = await sb.from('diaries').select('*').eq('user_id', _currentUser.id).eq('date', today).maybeSingle();
-    if (dbDiary) {
-      document.getElementById('diary-input').value = dbDiary.content || '';
-      const emoObj = typeof dbDiary.emotion === 'string' ? (() => { try { return JSON.parse(dbDiary.emotion); } catch(e) { return { emoji: dbDiary.emotion }; } })() : (dbDiary.emotion || {});
-      const btn = document.querySelector(`.diary-emotion-btn[data-emotion="${emoObj.emoji}"]`);
-      if (btn) { document.querySelectorAll('.diary-emotion-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); }
-    }
   }
 
-  function showSaveBadge() { }
+  function showSaveBadge() {
+    // 알림 숨김
+  }
 
   // 할 일 완료 시 축하 + 저장 연동
   const _origUpdateProgress = updateProgress;
@@ -3575,30 +3702,148 @@ ${diaryText}`,
     // ① progress bar 업데이트
     _origUpdateProgress();
 
-    // ② 저장 (viewingDate 여부에 따라 올바른 날짜에 저장됨)
+    // ② 저장 먼저 (localStorage에 최신 상태 기록)
     saveToday();
 
-    // ③ 달성률 항상 즉시 렌더 (모든 날짜)
+    // ③ 저장 후 주간 달성률 렌더
     renderWeeklyProgress();
 
-    // ④ 축하 애니메이션 (오늘을 보고 있을 때만)
-    if (!viewingDate) {
-      const isDone = todos.length > 0 && todos.every(t => t.done);
-      if (isDone && !wasDone) {
-        launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
-      }
+    // ④ 축하 애니메이션
+    const isDone = todos.length > 0 && todos.every(t => t.done);
+    if (isDone && !wasDone) {
+      launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
     }
   };
 
   // 오늘 기록 불러오기
-  // loadToday는 enterApp에서 호출됨 (Supabase 로그인 후)
+  setTimeout(loadToday, 800);
+
+  // ── 튜토리얼 ──
+  const TUT_SLIDES = [
+    {
+      emoji: '🐰',
+      title: '안녕하세요! 저는 모찌예요',
+      desc: '매일의 할 일, 마음일기, 아이디어까지\n모찌가 옆에서 함께 도와줄게요 💜\n\n총 5개 탭으로 이루어진 앱이에요.\n지금부터 하나씩 소개해드릴게요!',
+    },
+    {
+      emoji: '✏️',
+      title: '먼저 닉네임을 알려주세요!',
+      desc: '모찌가 어떻게 불러드릴까요?',
+      input: { id: 'tut-name-input', placeholder: '예: 윤주, 쥬, 언니 ...', storageKey: 'mochi_user_name' },
+    },
+    {
+      emoji: '📋',
+      title: '오늘 탭 — 하루를 한눈에',
+      desc: '• 수면시간 · 컨디션을 기록해요\n• 오늘 할 일을 태그별로 관리해요\n• 모찌와 채팅으로 뭐든 물어봐요\n• 마음일기를 매일 한 줄씩 써요\n\n💬 "오늘 뭐부터 해야 해?" 라고 물어보면\n모찌가 우선순위를 같이 고민해줘요!',
+    },
+    {
+      emoji: '📔',
+      title: '마음일기 탭 — 감정을 기록해요',
+      desc: '• 날짜별 감정 이모지 + 한 줄 일기\n• 한 달치 기록을 모아서 볼 수 있어요\n• 모찌가 한 달을 돌아보는 편지를 써줘요 🌸\n\n쌓일수록 나만의 감정 히스토리가 돼요.\n오늘 하루 어땠는지 꼭 기록해보세요!',
+    },
+    {
+      emoji: '💡',
+      title: '아이디어 노트 — 모찌 피드백까지',
+      desc: '• 떠오르는 아이디어를 바로 메모해요\n• 저장하면 AI가 자동으로 태그를 붙여줘요\n\n🐰 모찌 피드백 기능:\n저장된 아이디어마다 "모찌 피드백 받기"\n버튼을 누르면 좋은 점, 신경 쓸 점,\n응원 한 마디를 솔직하게 말해줘요!',
+    },
+    {
+      emoji: '⚙️',
+      title: '설정 탭 — 꼭 채워주세요!',
+      desc: '📌 모찌에게 나 소개하기를 작성하면\n대화할 때 나에게 딱 맞는 맞춤 답변을\n받을 수 있어요.\n\n직업, 관심사, 목표를 알수록\n모찌가 훨씬 더 잘 도와줄 수 있어요 🐰\n\n설정 탭에서 바로 입력해보세요!',
+      highlight: true,
+    },
+    {
+      emoji: '🎉',
+      title: '준비 완료!',
+      desc: '이제 모찌와 함께 하루를 시작해봐요.\n\n먼저 설정 탭에서 나를 소개하고\n오늘 탭에서 할 일을 추가해보세요 💜',
+      last: true,
+    },
+  ];
+
+  let tutStep = 0;
+
+  function renderTutSlides() {
+    const slidesEl = document.getElementById('tut-slides');
+    const dotsEl = document.getElementById('tut-dots');
+    const s = TUT_SLIDES[tutStep];
+
+    // 도트
+    dotsEl.innerHTML = TUT_SLIDES.map((_, i) =>
+      `<div style="width:${i===tutStep?'20':'8'}px;height:8px;border-radius:4px;background:${i===tutStep?'var(--purple)':'#ddd'};transition:all 0.3s;"></div>`
+    ).join('');
+
+    // 하이라이트 박스 (설정 슬라이드)
+    const highlightBox = s.highlight ? `
+      <div style="background:linear-gradient(135deg,#f0ebff,#ffe8f5);border-radius:14px;padding:14px 16px;margin-top:16px;border:1.5px solid #d8c8ff;text-align:left;">
+        <div style="font-size:12px;font-weight:800;color:var(--purple);margin-bottom:6px;">⚙️ 설정 → 모찌에게 나 소개하기</div>
+        <div style="font-size:12px;color:#7060a0;line-height:1.7;">직업 · 목표 · 관심사를 입력할수록<br>모찌의 답변이 나에게 딱 맞아져요!</div>
+      </div>` : '';
+
+    slidesEl.innerHTML = `
+      <div style="text-align:center; padding:0 4px;">
+        <div style="font-size:48px; margin-bottom:14px; animation:floatY 2s ease-in-out infinite;">${s.emoji}</div>
+        <div style="font-size:19px; font-weight:800; color:var(--text); margin-bottom:12px; letter-spacing:-0.4px;">${s.title}</div>
+        <div style="font-size:13.5px; color:#555; line-height:1.9; white-space:pre-line; text-align:left; background:#f8f7fc; border-radius:14px; padding:16px 18px;">${s.desc}</div>
+        ${highlightBox}
+        ${s.input ? `
+          <input id="${s.input.id}" type="text" class="todo-input"
+            placeholder="${s.input.placeholder}"
+            style="width:100%; margin-top:20px; font-size:16px; text-align:center; font-weight:700; box-sizing:border-box;"
+            value="${localStorage.getItem(s.input.storageKey)||''}"
+            oninput="localStorage.setItem('${s.input.storageKey}', this.value); const ni=document.getElementById('setting-name'); if(ni) ni.value=this.value; if(typeof updateUserName==='function') updateUserName(this.value);">
+        ` : ''}
+      </div>
+    `;
+
+    const nextBtn = document.getElementById('tut-next-btn');
+    const skipBtn = document.getElementById('tut-skip-btn');
+    if (s.last) {
+      nextBtn.textContent = '시작하기 🐰';
+      nextBtn.style.background = 'linear-gradient(135deg, var(--purple), #c060d0)';
+      skipBtn.style.display = 'none';
+    } else {
+      nextBtn.textContent = '다음 →';
+      nextBtn.style.background = 'var(--purple)';
+      skipBtn.style.display = '';
+    }
+
+    if (s.input) setTimeout(() => document.getElementById(s.input.id)?.focus(), 200);
+  }
+
+  function tutNext() {
+    if (tutStep < TUT_SLIDES.length - 1) {
+      tutStep++;
+      renderTutSlides();
+    } else {
+      tutFinish();
+    }
+  }
+
+  function tutSkip() { tutFinish(); }
+
+  function tutFinish() {
+    localStorage.setItem('mochi_tutorial_done', '1');
+    document.getElementById('tutorial-overlay').style.display = 'none';
+    const saved = localStorage.getItem('mochi_user_name') || '';
+    const ni = document.getElementById('setting-name');
+    if (ni) ni.value = saved;
+    if (saved && typeof updateUserName === 'function') updateUserName(saved);
+    const settingsBtn = document.querySelector('.nav-btn[onclick*="settings"]');
+    if (settingsBtn && typeof showPage === 'function') showPage('settings', settingsBtn);
+  }
+
+  // 첫 실행 튜토리얼은 loginUser()에서 새 계정일 때 자동 실행
+
+  window.tutNext = tutNext;
+  window.tutSkip = tutSkip;
 
   // ===== 토끼 AI 채팅 =====
 
   function getAppState() {
     const done = todos.filter(t => t.done).length;
     const total = todos.length;
-    const pending = todos.filter(t => !t.done).map(t => `${t.text}(${catLabels[t.tag]||t.tag})`).join(', ');
+    const tagLabels = getTagLabels();
+    const pending = todos.filter(t => !t.done).map(t => `${t.text}(${tagLabels[t.tag]||t.tag})`).join(', ');
     const sleepTime = document.getElementById('sleep-time')?.value || '미입력';
     const wakeTime = document.getElementById('wake-time')?.value || '미입력';
     const moodEl = document.querySelector('.emoji-btn.selected');
@@ -3788,44 +4033,22 @@ ${todoList}
 - learnedFact: 직업, 목표, 성격, 고민, 습관 등 기억할 만한 것만 1줄로`;
   }
 
-  // ── Gemini API 공통 호출 헬퍼 ──
-  async function callGemini(systemPrompt, userPrompt, maxTokens = 1000) {
-    const res = await fetch(GEMINI_URL(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        generationConfig: { maxOutputTokens: maxTokens }
-      })
-    });
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  }
-
-  // ── Gemini 멀티턴 채팅 호출 ──
-  async function callGeminiChat(systemPrompt, history, maxTokens = 1000) {
-    const contents = history.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
-    const res = await fetch(GEMINI_URL(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents,
-        generationConfig: { maxOutputTokens: maxTokens }
-      })
-    });
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  }
-
   async function sendChatAPI(userText) {
     chatHistory.push({ role: 'user', content: userText });
 
-    const raw = await callGeminiChat(getMochiSystemPrompt(), chatHistory, 1000);
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: getMochiSystemPrompt(),
+        messages: chatHistory
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || '{}';
 
     let parsed;
     try {
@@ -4079,7 +4302,7 @@ ${todoList}
 
       cell.innerHTML = `
         <span>${d}</span>
-        ${isToday ? `<span style="font-size:9px;font-weight:700;color:var(--purple);margin-top:1px;display:block;line-height:1;">오늘</span>` : ''}
+        ${isToday ? `<span style="font-size:9px;font-weight:700;color:white;margin-top:1px;display:block;line-height:1;">오늘</span>` : ''}
       `;
 
       if (true) {  // 미래 포함 모든 날짜 클릭 가능
@@ -4092,26 +4315,29 @@ ${todoList}
   // ── 날짜별 보기 ──
   function viewingKey(y, m, d) { return `mochi_${y}_${m+1}_${d}`; }
 
-  async function returnToToday() {
+  function returnToToday() {
     viewingDate = null;
     diaryOffset = 0;
     const n = new Date();
     const dayNames = ['일','월','화','수','목','금','토'];
     document.getElementById('date-badge').textContent = `📅 ${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일 (${dayNames[n.getDay()]})`;
     document.getElementById('return-today-btn').style.display = 'none';
-    await loadToday();
+    loadToday();
     renderDiary();
     renderCalendar();
-    renderWeeklyProgress();
   }
 
-  async function openDaylog(y, m, d) {
+  function openDaylog(y, m, d) {
     const n = new Date();
     const isToday = y === n.getFullYear() && m === n.getMonth() && d === n.getDate();
 
     document.getElementById('cal-overlay').style.display = 'none';
+
     if (isToday) { returnToToday(); return; }
 
+    viewingDate = { y, m, d };
+
+    // 날짜 뱃지 업데이트
     const dayNames = ['일','월','화','수','목','금','토'];
     const dow = new Date(y, m, d).getDay();
     const isFuture = new Date(y, m, d) > new Date(n.getFullYear(), n.getMonth(), n.getDate());
@@ -4119,37 +4345,30 @@ ${todoList}
     document.getElementById('date-badge').textContent = `${label} ${y}년 ${m+1}월 ${d}일 (${dayNames[dow]})`;
     document.getElementById('return-today-btn').style.display = 'inline-block';
 
-    // 1. 해당 날짜 할일 먼저 로드
-    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    let newTodos = [];
-    if (_currentUser && sb) {
-      const { data: dbTodos } = await sb.from('todos').select('*').eq('user_id', _currentUser.id).eq('date', dateStr);
-      newTodos = (dbTodos || []).map(t => ({ id: t.id, text: t.text, tag: t.tag, done: t.done, date: t.date }));
-    } else {
-      const raw = localStorage.getItem(viewingKey(y, m, d));
-      try { if (raw) newTodos = JSON.parse(raw).todos || []; } catch(e) {}
-    }
+    // 해당 날짜 데이터 불러와서 화면 교체
+    const raw = localStorage.getItem(viewingKey(y, m, d));
+    let data = {};
+    try { if (raw) data = JSON.parse(raw); } catch(e) {}
 
-    // 2. 데이터 로드 완료 후 viewingDate 세팅 + 화면 업데이트
-    viewingDate = { y, m, d };
-    todos = newTodos;
-    nextId = todos.length ? Math.max(...todos.map(t => typeof t.id === 'number' ? t.id : 0)) + 1 : 1;
+    // 할 일 교체
+    todos = data.todos || [];
+    nextId = todos.length ? Math.max(...todos.map(t => t.id || 0)) + 1 : 1;
     renderTodos();
     renderTagTabs();
-    renderWeeklyProgress();
 
-    // 일기 offset 계산
+    // 마음일기 교체 - 자정 기준으로 offset 계산
     const todayMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
     const targetMidnight = new Date(y, m, d);
     diaryOffset = Math.round((targetMidnight - todayMidnight) / 86400000);
     renderDiary();
+
+    // 할 일 렌더 완료
   }
 
   // saveToday가 viewingDate 기준으로 저장하도록 오버라이드
   const _origSaveToday = saveToday;
   saveToday = function() {
     if (!viewingDate) { _origSaveToday(); return; }
-    // 다른 날짜 보는 중: localStorage만 업데이트 (오늘 데이터 건드리지 않음)
     const { y, m, d } = viewingDate;
     const existing = (() => { try { return JSON.parse(localStorage.getItem(viewingKey(y,m,d)) || '{}'); } catch(e) { return {}; } })();
     existing.todos = todos;
@@ -4159,201 +4378,271 @@ ${todoList}
   };
 
   // ══════════════════════════════════════
-  // Supabase 인증 시스템
+  // 계정 관리 시스템
   // ══════════════════════════════════════
 
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let _currentUserId = null;
 
-  async function loginWithGoogle() {
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + window.location.pathname }
-    });
-    if (error) {
-      document.getElementById('login-error').textContent = '로그인 실패: ' + error.message;
-      document.getElementById('login-error').style.display = 'block';
-    }
+  // localStorage 키에 유저 prefix 자동 적용
+  const _origGet = localStorage.getItem.bind(localStorage);
+  const _origSet = localStorage.setItem.bind(localStorage);
+  const _origRem = localStorage.removeItem.bind(localStorage);
+
+  // 계정 메타데이터는 prefix 없이 저장 (공용)
+  const ACCOUNT_META_KEY = '__mochi_accounts__';
+  const SESSION_KEY = '__mochi_session__';
+
+  function getAccounts() {
+    try { return JSON.parse(_origGet(ACCOUNT_META_KEY) || '[]'); } catch(e) { return []; }
   }
-  window.loginWithGoogle = loginWithGoogle;
+  function saveAccounts(arr) { _origSet(ACCOUNT_META_KEY, JSON.stringify(arr)); }
 
-  function selectObChip(el) {
-    const group = el.dataset.group;
-    document.querySelectorAll(`.ob-chip[data-group="${group}"]`).forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
+  function userPrefix(uid) { return `u_${uid}_`; }
+
+  // 유저 데이터 접근 (현재 로그인된 유저 기준)
+  function uGet(key) { return _currentUserId ? _origGet(userPrefix(_currentUserId) + key) : _origGet(key); }
+  function uSet(key, val) { return _currentUserId ? _origSet(userPrefix(_currentUserId) + key, val) : _origSet(key, val); }
+  function uRemove(key) { return _currentUserId ? _origRem(userPrefix(_currentUserId) + key) : _origRem(key); }
+
+  // localStorage 전역 오버라이드 (로그인 후 앱 코드가 자동으로 유저별 저장)
+  function activateUserStorage(uid) {
+    _currentUserId = uid;
+    localStorage.getItem = (key) => {
+      // 공용 키는 그대로
+      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origGet(key);
+      return _origGet(userPrefix(uid) + key);
+    };
+    localStorage.setItem = (key, val) => {
+      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origSet(key, val);
+      return _origSet(userPrefix(uid) + key, val);
+    };
+    localStorage.removeItem = (key) => {
+      if (key.startsWith('__mochi_') || key.startsWith('u_')) return _origRem(key);
+      return _origRem(userPrefix(uid) + key);
+    };
   }
-  window.selectObChip = selectObChip;
 
-  function obNext(step) {
-    if (step === 0) {
-      const nick = document.getElementById('nickname-input').value.trim();
-      const errEl = document.getElementById('nickname-error');
-      errEl.style.display = 'none';
-      if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
-      if (nick.length > 12) { errEl.textContent = '12자 이내로 입력해주세요'; errEl.style.display = 'block'; return; }
-    }
-    document.getElementById(`ob-step-${step}`).style.display = 'none';
-    document.getElementById(`ob-step-${step+1}`).style.display = 'flex';
-    document.getElementById(`ob-dot-${step+1}`).style.background = 'var(--purple)';
-  }
-  window.obNext = obNext;
-
-  function obBack(step) {
-    document.getElementById(`ob-step-${step}`).style.display = 'none';
-    document.getElementById(`ob-step-${step-1}`).style.display = 'flex';
-    document.getElementById(`ob-dot-${step}`).style.background = 'var(--border)';
-  }
-  window.obBack = obBack;
-
-  async function saveNickname() {
-    const nick = document.getElementById('nickname-input').value.trim();
-    const errEl = document.getElementById('nickname-error');
+  // 계정 생성
+  function createAccount() {
+    const name = document.getElementById('ca-name').value.trim();
+    const pw = document.getElementById('ca-pw').value;
+    const pw2 = document.getElementById('ca-pw2').value;
+    const errEl = document.getElementById('ca-error');
     errEl.style.display = 'none';
-    if (!nick) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
 
-    const { data: existing } = await sb.from('profiles').select('id').eq('nickname', nick).maybeSingle();
-    if (existing) { errEl.textContent = '이미 사용 중인 닉네임이에요'; errEl.style.display = 'block'; return; }
+    if (!name) { errEl.textContent = '닉네임을 입력해주세요'; errEl.style.display = 'block'; return; }
+    if (pw.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 해요'; errEl.style.display = 'block'; return; }
+    if (!/[a-zA-Z]/.test(pw)) { errEl.textContent = '영문자를 포함해주세요'; errEl.style.display = 'block'; return; }
+    if (!/[0-9]/.test(pw)) { errEl.textContent = '숫자를 포함해주세요'; errEl.style.display = 'block'; return; }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) { errEl.textContent = '특수문자를 포함해주세요 (예: !@#$)'; errEl.style.display = 'block'; return; }
+    if (pw !== pw2) { errEl.textContent = '비밀번호가 일치하지 않아요'; errEl.style.display = 'block'; return; }
 
-    const gender = document.querySelector('.ob-chip[data-group="gender"].selected')?.dataset.val || '';
-    const age_group = document.querySelector('.ob-chip[data-group="age"].selected')?.dataset.val || '';
-    const location = document.getElementById('ob-location')?.value.trim() || '';
-    const sleep_time = document.getElementById('ob-sleep')?.value || '23:00';
-    const wake_time = document.getElementById('ob-wake')?.value || '07:00';
+    const accounts = getAccounts();
+    if (accounts.find(a => a.name === name)) { errEl.textContent = '이미 있는 닉네임이에요'; errEl.style.display = 'block'; return; }
+
+    const uid = Date.now().toString(36);
     const avatars = ['🐰','🐱','🐻','🦊','🐼','🐸','🐨','🦁'];
     const avatar = avatars[Math.floor(Math.random() * avatars.length)];
-
-    const { error } = await sb.from('profiles').insert({ id: _currentUser.id, nickname: nick, avatar, gender, age_group, location, sleep_time, wake_time });
-    if (error) { errEl.textContent = '저장 실패: ' + error.message; errEl.style.display = 'block'; return; }
-
-    localStorage.setItem('profile_gender', gender);
-    localStorage.setItem('profile_age', age_group);
-    localStorage.setItem('profile_location', location);
-    localStorage.setItem('goal_sleep_time', sleep_time);
-    localStorage.setItem('goal_wake_time', wake_time);
-
-    document.getElementById('nickname-screen').style.display = 'none';
-    enterApp(nick, true);
+    accounts.push({ uid, name, pw, avatar, createdAt: new Date().toISOString() });
+    saveAccounts(accounts);
+    loginUser(uid, name, avatar, true);
   }
-  window.saveNickname = saveNickname;
 
-  async function enterApp(nickname, isNew = false) {
-    const splash = document.getElementById('splash');
-    if (splash) splash.remove();
+  // 비밀번호 표시 토글
+  function toggleCaPw() {
+    const inp = document.getElementById('ca-pw');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+  function togglePinVisibility() {
+    const inp = document.getElementById('pin-input');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+  window.toggleCaPw = toggleCaPw;
+  window.togglePinVisibility = togglePinVisibility;
+
+  // 로그인
+  function loginUser(uid, name, avatar, isNew = false) {
+    activateUserStorage(uid);
+    _origSet(SESSION_KEY, uid);
+
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('nickname-screen').style.display = 'none';
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('create-account-screen').style.display = 'none';
     document.getElementById('app-wrapper').style.display = 'block';
 
-    localStorage.setItem('mochi_user_name', nickname);
-    if (typeof updateUserName === 'function') updateUserName(nickname);
-    const ni = document.getElementById('setting-name');
-    if (ni) ni.value = nickname;
+    // 로그아웃 버튼 업데이트
     const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) logoutBtn.textContent = `${nickname} · 로그아웃`;
+    if (logoutBtn) logoutBtn.innerHTML = `${avatar} ${name} · <span style="color:#e05">로그아웃</span>`;
 
-    if (!isNew && _currentUser) {
-      const { data: prof } = await sb.from('profiles').select('*').eq('id', _currentUser.id).maybeSingle();
-      if (prof) {
-        if (prof.gender) localStorage.setItem('profile_gender', prof.gender);
-        if (prof.age_group) localStorage.setItem('profile_age', prof.age_group);
-        if (prof.location) localStorage.setItem('profile_location', prof.location);
-        if (prof.sleep_time) localStorage.setItem('goal_sleep_time', prof.sleep_time);
-        if (prof.wake_time) localStorage.setItem('goal_wake_time', prof.wake_time);
+    // 닉네임 동기화
+    if (!localStorage.getItem('mochi_user_name')) {
+      localStorage.setItem('mochi_user_name', name);
+    }
+    if (typeof updateUserName === 'function') {
+      updateUserName(localStorage.getItem('mochi_user_name') || name);
+    }
+
+    // 새 계정이면 튜토리얼, 아니면 앱 초기화
+    if (isNew) {
+      localStorage.setItem('mochi_user_name', name);
+      if (typeof renderTutSlides === 'function') {
+        tutStep = 0;
+        document.getElementById('tutorial-overlay').style.display = 'block';
+        setTimeout(renderTutSlides, 100);
       }
     }
 
-    if (isNew) {
-      const tutEl = document.getElementById('tutorial-overlay');
-      if (tutEl) { tutEl.style.display = 'block'; if (typeof renderTutSlides === 'function') setTimeout(renderTutSlides, 100); }
-    }
-
+    // 앱 데이터 초기화
     if (typeof loadBasicProfile === 'function') setTimeout(loadBasicProfile, 100);
     if (typeof loadProfile === 'function') setTimeout(loadProfile, 120);
-    setTimeout(() => {
-      if (typeof loadToday === 'function') {
-        loadToday().then(() => renderWeeklyProgress());
-      } else {
-        renderWeeklyProgress();
-      }
-    }, 200);
+    if (typeof renderTags === 'function') setTimeout(renderTags, 150);
+    if (typeof loadToday === 'function') setTimeout(loadToday, 200);
+    const settingsNameEl = document.getElementById('setting-name');
+    if (settingsNameEl) settingsNameEl.value = localStorage.getItem('mochi_user_name') || name;
   }
 
-  async function logout() {
+  // 로그아웃
+  function logout() {
     if (!confirm('로그아웃 할까요?')) return;
-    await sb.auth.signOut();
-    _currentUser = null;
+    _origRem(SESSION_KEY);
+    _currentUserId = null;
+    // storage 원복
+    localStorage.getItem = _origGet;
+    localStorage.setItem = _origSet;
+    localStorage.removeItem = _origRem;
     document.getElementById('app-wrapper').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'block';
+    showLoginScreen();
   }
+  function resetAllData() {
+    if (!confirm('정말로 모든 데이터를 삭제할까요?\n할 일, 일기, 아이디어, 프로필이 전부 지워져요.')) return;
+    if (!_currentUserId) return;
+    const prefix = userPrefix(_currentUserId);
+    const keysToDelete = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = _origGet === localStorage.getItem ? localStorage.key(i) : (() => {
+        // 원본 접근
+        for (let j = 0; j < localStorage.length; j++) {
+          const raw = Object.keys(localStorage)[j];
+          return raw;
+        }
+      })();
+    }
+    // 원본 localStorage에서 현재 유저 prefix 키 전부 삭제
+    const allKeys = Object.keys(localStorage);
+    allKeys.forEach(k => { if (k.startsWith(prefix)) _origRem(k); });
+    // 메모리 상 todos/ideas 초기화
+    todos = []; nextId = 1;
+    ideas = []; nextIdeaId = 1;
+    // UI 갱신
+    if (typeof renderTodoList === 'function') renderTodoList();
+    if (typeof renderIdeas === 'function') renderIdeas();
+    if (typeof renderWeeklyProgress === 'function') renderWeeklyProgress();
+    if (typeof loadProfile === 'function') loadProfile();
+    if (typeof loadBasicProfile === 'function') loadBasicProfile();
+    ['profile-job','profile-goal','profile-interest','profile-memo'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.querySelectorAll('#gender-btns .profile-chip, #age-btns .profile-chip').forEach(b => b.classList.remove('selected'));
+    const locEl = document.getElementById('profile-location'); if (locEl) locEl.value = '';
+    if (typeof renderLearnedProfile === 'function') renderLearnedProfile();
+    alert('✅ 초기화 완료! 깨끗하게 시작해요 🐰');
+  }
+  window.resetAllData = resetAllData;
+
   window.logout = logout;
 
-  function clearLocalCache() {
-    if (!confirm('로컬 캐시를 초기화할까요?\n(Supabase에 저장된 데이터는 유지돼요)')) return;
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('mochi_')) keysToRemove.push(key);
-    }
-    keysToRemove.forEach(k => localStorage.removeItem(k));
-    alert(`캐시 ${keysToRemove.length}개 삭제됐어요. 새로고침할게요!`);
-    location.reload();
-  }
-  window.clearLocalCache = clearLocalCache;
+  // 계정 선택 화면
+  function showLoginScreen() {
+    const accounts = getAccounts();
+    const listEl = document.getElementById('account-list');
+    listEl.innerHTML = '';
 
-  // ── 앱 시작: 세션 확인 ──
-  (async function initAuth() {
-    document.body.insertAdjacentHTML('beforeend', `
-      <div id="splash" style="position:fixed;inset:0;background:var(--theme-bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-        <div style="font-size:52px;animation:floatY 1.5s ease-in-out infinite;">🐰</div>
-        <div style="font-size:14px;color:var(--text-light);margin-top:12px;">모찌 불러오는 중...</div>
-      </div>
-    `);
-
-    let splashHidden = false;
-    const hideSplash = () => {
-      if (splashHidden) return;
-      splashHidden = true;
-      const s = document.getElementById('splash');
-      if (s) s.remove();
-    };
-
-    // onAuthStateChange를 먼저 등록 (리다이렉트 직후 이벤트를 놓치지 않기 위해)
-    sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        if (_currentUser && _currentUser.id === session.user.id) return; // 이미 처리됨
-        _currentUser = session.user;
-        const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
-        hideSplash();
-        if (profile) { enterApp(profile.nickname, false); }
-        else {
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('nickname-screen').style.display = 'block';
-        }
-      } else if (event === 'SIGNED_OUT') {
-        _currentUser = null;
-        hideSplash();
-        document.getElementById('app-wrapper').style.display = 'none';
-        document.getElementById('login-screen').style.display = 'block';
-      }
-    });
-
-    // getSession으로 기존 세션 체크 (이미 onAuthStateChange가 잡으면 중복 방지)
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      if (!_currentUser) {
-        _currentUser = session.user;
-        const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
-        hideSplash();
-        if (profile) { enterApp(profile.nickname, false); }
-        else { document.getElementById('nickname-screen').style.display = 'block'; }
-      }
+    if (accounts.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-light); font-size:13px;">아직 계정이 없어요<br>아래 버튼으로 만들어보세요 🐰</div>`;
     } else {
-      // 세션 없음 — onAuthStateChange에서 SIGNED_IN이 오지 않으면 로그인 화면
-      setTimeout(() => {
-        if (!_currentUser) {
-          hideSplash();
-          document.getElementById('login-screen').style.display = 'block';
-        }
-      }, 1500); // 리다이렉트 직후 토큰 파싱 시간 여유
+      accounts.forEach(acc => {
+        const btn = document.createElement('div');
+        btn.style.cssText = 'display:flex;align-items:center;gap:14px;padding:16px 18px;background:white;border-radius:16px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.05);';
+        btn.innerHTML = `
+          <div style="font-size:32px;">${acc.avatar}</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;color:var(--text);">${acc.name}</div>
+            <div style="font-size:11px;color:var(--text-light);margin-top:2px;">가입일 ${acc.createdAt?.slice(0,10)||''}</div>
+          </div>
+          <div style="font-size:20px;color:var(--text-light);">›</div>
+        `;
+        btn.onmouseenter = () => btn.style.borderColor = 'var(--purple)';
+        btn.onmouseleave = () => btn.style.borderColor = 'var(--border)';
+        btn.onclick = () => showPinScreen(acc);
+        listEl.appendChild(btn);
+      });
     }
+
+    document.getElementById('login-screen').style.display = 'block';
+    document.getElementById('create-account-screen').style.display = 'none';
+    document.getElementById('pin-screen').style.display = 'none';
+  }
+
+  // 비밀번호 확인
+  let _pinTarget = null;
+
+  function showPinScreen(acc) {
+    _pinTarget = acc;
+    document.getElementById('pin-avatar').textContent = acc.avatar;
+    document.getElementById('pin-name').textContent = acc.name;
+    document.getElementById('pin-error').style.display = 'none';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-input').type = 'password';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('pin-screen').style.display = 'block';
+    setTimeout(() => document.getElementById('pin-input').focus(), 200);
+  }
+
+  function checkPin() {
+    const entered = document.getElementById('pin-input').value;
+    if (entered === _pinTarget.pw) {
+      loginUser(_pinTarget.uid, _pinTarget.name, _pinTarget.avatar);
+    } else {
+      const errEl = document.getElementById('pin-error');
+      errEl.style.display = 'block';
+      const inp = document.getElementById('pin-input');
+      inp.style.borderColor = '#e05';
+      setTimeout(() => { inp.style.borderColor = ''; inp.value = ''; inp.focus(); }, 800);
+    }
+  }
+  window.checkPin = checkPin;
+
+  function showCreateAccount() {
+    document.getElementById('ca-name').value = '';
+    document.getElementById('ca-pw').value = '';
+    document.getElementById('ca-pw2').value = '';
+    document.getElementById('ca-error').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('create-account-screen').style.display = 'block';
+    setTimeout(() => document.getElementById('ca-name').focus(), 200);
+  }
+
+  function hideCreateAccount() {
+    document.getElementById('create-account-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'block';
+  }
+
+  window.showCreateAccount = showCreateAccount;
+  window.hideCreateAccount = hideCreateAccount;
+  window.createAccount = createAccount;
+
+  // ── 앱 시작: 세션 복원 or 로그인 화면 ──
+  (function initAuth() {
+    const savedUid = _origGet(SESSION_KEY);
+    if (savedUid) {
+      const accounts = getAccounts();
+      const acc = accounts.find(a => a.uid === savedUid);
+      if (acc) {
+        loginUser(acc.uid, acc.name, acc.avatar);
+        return;
+      }
+    }
+    showLoginScreen();
   })();
 
 </script>
