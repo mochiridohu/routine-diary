@@ -2374,7 +2374,15 @@ ${recentMsgs}
     document.getElementById('diary-next-btn').style.opacity = diaryOffset >= 0 ? '0.3' : '1';
     document.getElementById('diary-next-btn').disabled = diaryOffset >= 0;
 
-    const raw = localStorage.getItem(diaryKey(diaryOffset));
+    // viewingDate가 있으면 그 날짜의 키 사용, 없으면 diaryOffset 기준
+    let storageKey;
+    if (viewingDate) {
+      const { y, m, d } = viewingDate;
+      storageKey = `diary_${y}_${m+1}_${d}`;
+    } else {
+      storageKey = diaryKey(diaryOffset);
+    }
+    const raw = localStorage.getItem(storageKey);
     const writeMode = document.getElementById('diary-write-mode');
     const viewMode = document.getElementById('diary-view-mode');
     const editBtn = document.getElementById('diary-edit-btn');
@@ -2427,12 +2435,22 @@ ${recentMsgs}
     const moodLabel = moodBtn ? (moodLabels[moodBtn.dataset.mood] || '') : '';
 
     const diaryData = { text, emotion, emotionLabel, mood: moodEmoji, moodLabel, savedAt: new Date().toISOString() };
-    localStorage.setItem(diaryKey(diaryOffset), JSON.stringify(diaryData));
+
+    // viewingDate가 있으면 그 날짜 키에 저장, 없으면 diaryOffset 기준
+    let targetKey, dateStr;
+    if (viewingDate) {
+      const { y, m, d } = viewingDate;
+      targetKey = `diary_${y}_${m+1}_${d}`;
+      dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    } else {
+      targetKey = diaryKey(diaryOffset);
+      const dObj = new Date(); dObj.setDate(dObj.getDate() + diaryOffset);
+      dateStr = `${dObj.getFullYear()}-${String(dObj.getMonth()+1).padStart(2,'0')}-${String(dObj.getDate()).padStart(2,'0')}`;
+    }
+    localStorage.setItem(targetKey, JSON.stringify(diaryData));
 
     // Supabase 저장
     if (_currentUser) {
-      const d = new Date(); d.setDate(d.getDate() + diaryOffset);
-      const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const emotionJson = JSON.stringify({ emoji: emotion, label: emotionLabel });
       await sb.from('diaries').upsert(
         { user_id: _currentUser.id, date: dateStr, content: text, emotion: emotionJson },
@@ -2483,8 +2501,15 @@ ${recentMsgs}
     document.getElementById('diary-view-mode').style.display = 'none';
     document.getElementById('diary-write-mode').style.display = 'block';
     document.getElementById('diary-edit-btn').style.display = 'none';
-    // 저장된 감정 복원
-    const raw = localStorage.getItem(diaryKey(diaryOffset));
+    // 저장된 감정 복원 (viewingDate 기준)
+    let storageKey;
+    if (viewingDate) {
+      const { y, m, d } = viewingDate;
+      storageKey = `diary_${y}_${m+1}_${d}`;
+    } else {
+      storageKey = diaryKey(diaryOffset);
+    }
+    const raw = localStorage.getItem(storageKey);
     if (raw) {
       try {
         const data = JSON.parse(raw);
@@ -2766,8 +2791,12 @@ ${recentMsgs}
 
   function renderWeeklyProgress() {
     const n = new Date();
-    const base = viewingDate
-      ? new Date(viewingDate.y, viewingDate.m, viewingDate.d)
+    // 호출 시점의 상태를 스냅샷으로 고정 (비동기 완료 후에도 이 값 사용)
+    const _viewingDate = viewingDate;
+    const _todosSnapshot = todos.slice();
+
+    const base = _viewingDate
+      ? new Date(_viewingDate.y, _viewingDate.m, _viewingDate.d)
       : new Date();
     const dow = base.getDay();
     const mondayOffset = dow === 0 ? -6 : 1 - dow;
@@ -2803,18 +2832,16 @@ ${recentMsgs}
         const nMidnight = new Date(n.getFullYear(), n.getMonth(), n.getDate());
         const isFuture = dMidnight > nMidnight;
 
-        // 현재 보고 있는 날(baseDay)이고 오늘과 같은 날일 때만 메모리 todos 사용
-        // 다른 날짜를 보고 있을 때는 DB/localStorage 데이터를 사용해야 정확함
+        // 스냅샷된 viewingDate 기준으로 판단
         let dayTodos;
         if (isBaseDay && isToday) {
-          // 오늘을 보고 있을 때: 메모리 todos가 가장 최신
-          dayTodos = todos;
-        } else if (isBaseDay && weekTodosMap[dateKey] && weekTodosMap[dateKey].length > 0) {
-          // 다른 날짜를 보고 있을 때: DB/localStorage 데이터 우선
-          dayTodos = weekTodosMap[dateKey];
+          // 오늘을 보고 있을 때: 스냅샷 todos가 가장 최신
+          dayTodos = _todosSnapshot;
         } else if (isBaseDay) {
-          // DB 데이터가 없으면 메모리 todos 사용 (openDaylog에서 이미 로드됨)
-          dayTodos = todos;
+          // 다른 날짜를 보고 있을 때: DB/localStorage 데이터 우선, 없으면 스냅샷
+          dayTodos = (weekTodosMap[dateKey] && weekTodosMap[dateKey].length > 0)
+            ? weekTodosMap[dateKey]
+            : _todosSnapshot;
         } else {
           dayTodos = weekTodosMap[dateKey] || [];
         }
@@ -3396,16 +3423,20 @@ ${diaryText}`
     // ① progress bar 업데이트
     _origUpdateProgress();
 
-    // ② 저장 먼저 (localStorage에 최신 상태 기록)
+    // ② 저장 (viewingDate 여부에 따라 올바른 날짜에 저장됨)
     saveToday();
 
-    // ③ 저장 후 주간 달성률 렌더
-    renderWeeklyProgress();
+    // ③ 저장 후 주간 달성률 렌더 (오늘 보고 있을 때만)
+    if (!viewingDate) {
+      renderWeeklyProgress();
+    }
 
-    // ④ 축하 애니메이션
-    const isDone = todos.length > 0 && todos.every(t => t.done);
-    if (isDone && !wasDone) {
-      launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
+    // ④ 축하 애니메이션 (오늘을 보고 있을 때만)
+    if (!viewingDate) {
+      const isDone = todos.length > 0 && todos.every(t => t.done);
+      if (isDone && !wasDone) {
+        launchConfetti('🎊', '오늘 할 일 다 완료!', `${getUserName() ? getUserName()+'씨 ' : ''}모찌가 너무 자랑스러워요 🐰✨`);
+      }
     }
   };
 
@@ -3951,6 +3982,7 @@ ${todoList}
   const _origSaveToday = saveToday;
   saveToday = function() {
     if (!viewingDate) { _origSaveToday(); return; }
+    // 다른 날짜 보는 중: localStorage만 업데이트 (오늘 데이터 건드리지 않음)
     const { y, m, d } = viewingDate;
     const existing = (() => { try { return JSON.parse(localStorage.getItem(viewingKey(y,m,d)) || '{}'); } catch(e) { return {}; } })();
     existing.todos = todos;
@@ -4107,29 +4139,54 @@ ${todoList}
         <div style="font-size:14px;color:var(--text-light);margin-top:12px;">모찌 불러오는 중...</div>
       </div>
     `);
-    const hideSplash = () => { const s = document.getElementById('splash'); if (s) s.remove(); };
 
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      _currentUser = session.user;
-      const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
-      hideSplash();
-      if (profile) { enterApp(profile.nickname, false); }
-      else { document.getElementById('nickname-screen').style.display = 'block'; }
-    } else {
-      hideSplash();
-      document.getElementById('login-screen').style.display = 'block';
-    }
+    let splashHidden = false;
+    const hideSplash = () => {
+      if (splashHidden) return;
+      splashHidden = true;
+      const s = document.getElementById('splash');
+      if (s) s.remove();
+    };
 
+    // onAuthStateChange를 먼저 등록 (리다이렉트 직후 이벤트를 놓치지 않기 위해)
     sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session && !_currentUser) {
+      if (event === 'SIGNED_IN' && session) {
+        if (_currentUser && _currentUser.id === session.user.id) return; // 이미 처리됨
         _currentUser = session.user;
         const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
         hideSplash();
         if (profile) { enterApp(profile.nickname, false); }
-        else { document.getElementById('login-screen').style.display = 'none'; document.getElementById('nickname-screen').style.display = 'block'; }
+        else {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('nickname-screen').style.display = 'block';
+        }
+      } else if (event === 'SIGNED_OUT') {
+        _currentUser = null;
+        hideSplash();
+        document.getElementById('app-wrapper').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
       }
     });
+
+    // getSession으로 기존 세션 체크 (이미 onAuthStateChange가 잡으면 중복 방지)
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      if (!_currentUser) {
+        _currentUser = session.user;
+        const { data: profile } = await sb.from('profiles').select('nickname').eq('id', _currentUser.id).maybeSingle();
+        hideSplash();
+        if (profile) { enterApp(profile.nickname, false); }
+        else { document.getElementById('nickname-screen').style.display = 'block'; }
+      }
+    } else {
+      // 세션 없음 — onAuthStateChange에서 SIGNED_IN이 오지 않으면 로그인 화면
+      setTimeout(() => {
+        if (!_currentUser) {
+          hideSplash();
+          document.getElementById('login-screen').style.display = 'block';
+        }
+      }, 1500); // 리다이렉트 직후 토큰 파싱 시간 여유
+    }
   })();
 
 </script>
